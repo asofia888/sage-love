@@ -1,0 +1,17 @@
+
+{
+  "name": "sages-love-ai-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Backend for the Sage's Love AI application.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@google/genai": "^1.7.0",
+    "@vercel/node": "^3.2.3"
+  }
+}
