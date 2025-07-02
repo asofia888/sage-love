@@ -9,11 +9,39 @@ interface ChatInputProps {
   isLoading: boolean;
 }
 
-// Simple inline SVG for loading spinner for button
-const ButtonLoadingSpinner: React.FC = () => (
-  <svg className="animate-spin ltr:-ml-1 ltr:mr-3 rtl:-mr-1 rtl:ml-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+// 送信アイコン（紙飛行機）
+const SendIcon: React.FC<{ className?: string }> = ({ className = "w-5 h-5" }) => (
+  <svg
+    className={className}
+    fill="currentColor"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+  </svg>
+);
+
+// 送信中のローディングスピナー
+const SendingSpinner: React.FC<{ className?: string }> = ({ className = "w-5 h-5" }) => (
+  <svg
+    className={`${className} animate-spin`}
+    fill="none"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <circle
+      className="opacity-25"
+      cx="12"
+      cy="12"
+      r="10"
+      stroke="currentColor"
+      strokeWidth="4"
+    />
+    <path
+      className="opacity-75"
+      fill="currentColor"
+      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+    />
   </svg>
 );
 
@@ -80,8 +108,8 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading }) => {
         </div>
       )}
       
-      <form onSubmit={handleSubmit} className="flex items-start space-x-2 rtl:space-x-reverse">
-        <div className="flex-grow relative">
+      <form onSubmit={handleSubmit} className="w-full">
+        <div className="relative">
           <textarea
             ref={textareaRef}
             value={inputValue}
@@ -89,43 +117,41 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading }) => {
             onKeyDown={handleKeyDown}
             placeholder={isVoiceInput ? '音声認識中...' : t('chatPlaceholder')}
             aria-label={t('chatPlaceholder')}
-            className={`w-full p-3 pr-12 border border-slate-600/70 rounded-lg bg-slate-800/60 text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none placeholder-slate-300 shadow-sm transition-colors duration-200 backdrop-blur-sm ${isVoiceInput ? 'bg-indigo-900/30 border-indigo-500/50' : ''}`}
+            className={`w-full p-3 pr-20 border border-slate-600/70 rounded-lg bg-slate-800/60 text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none placeholder-slate-300 shadow-sm transition-colors duration-200 backdrop-blur-sm ${isVoiceInput ? 'bg-indigo-900/30 border-indigo-500/50' : ''}`}
             rows={2}
             disabled={isLoading}
             style={{ minHeight: '3rem', maxHeight: '10rem' }}
           />
           
-          {/* 音声入力ボタン（テキストエリア内に配置） */}
-          <div className="absolute right-2 bottom-2">
+          {/* 右側のボタン群 */}
+          <div className="absolute right-2 bottom-2 flex items-center space-x-1">
+            {/* 音声入力ボタン */}
             <VoiceInputButton
               onTranscript={handleVoiceTranscript}
               onError={handleVoiceError}
               disabled={isLoading}
               className="bg-slate-700/50 hover:bg-slate-600/50 backdrop-blur-sm"
             />
+            
+            {/* 送信ボタン */}
+            <button
+              type="submit"
+              disabled={isLoading || !inputValue.trim()}
+              aria-label={isLoading ? t('sendingButton') : t('sendButton')}
+              className={`p-2 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-400 ${
+                isLoading || !inputValue.trim()
+                  ? 'bg-slate-600/50 text-slate-400 cursor-not-allowed'
+                  : 'bg-indigo-500 hover:bg-indigo-600 text-white shadow-md hover:shadow-lg'
+              }`}
+            >
+              {isLoading ? (
+                <SendingSpinner className="w-5 h-5" />
+              ) : (
+                <SendIcon className="w-5 h-5" />
+              )}
+            </button>
           </div>
         </div>
-        
-        <button
-          type="submit"
-          disabled={isLoading || !inputValue.trim()}
-          aria-label={isLoading ? t('sendingButton') : t('sendButton')}
-          className="px-6 py-3 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 text-white font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-opacity-75 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 ease-in-out flex items-center justify-center h-[3rem] min-h-[3rem]"
-        >
-        {isLoading ? (
-          <>
-            <ButtonLoadingSpinner />
-            {t('sendingButton')}
-          </>
-        ) : (
-          <>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 ltr:mr-2 rtl:ml-2 rtl:transform rtl:scale-x-[-1]" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
-            </svg>
-            {t('sendButton')}
-          </>
-        )}
-        </button>
       </form>
     </div>
   );
