@@ -131,7 +131,7 @@ const App: React.FC = () => {
               <h1 className="text-xl sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-sky-400 to-indigo-500">
                 {t('appName')}
               </h1>
-              <p className="text-xs sm:text-sm text-slate-400">{t('appSubtitle')}</p>
+              <p className="text-xs sm:text-sm text-slate-200">{t('appSubtitle')}</p>
             </div>
             <div className="mt-2 sm:mt-0 flex items-center space-x-2 rtl:space-x-reverse sm:flex-1 sm:justify-end">
               <HelpButton onClick={() => setIsHelpOpen(true)} />
@@ -171,7 +171,7 @@ const App: React.FC = () => {
               />
             )}
             <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
-            <div className="text-center mt-3 text-xs text-slate-400 flex flex-wrap justify-center items-center gap-x-4 gap-y-1">
+            <div className="text-center mt-3 text-xs text-slate-200 flex flex-wrap justify-center items-center gap-x-4 gap-y-1">
               <p>
                 {t('buyMeACoffeeText')}{' '}
                 <a 
@@ -184,7 +184,7 @@ const App: React.FC = () => {
                   {t('buyMeACoffeeButton')}
                 </a>
               </p>
-              <p className="text-slate-500">
+              <p className="text-slate-300">
                 <button
                   onClick={() => setIsDisclaimerOpen(true)}
                   className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1"
