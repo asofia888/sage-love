@@ -36,6 +36,13 @@ const App: React.FC = () => {
   const [messages, setMessages, clearChat] = useChatHistory(i18n.isInitialized);
 
 
+  // 翻訳サービスの初期化
+  useEffect(() => {
+    // 環境変数からAPI Keyを取得（実際の実装では適切な方法で）
+    const apiKey = process.env.REACT_APP_GEMINI_API_KEY || 'demo-key';
+    geminiService.initializeTranslationService(apiKey);
+  }, []);
+
   // Effect to update html lang, dir, and OGP url attributes for RTL/sharing support
   useEffect(() => {
     const currentLang = i18n.language.split('-')[0];
@@ -94,7 +101,13 @@ const App: React.FC = () => {
 
     try {
         const systemInstruction = t('systemInstructionForSage');
-        const stream = geminiService.streamChat(userInput, historyForApi, systemInstruction);
+        const currentLang = i18n.language.split('-')[0];
+        const stream = geminiService.streamChatWithTranslation(
+            userInput, 
+            historyForApi, 
+            systemInstruction,
+            currentLang
+        );
         
         let fullText = '';
         for await (const chunk of stream) {
