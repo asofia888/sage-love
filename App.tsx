@@ -134,10 +134,12 @@ const App: React.FC = () => {
         <footer className="p-4 bg-slate-800/50 backdrop-blur-md shadow-up sticky bottom-0 z-10">
           <div className="container mx-auto max-w-4xl">
             {messages.length === 0 && !isLoading && (
-              <PromptSuggestions
-                onSelectPrompt={handleSendMessage}
-                textSize={textSize}
-              />
+              <div className="hidden sm:block">
+                <PromptSuggestions
+                  onSelectPrompt={handleSendMessage}
+                  textSize={textSize}
+                />
+              </div>
             )}
             <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
             <div className="text-center mt-3 text-xs text-slate-200">
