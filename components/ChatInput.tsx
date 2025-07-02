@@ -1,7 +1,8 @@
 
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import VoiceInputButton from './VoiceInputButton';
 
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
@@ -19,6 +20,9 @@ const ButtonLoadingSpinner: React.FC = () => (
 const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading }) => {
   const { t } = useTranslation();
   const [inputValue, setInputValue] = useState('');
+  const [isVoiceInput, setIsVoiceInput] = useState(false);
+  const [voiceError, setVoiceError] = useState<string | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,25 +39,79 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading }) => {
     }
   };
 
+  const handleVoiceTranscript = (transcript: string, isFinal: boolean) => {
+    setVoiceError(null);
+    
+    if (isFinal) {
+      // 最終的な認識結果
+      setInputValue(prev => {
+        const newValue = prev.trim() ? `${prev} ${transcript}` : transcript;
+        return newValue;
+      });
+      setIsVoiceInput(false);
+      
+      // フォーカスをテキストエリアに戻す
+      setTimeout(() => {
+        textareaRef.current?.focus();
+      }, 100);
+    } else {
+      // 中間的な認識結果（リアルタイム表示）
+      setIsVoiceInput(true);
+      // 中間結果は inputValue に直接は反映せず、プレースホルダー的に表示
+    }
+  };
+
+  const handleVoiceError = (error: string) => {
+    setVoiceError(error);
+    setIsVoiceInput(false);
+    
+    // エラーメッセージを3秒後に自動で消去
+    setTimeout(() => {
+      setVoiceError(null);
+    }, 3000);
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="flex items-start space-x-2 rtl:space-x-reverse">
-      <textarea
-        value={inputValue}
-        onChange={e => setInputValue(e.target.value)}
-        onKeyDown={handleKeyDown}
-        placeholder={t('chatPlaceholder')}
-        aria-label={t('chatPlaceholder')}
-        className="flex-grow p-3 border border-slate-600/70 rounded-lg bg-slate-800/60 text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none placeholder-slate-300 shadow-sm transition-colors duration-200 backdrop-blur-sm"
-        rows={2}
-        disabled={isLoading}
-        style={{ minHeight: '3rem', maxHeight: '10rem' }}
-      />
-      <button
-        type="submit"
-        disabled={isLoading || !inputValue.trim()}
-        aria-label={isLoading ? t('sendingButton') : t('sendButton')}
-        className="px-6 py-3 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 text-white font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-opacity-75 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 ease-in-out flex items-center justify-center h-[3rem] min-h-[3rem]"
-      >
+    <div className="space-y-2">
+      {/* エラーメッセージ表示 */}
+      {voiceError && (
+        <div className="px-3 py-2 bg-red-500/20 border border-red-500/30 rounded-lg text-red-300 text-sm">
+          {voiceError}
+        </div>
+      )}
+      
+      <form onSubmit={handleSubmit} className="flex items-start space-x-2 rtl:space-x-reverse">
+        <div className="flex-grow relative">
+          <textarea
+            ref={textareaRef}
+            value={inputValue}
+            onChange={e => setInputValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={isVoiceInput ? '音声認識中...' : t('chatPlaceholder')}
+            aria-label={t('chatPlaceholder')}
+            className={`w-full p-3 pr-12 border border-slate-600/70 rounded-lg bg-slate-800/60 text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none placeholder-slate-300 shadow-sm transition-colors duration-200 backdrop-blur-sm ${isVoiceInput ? 'bg-indigo-900/30 border-indigo-500/50' : ''}`}
+            rows={2}
+            disabled={isLoading}
+            style={{ minHeight: '3rem', maxHeight: '10rem' }}
+          />
+          
+          {/* 音声入力ボタン（テキストエリア内に配置） */}
+          <div className="absolute right-2 bottom-2">
+            <VoiceInputButton
+              onTranscript={handleVoiceTranscript}
+              onError={handleVoiceError}
+              disabled={isLoading}
+              className="bg-slate-700/50 hover:bg-slate-600/50 backdrop-blur-sm"
+            />
+          </div>
+        </div>
+        
+        <button
+          type="submit"
+          disabled={isLoading || !inputValue.trim()}
+          aria-label={isLoading ? t('sendingButton') : t('sendButton')}
+          className="px-6 py-3 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 text-white font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-opacity-75 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 ease-in-out flex items-center justify-center h-[3rem] min-h-[3rem]"
+        >
         {isLoading ? (
           <>
             <ButtonLoadingSpinner />
@@ -67,8 +125,9 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading }) => {
             {t('sendButton')}
           </>
         )}
-      </button>
-    </form>
+        </button>
+      </form>
+    </div>
   );
 };
 
