@@ -147,14 +147,14 @@ const App: React.FC = () => {
             <div className="text-center mt-3 text-xs text-slate-200">
               {/* Mobile: Vertical layout */}
               <div className="sm:hidden">
-                <div className="mb-3 bg-gradient-to-r from-sky-500/10 to-indigo-500/10 border border-sky-500/20 rounded-lg px-3 py-2 mx-4">
-                  <p className="text-center text-sm">
+                <div className="mb-2">
+                  <p>
                     {t('buyMeACoffeeText')}{' '}
                     <a 
                       href="https://buymeacoffee.com/asofia" 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="font-semibold text-sky-400 hover:text-sky-300 underline decoration-2 underline-offset-2 transition-colors"
+                      className="font-semibold text-sky-400 hover:text-sky-300 underline transition-colors"
                       aria-label={t('buyMeACoffeeButtonAria')}
                     >
                       {t('buyMeACoffeeButton')}
