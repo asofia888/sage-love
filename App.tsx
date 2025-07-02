@@ -143,17 +143,19 @@ const App: React.FC = () => {
           </div>
         </header>
 
-        <main className="flex-grow overflow-y-auto p-4 space-y-4 bg-transparent">
-          {messages.length === 0 && <WelcomeMessage textSize={textSize} />}
-          {messages.map(msg => (
-            <ChatMessageDisplay
-              key={msg.id}
-              message={msg}
-              currentLang={i18n.language}
-              textSize={textSize}
-            />
-          ))}
-          <div ref={messagesEndRef} />
+        <main className="flex-grow overflow-y-auto p-4 bg-transparent">
+          <div className="container mx-auto max-w-4xl space-y-4">
+            {messages.length === 0 && <WelcomeMessage textSize={textSize} />}
+            {messages.map(msg => (
+              <ChatMessageDisplay
+                key={msg.id}
+                message={msg}
+                currentLang={i18n.language}
+                textSize={textSize}
+              />
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
         </main>
 
         {error && (
@@ -163,7 +165,7 @@ const App: React.FC = () => {
         )}
 
         <footer className="p-4 bg-slate-800/50 backdrop-blur-md shadow-up sticky bottom-0 z-10">
-          <div className="container mx-auto">
+          <div className="container mx-auto max-w-4xl">
             {messages.length === 0 && !isLoading && (
               <PromptSuggestions
                 onSelectPrompt={handleSendMessage}
