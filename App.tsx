@@ -7,16 +7,18 @@ import ChatInput from './components/ChatInput';
 import ChatMessageDisplay from './components/ChatMessageDisplay';
 import TextSizeSelector from './components/TextSizeSelector';
 import PromptSuggestions from './components/PromptSuggestions';
-import DisclaimerModal from './components/DisclaimerModal';
 import LanguageSelector from './components/LanguageSelector';
 import ClearChatButton from './components/ClearChatButton';
 import ShareButton from './components/ShareButton';
 import WelcomeMessage from './components/WelcomeMessage';
-import ConfirmationModal from './components/ConfirmationModal';
-import HelpModal from './components/HelpModal';
 import HelpButton from './components/HelpButton';
-import CrisisInterventionModal from './components/CrisisInterventionModal';
-import PrivacyPolicyModal from './components/PrivacyPolicyModal';
+
+// Lazy load modal components
+const DisclaimerModal = React.lazy(() => import('./components/DisclaimerModal'));
+const ConfirmationModal = React.lazy(() => import('./components/ConfirmationModal'));
+const HelpModal = React.lazy(() => import('./components/HelpModal'));
+const CrisisInterventionModal = React.lazy(() => import('./components/CrisisInterventionModal'));
+const PrivacyPolicyModal = React.lazy(() => import('./components/PrivacyPolicyModal'));
 import { useChatHistory } from './hooks/useChatHistory';
 import { useTextSize } from './hooks/useTextSize';
 import { useMessageHandler } from './hooks/useMessageHandler';
@@ -205,30 +207,32 @@ const App: React.FC = () => {
           </div>
         </footer>
       </div>
-      <DisclaimerModal isOpen={isDisclaimerOpen} onClose={() => setIsDisclaimerOpen(false)} />
-      <PrivacyPolicyModal isOpen={isPrivacyPolicyOpen} onClose={() => setIsPrivacyPolicyOpen(false)} />
-      <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
-      <ConfirmationModal
-        isOpen={isClearConfirmOpen}
-        onClose={() => setIsClearConfirmOpen(false)}
-        onConfirm={confirmClearChat}
-        title={t('confirmClearTitle')}
-        confirmText={t('confirmClearButton')}
-        cancelText={t('cancelButton')}
-      >
-        <p>{t('confirmClearText')}</p>
-      </ConfirmationModal>
-      
-      {/* Crisis Intervention Modal */}
-      {lastCrisisResult && (
-        <CrisisInterventionModal
-          isOpen={isCrisisModalOpen}
-          onClose={closeCrisisModal}
-          crisisResult={lastCrisisResult}
-          userLanguage={i18n.language}
-          userCountry={navigator.language.split('-')[1] || 'JP'}
-        />
-      )}
+      <React.Suspense fallback={<div />}>
+        <DisclaimerModal isOpen={isDisclaimerOpen} onClose={() => setIsDisclaimerOpen(false)} />
+        <PrivacyPolicyModal isOpen={isPrivacyPolicyOpen} onClose={() => setIsPrivacyPolicyOpen(false)} />
+        <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
+        <ConfirmationModal
+          isOpen={isClearConfirmOpen}
+          onClose={() => setIsClearConfirmOpen(false)}
+          onConfirm={confirmClearChat}
+          title={t('confirmClearTitle')}
+          confirmText={t('confirmClearButton')}
+          cancelText={t('cancelButton')}
+        >
+          <p>{t('confirmClearText')}</p>
+        </ConfirmationModal>
+        
+        {/* Crisis Intervention Modal */}
+        {lastCrisisResult && (
+          <CrisisInterventionModal
+            isOpen={isCrisisModalOpen}
+            onClose={closeCrisisModal}
+            crisisResult={lastCrisisResult}
+            userLanguage={i18n.language}
+            userCountry={navigator.language.split('-')[1] || 'JP'}
+          />
+        )}
+      </React.Suspense>
     </>
   );
 };
