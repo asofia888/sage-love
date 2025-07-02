@@ -41,7 +41,8 @@ export class EnhancedTranslationService {
   async translateAIResponse(
     text: string,
     targetLang: string,
-    context: TranslationContext
+    context: TranslationContext,
+    previousResponses: string[] = []
   ): Promise<string> {
     if (targetLang === 'ja') {
       return text; // 日本語はそのまま返す
@@ -55,14 +56,14 @@ export class EnhancedTranslationService {
     }
 
     try {
-      const enhancedPrompt = this.buildTranslationPrompt(text, targetLang, context);
+      const enhancedPrompt = this.buildTranslationPrompt(text, targetLang, context, previousResponses);
       
       const response = await this.geminiTranslator.models.generateContent({
         model: 'gemini-2.5-flash-preview-04-17',
         contents: [{ role: 'user', parts: [{ text: enhancedPrompt }] }],
         config: {
-          temperature: 0.3,
-          topP: 0.8
+          temperature: 0.4, // 重複回避のため少し創造性を上げる
+          topP: 0.9
         }
       });
 
@@ -85,7 +86,8 @@ export class EnhancedTranslationService {
   private buildTranslationPrompt(
     text: string,
     targetLang: string,
-    context: TranslationContext
+    context: TranslationContext,
+    previousResponses: string[] = []
   ): string {
     const cultureSpecificInstructions = {
       'japanese-sage': {
@@ -98,6 +100,20 @@ export class EnhancedTranslationService {
 
     const glossaryTerms = this.getRelevantGlossaryTerms(text, targetLang);
     const instruction = cultureSpecificInstructions[context.culturalContext]?.[targetLang] || '';
+    
+    // 重複回避のための指示を構築
+    const duplicateAvoidanceSection = previousResponses.length > 0 ? `
+
+IMPORTANT - Avoid Duplication:
+Previous responses in this conversation (avoid similar phrasing, expressions, and approaches):
+${previousResponses.map((resp, i) => `Response ${i + 1}: "${resp.substring(0, 200)}${resp.length > 200 ? '...' : ''}"`).join('\n')}
+
+Guidelines to avoid repetition:
+- Use different vocabulary and expressions from previous responses
+- Approach the topic from a new angle or perspective
+- Vary sentence structure and rhythm
+- Offer fresh insights while maintaining the sage's wisdom
+- If the content naturally overlaps, express it in a distinctly different way` : '';
 
     return `You are an expert translator specializing in spiritual and philosophical texts.
 
@@ -113,6 +129,7 @@ ${instruction}
 
 Important Terms (use these specific translations):
 ${glossaryTerms.map(([original, translation]) => `${original} → ${translation}`).join('\n')}
+${duplicateAvoidanceSection}
 
 Original Text:
 ${text}
@@ -124,6 +141,7 @@ Requirements:
 4. Keep the warm, accessible tone
 5. Ensure technical terms are accurately translated
 6. Do not add explanations or change the meaning
+7. Avoid repetitive phrasing from previous responses in this conversation
 
 Translation:`;
   }

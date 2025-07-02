@@ -111,10 +111,17 @@ export async function* streamChatWithTranslation(
         culturalContext: 'japanese-sage'
       };
       
+      // AI応答の履歴を取得（重複回避のため）
+      const aiResponses = history
+        .filter(msg => msg.sender === 'ai' && !msg.isTyping)
+        .map(msg => msg.text)
+        .slice(-3); // 最近の3つの応答のみ
+      
       const translatedText = await translationService.translateAIResponse(
         fullJapaneseText,
         targetLanguage,
-        translationContext
+        translationContext,
+        aiResponses
       );
       
       // 5. 翻訳結果をストリーミング風に返す

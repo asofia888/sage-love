@@ -18,6 +18,7 @@ import HelpButton from './components/HelpButton';
 import { useChatHistory } from './hooks/useChatHistory';
 import { useTextSize } from './hooks/useTextSize';
 import * as geminiService from './services/geminiService';
+import { DuplicateAvoidanceService } from './services/duplicateAvoidanceService';
 
 
 // --- Main App Component ---
@@ -100,12 +101,16 @@ const App: React.FC = () => {
     setIsLoading(true);
 
     try {
-        const systemInstruction = t('systemInstructionForSage');
+        // 基本システムプロンプトに重複回避指示を追加
+        const baseSystemInstruction = t('systemInstructionForSage');
+        const duplicateAvoidancePrompt = DuplicateAvoidanceService.generateDuplicateAvoidancePrompt(historyForApi);
+        const enhancedSystemInstruction = baseSystemInstruction + duplicateAvoidancePrompt;
+        
         const currentLang = i18n.language.split('-')[0];
         const stream = geminiService.streamChatWithTranslation(
             userInput, 
             historyForApi, 
-            systemInstruction,
+            enhancedSystemInstruction,
             currentLang
         );
         
@@ -115,6 +120,24 @@ const App: React.FC = () => {
             setMessages(prev => 
                 prev.map(m => m.id === aiMessageId ? { ...m, text: fullText } : m)
             );
+        }
+
+        // 応答完了後に多様性を評価
+        const aiResponses = historyForApi
+            .filter(msg => msg.sender === 'ai' && !msg.isTyping)
+            .map(msg => msg.text);
+        
+        const diversityEvaluation = DuplicateAvoidanceService.evaluateResponseDiversity(
+            fullText, 
+            aiResponses
+        );
+
+        // デバッグ情報をコンソールに出力
+        if (diversityEvaluation.diversityScore < 0.5) {
+            console.warn('応答の多様性が低い可能性があります:', {
+                diversityScore: diversityEvaluation.diversityScore,
+                suggestions: diversityEvaluation.suggestions
+            });
         }
 
     } catch (e: any) {
