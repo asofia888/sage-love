@@ -43,7 +43,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading }) => {
         onKeyDown={handleKeyDown}
         placeholder={t('chatPlaceholder')}
         aria-label={t('chatPlaceholder')}
-        className="flex-grow p-3 border border-slate-600/70 rounded-lg bg-slate-800/60 text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none placeholder-slate-400 shadow-sm transition-colors duration-200 backdrop-blur-sm"
+        className="flex-grow p-3 border border-slate-600/70 rounded-lg bg-slate-800/60 text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none placeholder-slate-300 shadow-sm transition-colors duration-200 backdrop-blur-sm"
         rows={2}
         disabled={isLoading}
         style={{ minHeight: '3rem', maxHeight: '10rem' }}
