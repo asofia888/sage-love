@@ -16,6 +16,7 @@ import ConfirmationModal from './components/ConfirmationModal';
 import HelpModal from './components/HelpModal';
 import HelpButton from './components/HelpButton';
 import CrisisInterventionModal from './components/CrisisInterventionModal';
+import PrivacyPolicyModal from './components/PrivacyPolicyModal';
 import { useChatHistory } from './hooks/useChatHistory';
 import { useTextSize } from './hooks/useTextSize';
 import { useMessageHandler } from './hooks/useMessageHandler';
@@ -28,6 +29,7 @@ const App: React.FC = () => {
   const [isDisclaimerOpen, setIsDisclaimerOpen] = useState<boolean>(false);
   const [isClearConfirmOpen, setIsClearConfirmOpen] = useState<boolean>(false);
   const [isHelpOpen, setIsHelpOpen] = useState<boolean>(false);
+  const [isPrivacyPolicyOpen, setIsPrivacyPolicyOpen] = useState<boolean>(false);
 
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
   
@@ -151,19 +153,30 @@ const App: React.FC = () => {
                   {t('buyMeACoffeeButton')}
                 </a>
               </p>
-              <p className="text-slate-300">
-                <button
-                  onClick={() => setIsDisclaimerOpen(true)}
-                  className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1"
-                >
-                  {t('disclaimerLinkText')}
-                </button>
-              </p>
+              <div className="text-slate-300 space-y-1">
+                <p>
+                  <button
+                    onClick={() => setIsDisclaimerOpen(true)}
+                    className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1"
+                  >
+                    {t('disclaimerLinkText')}
+                  </button>
+                </p>
+                <p>
+                  <button
+                    onClick={() => setIsPrivacyPolicyOpen(true)}
+                    className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1"
+                  >
+                    {t('privacyPolicyLinkText')}
+                  </button>
+                </p>
+              </div>
             </div>
           </div>
         </footer>
       </div>
       <DisclaimerModal isOpen={isDisclaimerOpen} onClose={() => setIsDisclaimerOpen(false)} />
+      <PrivacyPolicyModal isOpen={isPrivacyPolicyOpen} onClose={() => setIsPrivacyPolicyOpen(false)} />
       <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
       <ConfirmationModal
         isOpen={isClearConfirmOpen}
