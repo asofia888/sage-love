@@ -52,6 +52,30 @@ const resources = {
       "promptSuggestion1": "内なる平和を見つけるには？",
       "promptSuggestion2": "人生の意味とは？",
       "promptSuggestion3": "本当の自分とは？",
+      // Crisis intervention translations
+      "crisis": {
+        "title": "重要なお知らせ",
+        "youAreNotAlone": "あなたは一人ではありません",
+        "helpAvailable": "あなたの気持ちは大切です。専門の方があなたを支援する準備ができています。助けを求めることは強さの証拠です。",
+        "aiLimitation": "AIには限界があります。深刻な心の問題については、以下の専門機関にすぐにご相談ください。",
+        "emergencyResources": "今すぐ利用できる相談窓口",
+        "importantNote": "重要な注意",
+        "emergencyNote": "生命に関わる緊急事態の場合は、救急サービス（日本: 119、米国: 911など）にすぐに連絡してください。",
+        "footer": "あなたの命は大切です。助けを求めることを躊躇しないでください。",
+        "severity": {
+          "critical": "緊急",
+          "high": "重要",
+          "medium": "注意",
+          "low": "軽度"
+        }
+      },
+      "phone": "電話",
+      "web": "Web",
+      "hours": "時間",
+      "free": "無料",
+      "showMore": "さらに表示",
+      "showLess": "少なく表示",
+      "understood": "理解しました",
       "buyMeACoffeeText": "このアプリが役に立ったと思われたら、開発者への支援をご検討ください：",
       "buyMeACoffeeButton": "コーヒーを奢る ☕",
       "buyMeACoffeeButtonAria": "Buy Me a Coffeeで開発者を支援する",

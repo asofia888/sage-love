@@ -15,6 +15,7 @@ import WelcomeMessage from './components/WelcomeMessage';
 import ConfirmationModal from './components/ConfirmationModal';
 import HelpModal from './components/HelpModal';
 import HelpButton from './components/HelpButton';
+import CrisisInterventionModal from './components/CrisisInterventionModal';
 import { useChatHistory } from './hooks/useChatHistory';
 import { useTextSize } from './hooks/useTextSize';
 import { useMessageHandler } from './hooks/useMessageHandler';
@@ -34,7 +35,15 @@ const App: React.FC = () => {
   const [messages, setMessages, clearChat] = useChatHistory(i18n.isInitialized);
   
   // メッセージハンドリングロジックを分離
-  const { handleSendMessage, isLoading, error, setError } = useMessageHandler({
+  const { 
+    handleSendMessage, 
+    isLoading, 
+    error, 
+    setError,
+    isCrisisModalOpen,
+    closeCrisisModal,
+    lastCrisisResult
+  } = useMessageHandler({
     messages,
     setMessages
   });
@@ -166,6 +175,17 @@ const App: React.FC = () => {
       >
         <p>{t('confirmClearText')}</p>
       </ConfirmationModal>
+      
+      {/* Crisis Intervention Modal */}
+      {lastCrisisResult && (
+        <CrisisInterventionModal
+          isOpen={isCrisisModalOpen}
+          onClose={closeCrisisModal}
+          crisisResult={lastCrisisResult}
+          userLanguage={i18n.language}
+          userCountry={navigator.language.split('-')[1] || 'JP'}
+        />
+      )}
     </>
   );
 };

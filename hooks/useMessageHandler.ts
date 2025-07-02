@@ -4,6 +4,7 @@ import { ChatMessage, ApiError, MessageSender } from '../types';
 import * as geminiService from '../services/geminiService';
 import { DuplicateAvoidanceService } from '../services/duplicateAvoidanceService';
 import { ErrorService } from '../services/errorService';
+import { useCrisisDetection } from './useCrisisDetection';
 
 interface UseMessageHandlerProps {
   messages: ChatMessage[];
@@ -15,6 +16,10 @@ interface UseMessageHandlerReturn {
   isLoading: boolean;
   error: ApiError | null;
   setError: React.Dispatch<React.SetStateAction<ApiError | null>>;
+  // 危機検出関連
+  isCrisisModalOpen: boolean;
+  closeCrisisModal: () => void;
+  lastCrisisResult: any;
 }
 
 /**
@@ -27,11 +32,28 @@ export const useMessageHandler = ({
   const { t, i18n } = useTranslation();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<ApiError | null>(null);
+  
+  // 危機検出フックを統合
+  const {
+    checkForCrisis,
+    checkMessageHistory,
+    lastCrisisResult,
+    isCrisisModalOpen,
+    closeCrisisModal,
+    getCrisisGuidance
+  } = useCrisisDetection({
+    enabled: true,
+    checkHistoryLength: 5,
+    autoShowModal: true
+  });
 
   const handleSendMessage = useCallback(async (userInput: string) => {
     if (isLoading) return;
     setError(null);
 
+    // 危機検出チェック
+    const crisisResult = checkForCrisis(userInput);
+    
     // ユーザーメッセージを作成
     const newUserMessage: ChatMessage = {
       id: `user-${Date.now()}`,
@@ -59,8 +81,15 @@ export const useMessageHandler = ({
 
     try {
         // システムプロンプトに重複回避指示を追加
-        const baseSystemInstruction = t('systemInstructionForSage');
+        let baseSystemInstruction = t('systemInstructionForSage');
         const duplicateAvoidancePrompt = DuplicateAvoidanceService.generateDuplicateAvoidancePrompt(historyForApi);
+        
+        // 危機が検出された場合はシステムプロンプトを調整
+        if (crisisResult.isCrisis) {
+          const crisisGuidance = getCrisisGuidance(crisisResult);
+          baseSystemInstruction += `\n\n【重要な注意】ユーザーは現在困難な状況にある可能性があります。以下のガイダンスを参考に、共感的で支援的な応答を心がけてください：\n${crisisGuidance}\n\nまた、専門的な支援を受けることの重要性を優しく伝えてください。`;
+        }
+        
         const enhancedSystemInstruction = baseSystemInstruction + duplicateAvoidancePrompt;
         
         // 現在の言語を取得
@@ -120,6 +149,10 @@ export const useMessageHandler = ({
     handleSendMessage,
     isLoading,
     error,
-    setError
+    setError,
+    // 危機検出関連
+    isCrisisModalOpen,
+    closeCrisisModal,
+    lastCrisisResult
   };
 };
