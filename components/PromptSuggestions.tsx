@@ -14,7 +14,6 @@ const PromptSuggestions: React.FC<PromptSuggestionsProps> = ({ onSelectPrompt, t
     { id: 's1', key: 'promptSuggestion1', ariaKey: 'promptSuggestion1' },
     { id: 's2', key: 'promptSuggestion2', ariaKey: 'promptSuggestion2' },
     { id: 's3', key: 'promptSuggestion3', ariaKey: 'promptSuggestion3' },
-    { id: 's4', key: 'promptSuggestion4', ariaKey: 'promptSuggestion4' },
   ];
 
   const buttonTextClass = textSize === 'large' ? 'text-base' : 'text-sm';
