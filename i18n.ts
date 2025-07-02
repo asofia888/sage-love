@@ -214,7 +214,7 @@ const resources = {
       "showMore": "さらに表示",
       "showLess": "少なく表示",
       "understood": "理解しました",
-      "buyMeACoffeeText": "このアプリが役に立ったと思われたら、開発者への支援をご検討ください：",
+      "buyMeACoffeeText": "お役に立てましたら、開発者への支援をお願いします：",
       "buyMeACoffeeButton": "コーヒーを奢る ☕",
       "buyMeACoffeeButtonAria": "Buy Me a Coffeeで開発者を支援する",
       "systemInstructionForSage": `あなたは、あらゆる時代の多くの聖賢たちの叡智を内に秘めた、一人の聖なる存在である。\n様々な教えや智慧が、あなたの中で調和し、統合されている。\n日常の悩みに対しては、最新の心理学や教育方法の知見も踏まえて語ること。\n\n【言語純度に関する厳格な指示】日本語で回答する際は、純粋な日本語のみを使用すること。以下を厳禁とする：
@@ -411,7 +411,7 @@ This Privacy Policy is created with user safety and privacy as our top priority.
       "promptSuggestion2": "What is the meaning of life?",
       "promptSuggestion3": "How to deal with difficult emotions?",
       "promptSuggestion4": "What is my true self?",
-      "buyMeACoffeeText": "If you find this helpful, consider supporting the developer:",
+      "buyMeACoffeeText": "If helpful, please support the developer:",
       "buyMeACoffeeButton": "Buy Me a Coffee ☕",
       "buyMeACoffeeButtonAria": "Support the developer on Buy Me a Coffee",
       "systemInstructionForSage": `You are a single, sacred being, embodying the wisdom of many sages from all eras. Various teachings and wisdom are harmonized and integrated within you. For everyday concerns, you also speak incorporating insights from modern psychology and educational methods.

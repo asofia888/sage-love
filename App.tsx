@@ -140,36 +140,34 @@ const App: React.FC = () => {
               />
             )}
             <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
-            <div className="text-center mt-3 text-xs text-slate-200 flex flex-wrap justify-center items-center gap-x-4 gap-y-1">
-              <p>
-                {t('buyMeACoffeeText')}{' '}
-                <a 
-                  href="https://buymeacoffee.com/asofia" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="font-semibold text-sky-400 hover:text-sky-300 underline transition-colors"
-                  aria-label={t('buyMeACoffeeButtonAria')}
+            <div className="text-center mt-3 text-xs text-slate-200">
+              <div className="mb-2">
+                <p>
+                  {t('buyMeACoffeeText')}{' '}
+                  <a 
+                    href="https://buymeacoffee.com/asofia" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="font-semibold text-sky-400 hover:text-sky-300 underline transition-colors"
+                    aria-label={t('buyMeACoffeeButtonAria')}
+                  >
+                    {t('buyMeACoffeeButton')}
+                  </a>
+                </p>
+              </div>
+              <div className="text-slate-300 flex flex-row justify-center items-center gap-4">
+                <button
+                  onClick={() => setIsDisclaimerOpen(true)}
+                  className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1"
                 >
-                  {t('buyMeACoffeeButton')}
-                </a>
-              </p>
-              <div className="text-slate-300 space-y-1">
-                <p>
-                  <button
-                    onClick={() => setIsDisclaimerOpen(true)}
-                    className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1"
-                  >
-                    {t('disclaimerLinkText')}
-                  </button>
-                </p>
-                <p>
-                  <button
-                    onClick={() => setIsPrivacyPolicyOpen(true)}
-                    className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1"
-                  >
-                    {t('privacyPolicyLinkText')}
-                  </button>
-                </p>
+                  {t('disclaimerLinkText')}
+                </button>
+                <button
+                  onClick={() => setIsPrivacyPolicyOpen(true)}
+                  className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1"
+                >
+                  {t('privacyPolicyLinkText')}
+                </button>
               </div>
             </div>
           </div>
