@@ -1,8 +1,8 @@
 
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChatMessage, ApiError, MessageSender } from './types';
+import { ApiError } from './types';
 import ChatInput from './components/ChatInput';
 import ChatMessageDisplay from './components/ChatMessageDisplay';
 import TextSizeSelector from './components/TextSizeSelector';
@@ -17,16 +17,13 @@ import HelpModal from './components/HelpModal';
 import HelpButton from './components/HelpButton';
 import { useChatHistory } from './hooks/useChatHistory';
 import { useTextSize } from './hooks/useTextSize';
-import * as geminiService from './services/geminiService';
-import { DuplicateAvoidanceService } from './services/duplicateAvoidanceService';
+import { useMessageHandler } from './hooks/useMessageHandler';
 
 
 // --- Main App Component ---
 
 const App: React.FC = () => {
   const { t, i18n } = useTranslation();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<ApiError | null>(null);
   const [isDisclaimerOpen, setIsDisclaimerOpen] = useState<boolean>(false);
   const [isClearConfirmOpen, setIsClearConfirmOpen] = useState<boolean>(false);
   const [isHelpOpen, setIsHelpOpen] = useState<boolean>(false);
@@ -35,13 +32,18 @@ const App: React.FC = () => {
   
   const [textSize, setTextSize] = useTextSize();
   const [messages, setMessages, clearChat] = useChatHistory(i18n.isInitialized);
+  
+  // メッセージハンドリングロジックを分離
+  const { handleSendMessage, isLoading, error, setError } = useMessageHandler({
+    messages,
+    setMessages
+  });
 
 
-  // 翻訳サービスの初期化
+  // 翻訳サービスの初期化（安全のためサーバーサイドAPI経由で実行）
   useEffect(() => {
-    // 環境変数からAPI Keyを取得（実際の実装では適切な方法で）
-    const apiKey = process.env.REACT_APP_GEMINI_API_KEY || 'demo-key';
-    geminiService.initializeTranslationService(apiKey);
+    // API Keyはサーバーサイドでのみ使用、フロントエンドでは初期化不要
+    // geminiService.initializeTranslationService(apiKey); // 削除
   }, []);
 
   // Effect to update html lang, dir, and OGP url attributes for RTL/sharing support
@@ -73,88 +75,6 @@ const App: React.FC = () => {
     setError(null);
     setIsClearConfirmOpen(false);
   };
-
-  const handleSendMessage = useCallback(async (userInput: string) => {
-    if (isLoading) return;
-    setError(null);
-
-    const newUserMessage: ChatMessage = {
-      id: `user-${Date.now()}`,
-      text: userInput,
-      sender: MessageSender.USER,
-      timestamp: new Date(),
-    };
-    
-    // Capture history for the API call *before* adding the new user message to it.
-    const historyForApi = [...messages];
-
-    const aiMessageId = `ai-response-${Date.now()}`;
-    const aiPlaceholderMessage: ChatMessage = {
-        id: aiMessageId,
-        text: '',
-        sender: MessageSender.AI,
-        timestamp: new Date(),
-        isTyping: true,
-    };
-    
-    setMessages(prev => [...prev, newUserMessage, aiPlaceholderMessage]);
-    setIsLoading(true);
-
-    try {
-        // 基本システムプロンプトに重複回避指示を追加
-        const baseSystemInstruction = t('systemInstructionForSage');
-        const duplicateAvoidancePrompt = DuplicateAvoidanceService.generateDuplicateAvoidancePrompt(historyForApi);
-        const enhancedSystemInstruction = baseSystemInstruction + duplicateAvoidancePrompt;
-        
-        const currentLang = i18n.language.split('-')[0];
-        const stream = geminiService.streamChatWithTranslation(
-            userInput, 
-            historyForApi, 
-            enhancedSystemInstruction,
-            currentLang
-        );
-        
-        let fullText = '';
-        for await (const chunk of stream) {
-            fullText += chunk;
-            setMessages(prev => 
-                prev.map(m => m.id === aiMessageId ? { ...m, text: fullText } : m)
-            );
-        }
-
-        // 応答完了後に多様性を評価
-        const aiResponses = historyForApi
-            .filter(msg => msg.sender === 'ai' && !msg.isTyping)
-            .map(msg => msg.text);
-        
-        const diversityEvaluation = DuplicateAvoidanceService.evaluateResponseDiversity(
-            fullText, 
-            aiResponses
-        );
-
-        // デバッグ情報をコンソールに出力
-        if (diversityEvaluation.diversityScore < 0.5) {
-            console.warn('応答の多様性が低い可能性があります:', {
-                diversityScore: diversityEvaluation.diversityScore,
-                suggestions: diversityEvaluation.suggestions
-            });
-        }
-
-    } catch (e: any) {
-        console.error("Error calling Gemini API:", e);
-        const apiError: ApiError = e && e.code ? e : { code: 'errorMessageDefault', details: String(e) };
-        setError(apiError);
-        // On error, remove the placeholder
-        setMessages(prev => prev.filter(m => m.id !== aiMessageId));
-    } finally {
-        // Once the stream is finished, mark the message as not typing.
-        // This handles empty streams correctly and ensures the final state is clean.
-        setMessages(prev => 
-            prev.map(m => m.id === aiMessageId ? { ...m, isTyping: false } : m)
-        );
-        setIsLoading(false);
-    }
-  }, [messages, isLoading, t, setMessages]);
 
 
   return (

@@ -5,12 +5,25 @@ export enum MessageSender {
   AI = 'ai',
 }
 
-export interface ChatMessage {
+// 基本メッセージ型
+interface BaseMessage {
   id: string;
-  text: string;
   sender: MessageSender;
   timestamp: Date;
-  isTyping?: boolean; // Added to indicate AI is "typing" or generating response
+}
+
+// ユーザーメッセージ型（常に完了済み）
+export interface UserMessage extends BaseMessage {
+  sender: MessageSender.USER;
+  text: string;
+  isTyping?: false; // ユーザーメッセージは常に完了済み
+}
+
+// AIメッセージ型（タイピング状態を持つ）
+export interface AIMessage extends BaseMessage {
+  sender: MessageSender.AI;
+  text: string;
+  isTyping?: boolean;
   // 翻訳関連のフィールド
   originalText?: string;           // 元の日本語テキスト
   translatedText?: string;         // 翻訳されたテキスト
@@ -19,7 +32,34 @@ export interface ChatMessage {
   isTranslated?: boolean;          // 翻訳されたメッセージかどうか
 }
 
+// 統合メッセージ型（判別可能な合併型）
+export type ChatMessage = UserMessage | AIMessage;
+
+// エラー型の強化
+export type ErrorCode = 
+  | 'errorMessageDefault'
+  | 'errorAuth'
+  | 'errorQuota'
+  | 'errorNoApiKeyConfig'
+  | 'errorNetwork'
+  | 'errorTranslation'
+  | 'errorStreaming';
+
 export interface ApiError {
-  code: string;
+  code: ErrorCode;
   details?: string;
+  severity?: 'low' | 'medium' | 'high' | 'critical';
+  timestamp?: Date;
+}
+
+// サービス関連の型
+export interface StreamingOptions {
+  delayMs?: number;
+  maxRetries?: number;
+}
+
+export interface TranslationOptions {
+  domain?: 'spiritual' | 'general';
+  tone?: 'sage' | 'casual' | 'formal';
+  culturalContext?: string;
 }
