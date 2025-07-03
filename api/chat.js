@@ -1,40 +1,6 @@
 // Vercel Serverless Function for secure API handling
 import { GoogleGenerativeAI } from '@google/generative-ai';
-
-// Rate limiting storage (in production, use Redis or database)
-const requestCounts = new Map();
-
-// Rate limiting configuration
-const RATE_LIMIT = {
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  maxRequests: 20, // max 20 requests per window per IP
-  maxRequestsPerSession: 50 // max 50 requests per session per day
-};
-
-// Simple rate limiting function
-function isRateLimited(identifier, limit, windowMs) {
-  const now = Date.now();
-  const windowStart = now - windowMs;
-  
-  if (!requestCounts.has(identifier)) {
-    requestCounts.set(identifier, []);
-  }
-  
-  const requests = requestCounts.get(identifier);
-  
-  // Remove old requests outside the window
-  const validRequests = requests.filter(timestamp => timestamp > windowStart);
-  requestCounts.set(identifier, validRequests);
-  
-  // Check if limit exceeded
-  if (validRequests.length >= limit) {
-    return true;
-  }
-  
-  // Add current request
-  validRequests.push(now);
-  return false;
-}
+import rateLimiter from './rate-limiter.js';
 
 export default async function handler(req, res) {
   // CORS headers
@@ -61,20 +27,29 @@ export default async function handler(req, res) {
     const clientIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress || 'unknown';
     const sessionId = req.headers['x-session-id'] || clientIP;
     
-    // Apply rate limiting
-    if (isRateLimited(clientIP, RATE_LIMIT.maxRequests, RATE_LIMIT.windowMs)) {
-      return res.status(429).json({ 
-        error: 'RATE_LIMIT_EXCEEDED',
-        message: 'Too many requests. Please try again later.',
-        retryAfter: Math.ceil(RATE_LIMIT.windowMs / 1000)
+    // Validate request body early for rate limiting
+    const { message, conversationHistory = [] } = req.body || {};
+    
+    if (!message || typeof message !== 'string') {
+      return res.status(400).json({ 
+        error: 'INVALID_MESSAGE',
+        message: 'Message is required and must be a non-empty string' 
       });
     }
     
-    if (isRateLimited(`session_${sessionId}`, RATE_LIMIT.maxRequestsPerSession, 24 * 60 * 60 * 1000)) {
+    // Apply advanced rate limiting and cost control
+    const rateLimitResult = rateLimiter.shouldBlockRequest(
+      clientIP, 
+      sessionId, 
+      message.length, 
+      conversationHistory.length
+    );
+    
+    if (rateLimitResult.blocked) {
       return res.status(429).json({ 
-        error: 'SESSION_LIMIT_EXCEEDED',
-        message: 'Daily limit reached. Please try again tomorrow.',
-        retryAfter: 24 * 60 * 60
+        error: rateLimitResult.reason,
+        message: rateLimitResult.message,
+        retryAfter: rateLimitResult.retryAfter
       });
     }
     
@@ -88,22 +63,17 @@ export default async function handler(req, res) {
       });
     }
     
-    // Validate request body
-    const { message, systemInstruction, conversationHistory, language } = req.body;
+    // Further validate request body
+    const { systemInstruction, language } = req.body;
     
-    if (!message || typeof message !== 'string' || message.trim().length === 0) {
+    if (message.trim().length === 0) {
       return res.status(400).json({ 
-        error: 'INVALID_MESSAGE',
-        message: 'Message is required and must be a non-empty string' 
+        error: 'EMPTY_MESSAGE',
+        message: 'Message cannot be empty' 
       });
     }
     
-    if (message.length > 2000) {
-      return res.status(400).json({ 
-        error: 'MESSAGE_TOO_LONG',
-        message: 'Message must be less than 2000 characters' 
-      });
-    }
+    // Note: Length validation already done in rate limiter
     
     // Content filtering - basic checks
     const suspiciousPatterns = [
@@ -154,9 +124,9 @@ export default async function handler(req, res) {
     // Prepare conversation context
     let prompt = systemInstruction || '';
     
-    // Add conversation history if provided
+    // Add conversation history if provided (limited by rate limiter)
     if (conversationHistory && Array.isArray(conversationHistory)) {
-      const recentHistory = conversationHistory.slice(-10); // Limit to last 10 messages
+      const recentHistory = conversationHistory.slice(-5); // Limit to last 5 messages (reduced from 10)
       const historyText = recentHistory
         .map(msg => `${msg.sender === 'user' ? 'User' : 'Assistant'}: ${msg.text}`)
         .join('\n');
@@ -177,14 +147,25 @@ export default async function handler(req, res) {
       });
     }
     
-    // Log request (in production, use proper logging service)
-    console.log(`Chat request: IP=${clientIP}, Session=${sessionId}, Language=${language || 'unknown'}, MessageLength=${message.length}`);
+    // Record actual cost and update metrics
+    rateLimiter.recordActualCost(rateLimitResult.estimatedCost);
     
-    // Return successful response
+    // Get current usage stats for monitoring
+    const usageStats = rateLimiter.getUsageStats();
+    
+    // Log request with cost information
+    console.log(`Chat request: IP=${clientIP}, Session=${sessionId}, Language=${language || 'unknown'}, MessageLength=${message.length}, EstimatedCost=$${rateLimitResult.estimatedCost.toFixed(4)}, TotalCost=$${usageStats.globalMetrics.totalCost.toFixed(2)}`);
+    
+    // Return successful response with usage info
     res.status(200).json({
       message: text.trim(),
       timestamp: new Date().toISOString(),
-      sessionId: sessionId
+      sessionId: sessionId,
+      usage: {
+        estimatedCost: rateLimitResult.estimatedCost,
+        remainingRequests: rateLimitResult.remainingRequests,
+        budgetUtilization: usageStats.utilizationPercentage
+      }
     });
     
   } catch (error) {
