@@ -1,30 +1,101 @@
 
-
-import { chatService } from './chatService';
+import { apiService, ChatRequest } from './apiService';
+import { ChatMessage } from '../types';
 
 /**
- * 翻訳サービスを初期化（後方互換性のため）
+ * Secure Gemini Service - Routes requests through serverless backend
+ * No longer requires client-side API keys
+ */
+
+/**
+ * 翻訳サービスを初期化（レガシー互換性のため、現在は不要）
  */
 export function initializeTranslationService(apiKey: string) {
-  chatService.initializeTranslation(apiKey);
+  // No longer needed - API key is handled server-side
+  console.log('Translation service initialization is now handled server-side');
 }
 
 /**
- * 基本的なチャットストリーミング（後方互換性のため）
+ * Secure chat function using serverless backend
+ */
+export async function sendSecureChat(
+  message: string,
+  history: ChatMessage[],
+  systemInstruction: string,
+  language: string = 'ja'
+): Promise<string> {
+  try {
+    const request: ChatRequest = {
+      message,
+      systemInstruction,
+      conversationHistory: history.map(msg => ({
+        sender: msg.sender,
+        text: msg.text,
+        timestamp: msg.timestamp
+      })),
+      language
+    };
+
+    const response = await apiService.sendMessage(request);
+    return response.message;
+
+  } catch (error) {
+    console.error('Secure chat error:', error);
+    
+    if (error instanceof Error && error.message.startsWith('API_ERROR:')) {
+      const [, errorCode, errorMessage] = error.message.split(':');
+      
+      // Handle specific error types
+      switch (errorCode) {
+        case 'RATE_LIMIT_EXCEEDED':
+          throw new Error('ERR_RATE_LIMIT');
+        case 'SESSION_LIMIT_EXCEEDED':
+          throw new Error('ERR_SESSION_LIMIT');
+        case 'QUOTA_EXCEEDED':
+          throw new Error('ERR_QUOTA');
+        case 'CONTENT_SAFETY':
+          throw new Error('ERR_CONTENT_SAFETY');
+        case 'NETWORK_ERROR':
+          throw new Error('ERR_NETWORK');
+        default:
+          throw new Error('ERR_GENERIC');
+      }
+    }
+    
+    throw new Error('ERR_GENERIC');
+  }
+}
+
+/**
+ * Legacy streaming chat function - now uses secure backend
+ * Returns message in chunks for compatibility
  */
 export async function* streamChat(
     message: string, 
     history: any[],
     systemInstruction: string
 ): AsyncGenerator<string, void, unknown> {
-  const stream = chatService.streamChat(message, history, systemInstruction);
-  for await (const chunk of stream) {
-    yield chunk;
+  try {
+    const fullResponse = await sendSecureChat(message, history, systemInstruction);
+    
+    // Simulate streaming by yielding chunks
+    const words = fullResponse.split(' ');
+    for (let i = 0; i < words.length; i++) {
+      const chunk = i === 0 ? words[i] : ' ' + words[i];
+      yield chunk;
+      
+      // Small delay to simulate streaming
+      await new Promise(resolve => setTimeout(resolve, 50));
+    }
+    
+  } catch (error) {
+    console.error('Stream chat error:', error);
+    throw error;
   }
 }
 
 /**
- * 翻訳機能付きストリーミングチャット（後方互換性のため）
+ * Legacy streaming chat with translation - now uses secure backend
  */
 export async function* streamChatWithTranslation(
     message: string,
@@ -32,13 +103,21 @@ export async function* streamChatWithTranslation(
     systemInstruction: string,
     targetLanguage: string = 'ja'
 ): AsyncGenerator<string, void, unknown> {
-  const stream = chatService.streamChatWithTranslation(
-    message, 
-    history, 
-    systemInstruction, 
-    targetLanguage
-  );
-  for await (const chunk of stream) {
-    yield chunk;
+  try {
+    const fullResponse = await sendSecureChat(message, history, systemInstruction, targetLanguage);
+    
+    // Simulate streaming by yielding chunks
+    const words = fullResponse.split(' ');
+    for (let i = 0; i < words.length; i++) {
+      const chunk = i === 0 ? words[i] : ' ' + words[i];
+      yield chunk;
+      
+      // Small delay to simulate streaming
+      await new Promise(resolve => setTimeout(resolve, 50));
+    }
+    
+  } catch (error) {
+    console.error('Stream chat with translation error:', error);
+    throw error;
   }
 }
