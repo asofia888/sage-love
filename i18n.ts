@@ -46,6 +46,8 @@ const resources = {
       "disclaimerModalTitle": "免責事項",
       "privacyPolicyLinkText": "プライバシーポリシー",
       "privacyPolicyModalTitle": "プライバシーポリシー",
+      "termsOfServiceLinkText": "利用規約",
+      "termsOfServiceModalTitle": "利用規約",
       "privacyPolicy": `【プライバシーポリシー】
 
 最終更新日: 2025年1月
@@ -153,6 +155,101 @@ const resources = {
 プライバシーに関するご質問やご懸念がございましたら、GitHubリポジトリのIssuesセクションを通じてお問い合わせください。
 
 このプライバシーポリシーは、ユーザーの皆様の安全と privacy を最優先に作成されています。`,
+      "termsOfService": `【利用規約】
+
+最終更新日: 2025年1月
+
+**1. サービスの概要**
+
+本アプリケーション「聖者の愛（AI）」（以下「本サービス」）は、AI技術を活用したスピリチュアル・人生相談サービスです。ユーザーは聖者の智慧をモデルとしたAIとの対話を通じて、人生の悩みや精神的な問題について相談することができます。
+
+**2. 利用条件**
+
+**2.1 年齢制限**
+• 18歳未満の方のご利用には保護者の同意が必要です
+• 13歳未満の方はご利用いただけません
+
+**2.2 利用目的**
+• 本サービスはスピリチュアル・人生相談・宗教的探求を目的とした利用のみを想定しています
+• 専門的な医療、法律、精神的健康に関する助言の代替として使用することはできません
+
+**3. 禁止事項**
+
+以下の行為を禁止します：
+• 法令に違反する行為または犯罪行為に関連する行為
+• 他者への嫌がらせ、脅迫、誹謗中傷
+• わいせつ、暴力的、差別的な内容の投稿
+• 本サービスの運営を妨害する行為
+• 技術的手段を用いたサービスの不正利用
+• 商業的な宣伝・広告・勧誘行為
+• 個人情報の不正な収集・利用
+• AIの応答を悪用して他者を欺く行為
+
+**4. アカウントと利用制限**
+
+**4.1 利用制限**
+• サービス品質保持のため、一定の利用制限を設けています
+• 不適切な利用が確認された場合、予告なくサービス利用を制限する場合があります
+
+**4.2 データの保存**
+• 会話履歴はブラウザローカルに保存され、ユーザー自身で管理されます
+• 運営者はユーザーの会話内容を保存・記録いたしません
+
+**5. AIサービスの特性と限界**
+
+**5.1 AI生成コンテンツについて**
+• 本サービスの応答はAIによって生成されており、実在の聖者による助言ではありません
+• AIの応答には誤りや不適切な内容が含まれる可能性があります
+• 生成される内容について、その正確性や適切性を保証するものではありません
+
+**5.2 専門的助言の代替不可**
+• 医療、法律、精神的健康に関する専門的な助言の代替として使用することはできません
+• 深刻な問題については必ず適切な専門家にご相談ください
+
+**6. 知的財産権**
+
+• 本サービスのデザイン、コンテンツ、システムに関する知的財産権は運営者に帰属します
+• ユーザーが入力したコンテンツの権利はユーザーに帰属します
+• AIが生成したコンテンツは、個人的・非商業的利用に限り自由にご利用いただけます
+
+**7. プライバシーとデータ保護**
+
+• ユーザーのプライバシー保護については、別途定める「プライバシーポリシー」に従います
+• 危機検出機能により、安全確保のために会話内容が自動分析される場合があります
+
+**8. サービスの変更・中断・終了**
+
+• 運営者は事前の通知なく、サービス内容の変更、一時中断、または終了を行う場合があります
+• システムメンテナンス、技術的問題、その他やむを得ない事情により、サービスが利用できない場合があります
+
+**9. 免責事項**
+
+**9.1 運営者の責任制限**
+• 運営者は、本サービスの利用によって生じた直接的・間接的な損害について、故意または重過失がある場合を除き、責任を負いません
+• システム障害、通信障害、第三者の行為等により生じた損害について責任を負いません
+
+**9.2 第三者サービス**
+• 本サービスはGoogle Gemini APIを利用しており、Googleの利用規約も適用されます
+• 第三者サービスの利用に関する問題については、各サービス提供者にお問い合わせください
+
+**10. 規約の変更**
+
+• 本利用規約は、法令の変更やサービス内容の変更に伴い、事前の通知なく変更される場合があります
+• 変更後の継続利用により、変更内容に同意したものとみなされます
+• 重要な変更がある場合は、アプリ内で適切に通知いたします
+
+**11. 準拠法・管轄裁判所**
+
+• 本利用規約は日本法に準拠して解釈されます
+• 本サービスに関する紛争については、運営者の本店所在地を管轄する裁判所を専属的合意管轄裁判所とします
+
+**12. お問い合わせ**
+
+本利用規約に関するご質問やご不明な点がございましたら、GitHubリポジトリのIssuesセクションを通じてお問い合わせください。
+
+**13. 効力**
+
+本利用規約は、ユーザーが本サービスを利用した時点で効力を生じます。`,
       "closeModalButton": "閉じる",
       "cancelButton": "キャンセル",
       "helpButtonTooltip": "使い方",
@@ -272,6 +369,8 @@ Developers and operators are not responsible for direct or indirect damages aris
 Please use this app responsibly and understand these limitations.`,
       "privacyPolicyLinkText": "Privacy Policy",
       "privacyPolicyModalTitle": "Privacy Policy",
+      "termsOfServiceLinkText": "Terms of Service",
+      "termsOfServiceModalTitle": "Terms of Service",
       "privacyPolicy": `【PRIVACY POLICY】
 
 Last Updated: January 2025
@@ -379,6 +478,101 @@ Last Updated: January 2025
 For privacy-related questions or concerns, please contact us through the Issues section of our GitHub repository.
 
 This Privacy Policy is created with user safety and privacy as our top priority.`,
+      "termsOfService": `【TERMS OF SERVICE】
+
+Last Updated: January 2025
+
+**1. Service Overview**
+
+This application "Sage's Love (AI)" (hereinafter "this Service") is a spiritual and life consultation service utilizing AI technology. Users can consult with an AI modeled on the wisdom of sages about life concerns and spiritual problems through dialogue.
+
+**2. Terms of Use**
+
+**2.1 Age Restrictions**
+• Users under 18 require parental consent
+• Users under 13 are not permitted to use this service
+
+**2.2 Intended Use**
+• This service is intended solely for spiritual, life consultation, and religious exploration purposes
+• Cannot be used as a substitute for professional medical, legal, or mental health advice
+
+**3. Prohibited Activities**
+
+The following activities are prohibited:
+• Acts that violate laws or are related to criminal activities
+• Harassment, threats, or defamation of others
+• Posting obscene, violent, or discriminatory content
+• Acts that interfere with the operation of this service
+• Unauthorized use of the service through technical means
+• Commercial advertising, promotion, or solicitation activities
+• Unauthorized collection or use of personal information
+• Misusing AI responses to deceive others
+
+**4. Account and Usage Limitations**
+
+**4.1 Usage Limitations**
+• Certain usage limitations are in place to maintain service quality
+• Service usage may be restricted without notice if inappropriate use is confirmed
+
+**4.2 Data Storage**
+• Conversation history is stored locally in the browser and managed by users themselves
+• Operators do not store or record users' conversation content
+
+**5. AI Service Characteristics and Limitations**
+
+**5.1 AI-Generated Content**
+• Responses from this service are generated by AI and are not advice from actual sages
+• AI responses may contain errors or inappropriate content
+• We do not guarantee the accuracy or appropriateness of generated content
+
+**5.2 Not a Substitute for Professional Advice**
+• Cannot be used as a substitute for professional medical, legal, or mental health advice
+• For serious problems, please consult appropriate professionals
+
+**6. Intellectual Property Rights**
+
+• Intellectual property rights related to the design, content, and system of this service belong to the operators
+• Rights to content input by users belong to the users
+• AI-generated content may be freely used for personal, non-commercial purposes only
+
+**7. Privacy and Data Protection**
+
+• User privacy protection is governed by the separately defined "Privacy Policy"
+• Conversation content may be automatically analyzed by crisis detection functions to ensure safety
+
+**8. Service Changes, Interruptions, and Termination**
+
+• Operators may change, temporarily interrupt, or terminate service content without prior notice
+• Service may be unavailable due to system maintenance, technical problems, or other unavoidable circumstances
+
+**9. Disclaimer**
+
+**9.1 Limitation of Operator Liability**
+• Operators are not liable for direct or indirect damages arising from the use of this service, except in cases of intentional or gross negligence
+• Not liable for damages arising from system failures, communication failures, third-party actions, etc.
+
+**9.2 Third-Party Services**
+• This service uses Google Gemini API, and Google's terms of service also apply
+• For issues related to third-party services, please contact the respective service providers
+
+**10. Changes to Terms**
+
+• These terms of service may be changed without prior notice due to legal changes or service content changes
+• Continued use after changes constitutes agreement to the changed content
+• Important changes will be appropriately notified within the app
+
+**11. Governing Law and Jurisdiction**
+
+• These terms of service are governed by and interpreted under Japanese law
+• For disputes related to this service, the court with jurisdiction over the operator's head office location shall be the exclusive agreed jurisdiction court
+
+**12. Contact**
+
+For questions or concerns about these terms of service, please contact us through the Issues section of our GitHub repository.
+
+**13. Effectiveness**
+
+These terms of service take effect when users use this service.`,
       "disclaimerLinkText": "Disclaimer",
       "disclaimerModalTitle": "Disclaimer",
       "closeModalButton": "Close",

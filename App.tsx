@@ -18,6 +18,7 @@ const ConfirmationModal = React.lazy(() => import('./components/ConfirmationModa
 const HelpModal = React.lazy(() => import('./components/HelpModal'));
 const CrisisInterventionModal = React.lazy(() => import('./components/CrisisInterventionModal'));
 const PrivacyPolicyModal = React.lazy(() => import('./components/PrivacyPolicyModal'));
+const TermsOfServiceModal = React.lazy(() => import('./components/TermsOfServiceModal'));
 import { useChatHistory } from './hooks/useChatHistory';
 import { useTextSize } from './hooks/useTextSize';
 import { useMessageHandler } from './hooks/useMessageHandler';
@@ -31,6 +32,7 @@ const App: React.FC = () => {
   const [isClearConfirmOpen, setIsClearConfirmOpen] = useState<boolean>(false);
   const [isHelpOpen, setIsHelpOpen] = useState<boolean>(false);
   const [isPrivacyPolicyOpen, setIsPrivacyPolicyOpen] = useState<boolean>(false);
+  const [isTermsOfServiceOpen, setIsTermsOfServiceOpen] = useState<boolean>(false);
 
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
   
@@ -160,18 +162,26 @@ const App: React.FC = () => {
                     </a>
                   </p>
                 </div>
-                <div className="text-slate-300 flex flex-row justify-center items-center gap-4">
+                <div className="text-slate-300 flex flex-col justify-center items-center gap-2">
+                  <div className="flex flex-row gap-4">
+                    <button
+                      onClick={() => setIsDisclaimerOpen(true)}
+                      className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1"
+                    >
+                      {t('disclaimerLinkText')}
+                    </button>
+                    <button
+                      onClick={() => setIsPrivacyPolicyOpen(true)}
+                      className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1"
+                    >
+                      {t('privacyPolicyLinkText')}
+                    </button>
+                  </div>
                   <button
-                    onClick={() => setIsDisclaimerOpen(true)}
+                    onClick={() => setIsTermsOfServiceOpen(true)}
                     className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1"
                   >
-                    {t('disclaimerLinkText')}
-                  </button>
-                  <button
-                    onClick={() => setIsPrivacyPolicyOpen(true)}
-                    className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1"
-                  >
-                    {t('privacyPolicyLinkText')}
+                    {t('termsOfServiceLinkText')}
                   </button>
                 </div>
               </div>
@@ -203,6 +213,12 @@ const App: React.FC = () => {
                 >
                   {t('privacyPolicyLinkText')}
                 </button>
+                <button
+                  onClick={() => setIsTermsOfServiceOpen(true)}
+                  className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1"
+                >
+                  {t('termsOfServiceLinkText')}
+                </button>
               </div>
             </div>
           </div>
@@ -211,6 +227,7 @@ const App: React.FC = () => {
       <React.Suspense fallback={<div />}>
         <DisclaimerModal isOpen={isDisclaimerOpen} onClose={() => setIsDisclaimerOpen(false)} />
         <PrivacyPolicyModal isOpen={isPrivacyPolicyOpen} onClose={() => setIsPrivacyPolicyOpen(false)} />
+        <TermsOfServiceModal isOpen={isTermsOfServiceOpen} onClose={() => setIsTermsOfServiceOpen(false)} />
         <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
         <ConfirmationModal
           isOpen={isClearConfirmOpen}
