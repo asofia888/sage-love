@@ -63,7 +63,7 @@ export default async function handler(req: Request) {
         temperature: 0.7,
         topP: 0.8,
         topK: 40,
-        maxOutputTokens: 2048,
+        maxOutputTokens: 4096,
       },
       safetySettings: [
         {
