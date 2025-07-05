@@ -1,20 +1,11 @@
 
-import { GoogleGenAI, HarmCategory, HarmBlockThreshold, Content } from '@google/genai';
+import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 import { type ChatMessage, MessageSender } from '../types';
 
 export const config = {
   runtime: 'edge',
 };
 
-// Helper function to convert frontend history to API format
-const toApiHistory = (messages: ChatMessage[]): Content[] => {
-    return messages
-      .filter(msg => !msg.isTyping && !msg.id.startsWith('welcome-'))
-      .map(msg => ({
-        role: msg.sender === MessageSender.USER ? 'user' : 'model',
-        parts: [{ text: msg.text }]
-      }));
-};
 
 function handleError(error: any) {
     console.error('Error in Vercel Edge Function:', error);
@@ -52,9 +43,9 @@ export default async function handler(req: Request) {
   }
 
   try {
-    const { message, history, systemInstruction } = await req.json();
+    const { message, conversationHistory, systemInstruction, language } = await req.json();
 
-    if (!process.env.API_KEY) {
+    if (!process.env.GEMINI_API_KEY) {
       throw new Error('API key is not configured on the server.');
     }
 
@@ -65,46 +56,69 @@ export default async function handler(req: Request) {
       });
     }
 
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     
-    // Combine history and new message for a stateless API call
-    const contents: Content[] = [
-      ...toApiHistory(history || []),
-      { role: 'user', parts: [{ text: message }] }
-    ];
-
-    const resultStream = await ai.models.generateContentStream({
-        model: 'gemini-2.5-flash-preview-04-17',
-        contents: contents,
-        config: {
-            systemInstruction: systemInstruction || 'You are a helpful assistant.',
-            safetySettings: [
-              { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-              { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-            ],
-        }
-    });
-
-    // Create a new ReadableStream to pipe the Gemini stream to the client
-    const stream = new ReadableStream({
-      async start(controller) {
-        const encoder = new TextEncoder();
-        for await (const chunk of resultStream) {
-          const chunkText = chunk.text;
-          if (chunkText) {
-            controller.enqueue(encoder.encode(chunkText));
-          }
-        }
-        controller.close();
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-1.5-flash",
+      generationConfig: {
+        temperature: 0.7,
+        topP: 0.8,
+        topK: 40,
+        maxOutputTokens: 2048,
       },
+      safetySettings: [
+        {
+          category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        },
+      ],
     });
+    
+    // Prepare conversation context
+    let prompt = systemInstruction || '';
+    
+    // Add conversation history if provided
+    if (conversationHistory && Array.isArray(conversationHistory)) {
+      const recentHistory = conversationHistory.slice(-10); // Limit to last 10 messages
+      const historyText = recentHistory
+        .map(msg => `${msg.sender === 'user' ? 'User' : 'Assistant'}: ${msg.text}`)
+        .join('\n');
+      prompt += `\n\nConversation History:\n${historyText}`;
+    }
+    
+    prompt += `\n\nUser: ${message}\nAssistant:`;
+    
+    // Generate response
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    
+    if (!text || text.trim().length === 0) {
+      throw new Error('AI service returned empty response');
+    }
 
-    return new Response(stream, {
+    // Return successful response
+    return new Response(JSON.stringify({
+      message: text.trim(),
+      timestamp: new Date().toISOString(),
+      sessionId: req.headers.get('X-Session-ID') || 'unknown'
+    }), {
+      status: 200,
       headers: {
-        'Content-Type': 'text/plain; charset=utf-8',
+        'Content-Type': 'application/json',
         'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
-        'X-Content-Type-Options': 'nosniff',
       },
     });
 

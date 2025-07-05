@@ -14,7 +14,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@google/genai": "^1.7.0",
+    "@google/generative-ai": "^0.21.0",
     "@vercel/node": "^3.2.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
