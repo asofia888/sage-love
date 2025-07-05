@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: sage-love-api
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: API_KEY
+        value: AIzaSyB0vC5yi8FjWVh0VH3T_J0WLDf6G5tuBlw
+      - key: ALLOWED_ORIGIN
+        value: "*"
+      - key: DAILY_TOKEN_LIMIT
+        value: "50000"
+      - key: MONTHLY_REQUEST_LIMIT
+        value: "1000"
