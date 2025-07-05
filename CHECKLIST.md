@@ -23,7 +23,7 @@
 4. **環境変数設定**
    - [ ] Vercelダッシュボードにアクセス
    - [ ] プロジェクトの Settings > Environment Variables
-   - [ ] `API_KEY` = `AIzaSyB0vC5yi8FjWVh0VH3T_J0WLDf6G5tuBlw`
+   - [ ] `API_KEY` = `[YOUR_GEMINI_API_KEY]`
    - [ ] `NODE_ENV` = `production`
    - [ ] `ALLOWED_ORIGIN` = `https://yourdomain.vercel.app`
 

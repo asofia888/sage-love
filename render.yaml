@@ -9,7 +9,7 @@ services:
       - key: NODE_ENV
         value: production
       - key: API_KEY
-        value: AIzaSyB0vC5yi8FjWVh0VH3T_J0WLDf6G5tuBlw
+        fromDatabase: false  # Set this in Render dashboard environment variables
       - key: ALLOWED_ORIGIN
         value: "*"
       - key: DAILY_TOKEN_LIMIT

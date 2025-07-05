@@ -50,7 +50,7 @@ echo
 echo "次の手順:"
 echo "1. Vercelダッシュボードで環境変数を設定"
 echo "   https://vercel.com/dashboard"
-echo "2. API_KEY = AIzaSyB0vC5yi8FjWVh0VH3T_J0WLDf6G5tuBlw"
+echo "2. GEMINI_API_KEY = [新しいAPI KEYを設定してください]"
 echo "3. NODE_ENV = production"
 echo "4. ALLOWED_ORIGIN = https://yourdomain.vercel.app"
 echo

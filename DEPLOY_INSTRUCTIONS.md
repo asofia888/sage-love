@@ -24,7 +24,7 @@
 
 **環境変数（Environment Variables）:**
 ```
-API_KEY = AIzaSyB0vC5yi8FjWVh0VH3T_J0WLDf6G5tuBlw
+API_KEY = [YOUR_GEMINI_API_KEY]
 NODE_ENV = production
 ALLOWED_ORIGIN = *
 DAILY_TOKEN_LIMIT = 50000

@@ -42,7 +42,7 @@ npm run deploy
 ### Vercelダッシュボードで設定する環境変数：
 
 1. **API_KEY**: Google Gemini APIキー
-   - 値: `AIzaSyB0vC5yi8FjWVh0VH3T_J0WLDf6G5tuBlw`
+   - 値: `[YOUR_GEMINI_API_KEY]`
 
 2. **ALLOWED_ORIGIN**: フロントエンドのURL
    - 開発時: `*`

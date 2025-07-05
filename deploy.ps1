@@ -49,7 +49,7 @@ Write-Host
 Write-Host "次の手順:" -ForegroundColor Cyan
 Write-Host "1. Vercelダッシュボードで環境変数を設定"
 Write-Host "   https://vercel.com/dashboard"
-Write-Host "2. API_KEY = AIzaSyB0vC5yi8FjWVh0VH3T_J0WLDf6G5tuBlw"
+Write-Host "2. GEMINI_API_KEY = [新しいAPI KEYを設定してください]"
 Write-Host "3. NODE_ENV = production"
 Write-Host "4. ALLOWED_ORIGIN = https://yourdomain.vercel.app"
 Write-Host
