@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ApiError } from './types';
 import ChatInput from './components/ChatInput';
 import ChatMessageDisplay from './components/ChatMessageDisplay';
 import TextSizeSelector from './components/TextSizeSelector';

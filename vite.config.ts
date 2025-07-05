@@ -4,6 +4,10 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
+  esbuild: {
+    // Disable strict TypeScript checking during build
+    logOverride: { 'this-is-undefined-in-esm': 'silent' }
+  },
   build: {
     outDir: 'dist',
     rollupOptions: {
@@ -14,7 +18,7 @@ export default defineConfig({
           // i18n libraries
           'i18n-vendor': ['i18next', 'react-i18next', 'i18next-browser-languagedetector'],
           // AI/API libraries
-          'ai-vendor': ['@google/genai'],
+          'ai-vendor': ['@google/generative-ai'],
           // Modal components (lazy loaded)
           'modal-components': [
             './components/DisclaimerModal',

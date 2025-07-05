@@ -10,7 +10,7 @@ import { ChatMessage } from '../types';
 /**
  * 翻訳サービスを初期化（レガシー互換性のため、現在は不要）
  */
-export function initializeTranslationService(apiKey: string) {
+export function initializeTranslationService(_apiKey: string) {
   // No longer needed - API key is handled server-side
   console.log('Translation service initialization is now handled server-side');
 }
@@ -29,9 +29,9 @@ export async function sendSecureChat(
       message,
       systemInstruction,
       conversationHistory: history.map(msg => ({
-        sender: msg.sender,
+        sender: msg.sender === 'user' ? 'user' : 'assistant',
         text: msg.text,
-        timestamp: msg.timestamp
+        timestamp: msg.timestamp.toISOString()
       })),
       language
     };
@@ -43,7 +43,7 @@ export async function sendSecureChat(
     console.error('Secure chat error:', error);
     
     if (error instanceof Error && error.message.startsWith('API_ERROR:')) {
-      const [, errorCode, errorMessage] = error.message.split(':');
+      const [, errorCode] = error.message.split(':');
       
       // Handle specific error types
       switch (errorCode) {

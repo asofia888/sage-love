@@ -1,6 +1,5 @@
 
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
-import { type ChatMessage, MessageSender } from '../types';
 
 export const config = {
   runtime: 'edge',
@@ -43,7 +42,7 @@ export default async function handler(req: Request) {
   }
 
   try {
-    const { message, conversationHistory, systemInstruction, language } = await req.json();
+    const { message, conversationHistory, systemInstruction } = await req.json();
 
     if (!process.env.GEMINI_API_KEY) {
       throw new Error('API key is not configured on the server.');

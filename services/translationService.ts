@@ -1,4 +1,4 @@
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export interface TranslationContext {
   domain: 'spiritual' | 'philosophical' | 'practical';
@@ -29,12 +29,12 @@ export interface TranslationIssue {
 }
 
 export class EnhancedTranslationService {
-  private geminiTranslator: GoogleGenAI;
+  private geminiTranslator: GoogleGenerativeAI;
   private cache = new Map<string, CachedTranslation>();
   private glossary = new Map<string, Map<string, string>>();
 
   constructor(apiKey: string) {
-    this.geminiTranslator = new GoogleGenAI({ apiKey });
+    this.geminiTranslator = new GoogleGenerativeAI(apiKey);
     this.loadSpiritualGlossary();
   }
 
