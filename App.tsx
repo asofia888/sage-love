@@ -123,7 +123,6 @@ const App: React.FC = () => {
         <main className="flex-grow overflow-y-auto p-4 bg-transparent">
           <div className="container mx-auto max-w-4xl space-y-4">
             {messages.length === 0 && <WelcomeMessage textSize={textSize} />}
-            <SEOContent />
             {messages.map(msg => (
               <ChatMessageDisplay
                 key={msg.id}
@@ -259,6 +258,9 @@ const App: React.FC = () => {
           />
         )}
       </React.Suspense>
+      
+      {/* SEO Content - hidden from display but crawlable */}
+      <SEOContent />
     </>
   );
 };

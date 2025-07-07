@@ -241,24 +241,8 @@
     }
   </style>
   
-  <!-- Non-critical CSS loaded asynchronously -->
-  <script>
-    // Load Tailwind CSS asynchronously
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = 'https://cdn.tailwindcss.com';
-    link.media = 'print';
-    link.onload = function() { this.media = 'all'; };
-    document.head.appendChild(link);
-    
-    // Fallback for older browsers
-    const noscript = document.createElement('noscript');
-    const fallbackLink = document.createElement('link');
-    fallbackLink.rel = 'stylesheet';
-    fallbackLink.href = 'https://cdn.tailwindcss.com';
-    noscript.appendChild(fallbackLink);
-    document.head.appendChild(noscript);
-  </script>
+  <!-- Tailwind CSS - loaded synchronously for stable styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
 <script type="importmap">
 {
   "imports": {
