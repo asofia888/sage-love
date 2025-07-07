@@ -1,0 +1,68 @@
+# Robots.txt for Sage's Love AI (聖者の愛AI)
+# https://sage-love.vercel.app/
+
+User-agent: *
+Allow: /
+
+# Allow specific important files
+Allow: /sitemap.xml
+Allow: /manifest.json
+Allow: /assets/
+Allow: /*.css
+Allow: /*.js
+Allow: /*.png
+Allow: /*.jpg
+Allow: /*.jpeg
+Allow: /*.gif
+Allow: /*.svg
+Allow: /*.webp
+
+# Disallow private/sensitive areas
+Disallow: /api/
+Disallow: /.well-known/
+Disallow: /admin/
+Disallow: /private/
+Disallow: /_next/
+Disallow: /node_modules/
+
+# Crawl delay - be respectful
+Crawl-delay: 1
+
+# Sitemap location
+Sitemap: https://sage-love.vercel.app/sitemap.xml
+
+# Additional sitemaps
+Sitemap: https://sage-love.vercel.app/sitemap-images.xml
+
+# Special instructions for major search engines
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Slurp
+Allow: /
+Crawl-delay: 1
+
+# Social media crawlers
+User-agent: facebookexternalhit
+Allow: /
+User-agent: Twitterbot
+Allow: /
+User-agent: LinkedInBot
+Allow: /
+
+# Archive crawlers
+User-agent: ia_archiver
+Allow: /
+
+# Block abusive crawlers
+User-agent: AhrefsBot
+Disallow: /
+User-agent: MJ12bot
+Disallow: /
+User-agent: DotBot
+Disallow: /

@@ -11,6 +11,10 @@ import ClearChatButton from './components/ClearChatButton';
 import ShareButton from './components/ShareButton';
 import WelcomeMessage from './components/WelcomeMessage';
 import HelpButton from './components/HelpButton';
+import SEOContent from './components/SEOContent';
+import GoogleAnalytics from './components/GoogleAnalytics';
+import PerformanceMonitor from './components/PerformanceMonitor';
+import MultilingualSEO from './components/MultilingualSEO';
 
 // Lazy load modal components
 const DisclaimerModal = React.lazy(() => import('./components/DisclaimerModal'));
@@ -93,6 +97,9 @@ const App: React.FC = () => {
 
   return (
     <>
+      <GoogleAnalytics />
+      <PerformanceMonitor />
+      <MultilingualSEO />
       <div className="flex flex-col h-screen bg-transparent text-slate-100">
         <header className="p-4 bg-slate-800/50 backdrop-blur-md shadow-lg sticky top-0 z-10">
           <div className="container mx-auto flex flex-col sm:flex-row items-center">
@@ -116,6 +123,7 @@ const App: React.FC = () => {
         <main className="flex-grow overflow-y-auto p-4 bg-transparent">
           <div className="container mx-auto max-w-4xl space-y-4">
             {messages.length === 0 && <WelcomeMessage textSize={textSize} />}
+            <SEOContent />
             {messages.map(msg => (
               <ChatMessageDisplay
                 key={msg.id}
