@@ -169,24 +169,22 @@ const App: React.FC = () => {
                     </a>
                   </p>
                 </div>
-                <div className="text-slate-300 flex flex-col justify-center items-center gap-2">
-                  <div className="flex flex-row gap-4">
-                    <button
-                      onClick={() => setIsDisclaimerOpen(true)}
-                      className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1"
-                    >
-                      {t('disclaimerLinkText')}
-                    </button>
-                    <button
-                      onClick={() => setIsPrivacyPolicyOpen(true)}
-                      className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1"
-                    >
-                      {t('privacyPolicyLinkText')}
-                    </button>
-                  </div>
+                <div className="text-slate-300 flex flex-row justify-center items-center gap-4">
+                  <button
+                    onClick={() => setIsDisclaimerOpen(true)}
+                    className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1 text-xs"
+                  >
+                    {t('disclaimerLinkText')}
+                  </button>
+                  <button
+                    onClick={() => setIsPrivacyPolicyOpen(true)}
+                    className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1 text-xs"
+                  >
+                    {t('privacyPolicyLinkText')}
+                  </button>
                   <button
                     onClick={() => setIsTermsOfServiceOpen(true)}
-                    className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1"
+                    className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1 text-xs"
                   >
                     {t('termsOfServiceLinkText')}
                   </button>
