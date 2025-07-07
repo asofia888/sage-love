@@ -12,73 +12,9 @@
   "scope": "/",
   "icons": [
     {
-      "src": "/assets/favicon-16x16.png",
-      "sizes": "16x16",
-      "type": "image/png"
-    },
-    {
-      "src": "/assets/favicon-32x32.png", 
-      "sizes": "32x32",
-      "type": "image/png"
-    },
-    {
-      "src": "/assets/apple-touch-icon.png",
-      "sizes": "180x180",
-      "type": "image/png"
-    },
-    {
-      "src": "/assets/android-chrome-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/assets/android-chrome-512x512.png",
-      "sizes": "512x512", 
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "/assets/screenshot-mobile.png",
-      "sizes": "375x812",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "聖者の愛AI - モバイル画面"
-    },
-    {
-      "src": "/assets/screenshot-desktop.png", 
-      "sizes": "1200x800",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "聖者の愛AI - デスクトップ画面"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "新しい相談を始める",
-      "short_name": "新しい相談",
-      "description": "聖者に新しい質問をする",
-      "url": "/?action=new-chat",
-      "icons": [
-        {
-          "src": "/assets/shortcut-new-chat.png",
-          "sizes": "96x96"
-        }
-      ]
-    },
-    {
-      "name": "ヘルプ・使い方",
-      "short_name": "ヘルプ",
-      "description": "アプリの使い方を確認する",
-      "url": "/?action=help",
-      "icons": [
-        {
-          "src": "/assets/shortcut-help.png",
-          "sizes": "96x96"
-        }
-      ]
+      "src": "/favicon.ico",
+      "sizes": "16x16 32x32 48x48",
+      "type": "image/x-icon"
     }
   ],
   "related_applications": [],
