@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import ChatInput from './components/ChatInput';
 import ChatMessageDisplay from './components/ChatMessageDisplay';
+import VirtualizedChat from './components/VirtualizedChat';
 import TextSizeSelector from './components/TextSizeSelector';
 import PromptSuggestions from './components/PromptSuggestions';
 import LanguageSelector from './components/LanguageSelector';
@@ -41,7 +42,7 @@ const App: React.FC = () => {
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
   
   const [textSize, setTextSize] = useTextSize();
-  const [messages, setMessages, clearChat] = useChatHistory(i18n.isInitialized);
+  const [messages, setMessages, clearChat, memoryStats] = useChatHistory(i18n.isInitialized);
   
   // メッセージハンドリングロジックを分離
   const { 
@@ -98,7 +99,7 @@ const App: React.FC = () => {
   return (
     <>
       <GoogleAnalytics />
-      <PerformanceMonitor />
+      <PerformanceMonitor memoryStats={memoryStats} />
       <MultilingualSEO />
       <div className="flex flex-col h-screen bg-transparent text-slate-100">
         <header className="p-4 bg-slate-800/50 backdrop-blur-md shadow-lg sticky top-0 z-10">
@@ -121,16 +122,15 @@ const App: React.FC = () => {
         </header>
 
         <main className="flex-grow overflow-y-auto p-4 bg-transparent">
-          <div className="container mx-auto max-w-4xl space-y-4">
+          <div className="container mx-auto max-w-4xl">
             {messages.length === 0 && <WelcomeMessage textSize={textSize} />}
-            {messages.map(msg => (
-              <ChatMessageDisplay
-                key={msg.id}
-                message={msg}
-                currentLang={i18n.language}
+            {messages.length > 0 && (
+              <VirtualizedChat
+                messages={messages}
                 textSize={textSize}
+                currentLang={i18n.language}
               />
-            ))}
+            )}
             <div ref={messagesEndRef} />
           </div>
         </main>

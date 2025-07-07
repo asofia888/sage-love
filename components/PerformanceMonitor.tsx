@@ -1,10 +1,18 @@
 import React, { useEffect } from 'react';
 
+interface PerformanceMonitorProps {
+  memoryStats?: {
+    totalMessages: number;
+    memoryUsage: number;
+    isNearLimit: boolean;
+  };
+}
+
 /**
- * Core Web Vitals パフォーマンス監視コンポーネント
- * LCP, FID, CLS の測定とレポート
+ * 拡張パフォーマンス監視コンポーネント
+ * Core Web Vitals + メモリ使用量 + チャット履歴監視
  */
-const PerformanceMonitor: React.FC = () => {
+const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({ memoryStats }) => {
   useEffect(() => {
     // Web Vitals の測定
     const measureWebVitals = () => {
@@ -200,6 +208,102 @@ const PerformanceMonitor: React.FC = () => {
       clearInterval(memoryInterval);
     };
   }, []);
+
+  // チャット履歴とメモリ統計の監視
+  useEffect(() => {
+    if (!memoryStats) return;
+
+    const { totalMessages, memoryUsage, isNearLimit } = memoryStats;
+
+    // メモリ使用量の定期チェック
+    const checkMemoryUsage = () => {
+      if (window.gtag) {
+        window.gtag('event', 'chat_memory_stats', {
+          event_category: 'performance',
+          total_messages: totalMessages,
+          memory_usage_bytes: memoryUsage,
+          memory_usage_mb: Math.round(memoryUsage / 1024 / 1024 * 100) / 100,
+          is_near_limit: isNearLimit
+        });
+      }
+
+      // メモリ使用量が制限に近い場合の警告
+      if (isNearLimit) {
+        console.warn(`Chat memory usage is near limit: ${Math.round(memoryUsage / 1024)} KB (${totalMessages} messages)`);
+        
+        if (window.gtag) {
+          window.gtag('event', 'memory_limit_warning', {
+            event_category: 'performance',
+            memory_usage: memoryUsage,
+            message_count: totalMessages
+          });
+        }
+      }
+
+      // DOM ノード数の監視
+      const domNodeCount = document.querySelectorAll('*').length;
+      if (domNodeCount > 2000) { // 2000ノード以上で警告
+        console.warn(`High DOM node count: ${domNodeCount}`);
+        
+        if (window.gtag) {
+          window.gtag('event', 'high_dom_node_count', {
+            event_category: 'performance',
+            node_count: domNodeCount,
+            message_count: totalMessages
+          });
+        }
+      }
+    };
+
+    // 初回チェック
+    checkMemoryUsage();
+
+    // メッセージ数が多い場合は監視頻度を上げる
+    const checkInterval = totalMessages > 50 ? 30000 : 60000; // 30秒 or 60秒
+    const memoryCheckInterval = setInterval(checkMemoryUsage, checkInterval);
+
+    return () => {
+      clearInterval(memoryCheckInterval);
+    };
+  }, [memoryStats]);
+
+  // レンダリングパフォーマンスの監視
+  useEffect(() => {
+    let frameCount = 0;
+    let lastTime = performance.now();
+
+    const measureFPS = () => {
+      frameCount++;
+      const currentTime = performance.now();
+      
+      if (currentTime - lastTime >= 1000) { // 1秒ごと
+        const fps = Math.round((frameCount * 1000) / (currentTime - lastTime));
+        
+        if (fps < 30) { // 30FPS以下で警告
+          console.warn(`Low FPS detected: ${fps}`);
+          
+          if (window.gtag) {
+            window.gtag('event', 'low_fps_detected', {
+              event_category: 'performance',
+              fps: fps,
+              message_count: memoryStats?.totalMessages || 0
+            });
+          }
+        }
+        
+        frameCount = 0;
+        lastTime = currentTime;
+      }
+      
+      requestAnimationFrame(measureFPS);
+    };
+
+    const rafId = requestAnimationFrame(measureFPS);
+    
+    return () => {
+      cancelAnimationFrame(rafId);
+    };
+  }, [memoryStats?.totalMessages]);
   
   return null; // このコンポーネントは何も描画しない
 };
