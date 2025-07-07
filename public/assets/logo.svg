@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="lotusGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0ea5e9;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1e293b;stop-opacity:1" />
+    </linearGradient>
+    <radialGradient id="centerGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:1" />
+    </radialGradient>
+  </defs>
+  
+  <!-- Outer petals -->
+  <g transform="translate(100,100)">
+    <!-- 8 outer petals -->
+    <g fill="url(#lotusGradient)" opacity="0.8">
+      <ellipse cx="0" cy="-45" rx="12" ry="35" transform="rotate(0)"/>
+      <ellipse cx="0" cy="-45" rx="12" ry="35" transform="rotate(45)"/>
+      <ellipse cx="0" cy="-45" rx="12" ry="35" transform="rotate(90)"/>
+      <ellipse cx="0" cy="-45" rx="12" ry="35" transform="rotate(135)"/>
+      <ellipse cx="0" cy="-45" rx="12" ry="35" transform="rotate(180)"/>
+      <ellipse cx="0" cy="-45" rx="12" ry="35" transform="rotate(225)"/>
+      <ellipse cx="0" cy="-45" rx="12" ry="35" transform="rotate(270)"/>
+      <ellipse cx="0" cy="-45" rx="12" ry="35" transform="rotate(315)"/>
+    </g>
+    
+    <!-- Inner petals -->
+    <g fill="url(#lotusGradient)" opacity="0.9">
+      <ellipse cx="0" cy="-30" rx="10" ry="25" transform="rotate(22.5)"/>
+      <ellipse cx="0" cy="-30" rx="10" ry="25" transform="rotate(67.5)"/>
+      <ellipse cx="0" cy="-30" rx="10" ry="25" transform="rotate(112.5)"/>
+      <ellipse cx="0" cy="-30" rx="10" ry="25" transform="rotate(157.5)"/>
+      <ellipse cx="0" cy="-30" rx="10" ry="25" transform="rotate(202.5)"/>
+      <ellipse cx="0" cy="-30" rx="10" ry="25" transform="rotate(247.5)"/>
+      <ellipse cx="0" cy="-30" rx="10" ry="25" transform="rotate(292.5)"/>
+      <ellipse cx="0" cy="-30" rx="10" ry="25" transform="rotate(337.5)"/>
+    </g>
+    
+    <!-- Center -->
+    <circle cx="0" cy="0" r="15" fill="url(#centerGradient)"/>
+    <circle cx="0" cy="0" r="8" fill="#fbbf24" opacity="0.8"/>
+  </g>
+</svg>
