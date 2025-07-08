@@ -5,6 +5,60 @@ export const config = {
   runtime: 'edge',
 };
 
+// Retry configuration
+const RETRY_CONFIG = {
+  maxRetries: 3,
+  baseDelay: 1000, // 1 second
+  maxDelay: 10000, // 10 seconds
+  backoffFactor: 2
+};
+
+// Sleep function for retry delays
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// Retry function with exponential backoff
+async function retryWithBackoff<T>(
+  fn: () => Promise<T>,
+  maxRetries: number = RETRY_CONFIG.maxRetries,
+  baseDelay: number = RETRY_CONFIG.baseDelay
+): Promise<T> {
+  let lastError: any;
+  
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error: any) {
+      lastError = error;
+      
+      // Don't retry on authentication errors or invalid requests
+      if (error.message?.includes('API key not valid') || 
+          error.message?.includes('API key is not configured') ||
+          error.status === 400 || 
+          error.status === 401 || 
+          error.status === 403) {
+        throw error;
+      }
+      
+      // If this is the last attempt, throw the error
+      if (attempt === maxRetries) {
+        throw error;
+      }
+      
+      // Calculate delay with exponential backoff
+      const delay = Math.min(
+        baseDelay * Math.pow(RETRY_CONFIG.backoffFactor, attempt),
+        RETRY_CONFIG.maxDelay
+      );
+      
+      console.log(`Attempt ${attempt + 1} failed, retrying in ${delay}ms...`, error.message);
+      await sleep(delay);
+    }
+  }
+  
+  throw lastError;
+}
 
 function handleError(error: any) {
     console.error('Error in Vercel Edge Function:', error);
@@ -21,6 +75,15 @@ function handleError(error: any) {
         errorCode = 'errorQuota';
     } else if (errorMessage.includes('API key is not configured')) {
         errorCode = 'errorNoApiKeyConfig';
+    } else if (errorMessage.includes('overloaded') || errorMessage.includes('503')) {
+        statusCode = 503;
+        errorCode = 'errorServiceUnavailable';
+    } else if (errorMessage.includes('timeout') || errorMessage.includes('TIMEOUT')) {
+        statusCode = 408;
+        errorCode = 'errorTimeout';
+    } else if (errorMessage.includes('rate limit') || errorMessage.includes('429')) {
+        statusCode = 429;
+        errorCode = 'errorRateLimit';
     }
 
     return new Response(JSON.stringify({
@@ -99,8 +162,10 @@ export default async function handler(req: Request) {
     
     prompt += `\n\nUser: ${message}\nAssistant:`;
     
-    // Generate response
-    const result = await model.generateContent(prompt);
+    // Generate response with retry logic
+    const result = await retryWithBackoff(async () => {
+      return await model.generateContent(prompt);
+    });
     const response = await result.response;
     const text = response.text();
     
