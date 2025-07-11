@@ -13,9 +13,9 @@ import ShareButton from './components/ShareButton';
 import WelcomeMessage from './components/WelcomeMessage';
 import HelpButton from './components/HelpButton';
 import SEOContent from './components/SEOContent';
-import GoogleAnalytics from './components/GoogleAnalytics';
 import PerformanceMonitor from './components/PerformanceMonitor';
 import MultilingualSEO from './components/MultilingualSEO';
+import CookieBanner from './components/CookieBanner';
 
 // Lazy load modal components
 const DisclaimerModal = React.lazy(() => import('./components/DisclaimerModal'));
@@ -98,7 +98,7 @@ const App: React.FC = () => {
 
   return (
     <>
-      <GoogleAnalytics />
+      <CookieBanner />
       <PerformanceMonitor memoryStats={memoryStats} />
       <MultilingualSEO />
       <div className="flex flex-col h-screen bg-transparent text-slate-100">
