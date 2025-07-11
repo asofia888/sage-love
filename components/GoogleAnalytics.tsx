@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 declare global {
   interface Window {
-    gtag: (command: string, targetId: string, config?: any) => void;
+    gtag: (...args: any[]) => void;
     dataLayer: any[];
   }
 }
@@ -39,7 +39,7 @@ const GoogleAnalytics: React.FC = () => {
     };
     
     // Google Analytics の初期化
-    window.gtag('js', new Date());
+    window.gtag('js', new Date().toISOString());
     window.gtag('config', GA_MEASUREMENT_ID, {
       // プライバシー設定
       anonymize_ip: true,
