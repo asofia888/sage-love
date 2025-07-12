@@ -4,6 +4,33 @@
       "memory": 1024
     }
   },
+  "env": {
+    "ALLOWED_ORIGIN": "https://www.sage-love.com,https://sage-love.vercel.app"
+  },
+  "redirects": [
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "sage-love.vercel.app"
+        }
+      ],
+      "destination": "https://www.sage-love.com/",
+      "permanent": true
+    },
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "sage-love.vercel.app"
+        }
+      ],
+      "destination": "https://www.sage-love.com/$1",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/chat",

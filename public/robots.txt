@@ -1,5 +1,5 @@
 # Robots.txt for Sage's Love AI (聖者の愛AI)
-# https://sage-love.vercel.app/
+# https://www.sage-love.com/
 
 User-agent: *
 Allow: /
@@ -29,10 +29,10 @@ Disallow: /node_modules/
 Crawl-delay: 1
 
 # Sitemap location
-Sitemap: https://sage-love.vercel.app/sitemap.xml
+Sitemap: https://www.sage-love.com/sitemap.xml
 
 # Additional sitemaps
-Sitemap: https://sage-love.vercel.app/sitemap-images.xml
+Sitemap: https://www.sage-love.com/sitemap-images.xml
 
 # Special instructions for major search engines
 User-agent: Googlebot

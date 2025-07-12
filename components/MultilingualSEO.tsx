@@ -11,7 +11,7 @@ const MultilingualSEO: React.FC = () => {
   useEffect(() => {
     const updateSEOForLanguage = () => {
       const currentLang = i18n.language.split('-')[0];
-      const baseUrl = 'https://sage-love.vercel.app';
+      const baseUrl = 'https://www.sage-love.com';
       
       // 言語別メタタグの更新
       const updateMetaTags = () => {

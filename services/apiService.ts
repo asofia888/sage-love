@@ -31,9 +31,7 @@ class ApiService {
 
   constructor() {
     // Use environment variable for API base URL
-    this.baseUrl = process.env.NODE_ENV === 'production' 
-      ? 'https://sage-love.vercel.app/api'
-      : '/api';
+    this.baseUrl = '/api';
     
     // Generate or retrieve session ID
     this.sessionId = this.getSessionId();

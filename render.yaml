@@ -11,7 +11,7 @@ services:
       - key: API_KEY
         fromDatabase: false  # Set this in Render dashboard environment variables
       - key: ALLOWED_ORIGIN
-        value: "https://www.sage-love.com,https://sage-love.vercel.app"
+        value: "*"
       - key: DAILY_TOKEN_LIMIT
         value: "50000"
       - key: MONTHLY_REQUEST_LIMIT

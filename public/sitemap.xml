@@ -5,17 +5,17 @@
   
   <!-- Main page with language alternatives -->
   <url>
-    <loc>https://sage-love.vercel.app/</loc>
+    <loc>https://www.sage-love.com/</loc>
     <lastmod>2025-07-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="ja" href="https://sage-love.vercel.app/" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://sage-love.vercel.app/?lang=en" />
-    <xhtml:link rel="alternate" hreflang="es" href="https://sage-love.vercel.app/?lang=es" />
-    <xhtml:link rel="alternate" hreflang="pt" href="https://sage-love.vercel.app/?lang=pt" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://sage-love.vercel.app/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.sage-love.com/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.sage-love.com/?lang=en" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.sage-love.com/?lang=es" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://www.sage-love.com/?lang=pt" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.sage-love.com/" />
     <image:image>
-      <image:loc>https://sage-love.vercel.app/assets/og-image.png</image:loc>
+      <image:loc>https://www.sage-love.com/assets/og-image.png</image:loc>
       <image:title>聖者の愛（AI）- スピリチュアル相談AI</image:title>
       <image:caption>無料のAI聖者があなたの人生の悩みにお答えします</image:caption>
     </image:image>
@@ -23,55 +23,55 @@
 
   <!-- Japanese version -->
   <url>
-    <loc>https://sage-love.vercel.app/?lang=ja</loc>
+    <loc>https://www.sage-love.com/?lang=ja</loc>
     <lastmod>2025-07-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
-    <xhtml:link rel="alternate" hreflang="ja" href="https://sage-love.vercel.app/?lang=ja" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://sage-love.vercel.app/?lang=en" />
-    <xhtml:link rel="alternate" hreflang="es" href="https://sage-love.vercel.app/?lang=es" />
-    <xhtml:link rel="alternate" hreflang="pt" href="https://sage-love.vercel.app/?lang=pt" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.sage-love.com/?lang=ja" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.sage-love.com/?lang=en" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.sage-love.com/?lang=es" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://www.sage-love.com/?lang=pt" />
   </url>
 
   <!-- English version -->
   <url>
-    <loc>https://sage-love.vercel.app/?lang=en</loc>
+    <loc>https://www.sage-love.com/?lang=en</loc>
     <lastmod>2025-07-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
-    <xhtml:link rel="alternate" hreflang="ja" href="https://sage-love.vercel.app/" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://sage-love.vercel.app/?lang=en" />
-    <xhtml:link rel="alternate" hreflang="es" href="https://sage-love.vercel.app/?lang=es" />
-    <xhtml:link rel="alternate" hreflang="pt" href="https://sage-love.vercel.app/?lang=pt" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.sage-love.com/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.sage-love.com/?lang=en" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.sage-love.com/?lang=es" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://www.sage-love.com/?lang=pt" />
   </url>
 
   <!-- Spanish version -->
   <url>
-    <loc>https://sage-love.vercel.app/?lang=es</loc>
+    <loc>https://www.sage-love.com/?lang=es</loc>
     <lastmod>2025-07-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
-    <xhtml:link rel="alternate" hreflang="ja" href="https://sage-love.vercel.app/" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://sage-love.vercel.app/?lang=en" />
-    <xhtml:link rel="alternate" hreflang="es" href="https://sage-love.vercel.app/?lang=es" />
-    <xhtml:link rel="alternate" hreflang="pt" href="https://sage-love.vercel.app/?lang=pt" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.sage-love.com/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.sage-love.com/?lang=en" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.sage-love.com/?lang=es" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://www.sage-love.com/?lang=pt" />
   </url>
 
   <!-- Portuguese version -->
   <url>
-    <loc>https://sage-love.vercel.app/?lang=pt</loc>
+    <loc>https://www.sage-love.com/?lang=pt</loc>
     <lastmod>2025-07-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
-    <xhtml:link rel="alternate" hreflang="ja" href="https://sage-love.vercel.app/" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://sage-love.vercel.app/?lang=en" />
-    <xhtml:link rel="alternate" hreflang="es" href="https://sage-love.vercel.app/?lang=es" />
-    <xhtml:link rel="alternate" hreflang="pt" href="https://sage-love.vercel.app/?lang=pt" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.sage-love.com/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.sage-love.com/?lang=en" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.sage-love.com/?lang=es" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://www.sage-love.com/?lang=pt" />
   </url>
 
   <!-- Privacy Policy -->
   <url>
-    <loc>https://sage-love.vercel.app/privacy</loc>
+    <loc>https://www.sage-love.com/privacy</loc>
     <lastmod>2025-07-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
@@ -79,7 +79,7 @@
 
   <!-- Terms of Service -->
   <url>
-    <loc>https://sage-love.vercel.app/terms</loc>
+    <loc>https://www.sage-love.com/terms</loc>
     <lastmod>2025-07-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
@@ -87,7 +87,7 @@
 
   <!-- Help/FAQ -->
   <url>
-    <loc>https://sage-love.vercel.app/help</loc>
+    <loc>https://www.sage-love.com/help</loc>
     <lastmod>2025-07-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
