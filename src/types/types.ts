@@ -2,14 +2,14 @@
 
 export enum MessageSender {
   USER = 'user',
-  AI = 'ai',
+  AI = 'assistant',
 }
 
 // 基本メッセージ型
 interface BaseMessage {
   id: string;
   sender: MessageSender;
-  timestamp: Date;
+  timestamp: string;
 }
 
 // ユーザーメッセージ型（常に完了済み）

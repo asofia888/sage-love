@@ -2,31 +2,31 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import ChatInput from './components/ChatInput';
-import ChatMessageDisplay from './components/ChatMessageDisplay';
-import VirtualizedChat from './components/VirtualizedChat';
-import TextSizeSelector from './components/TextSizeSelector';
-import PromptSuggestions from './components/PromptSuggestions';
-import LanguageSelector from './components/LanguageSelector';
-import ClearChatButton from './components/ClearChatButton';
-import ShareButton from './components/ShareButton';
-import WelcomeMessage from './components/WelcomeMessage';
-import HelpButton from './components/HelpButton';
-import SEOContent from './components/SEOContent';
-import PerformanceMonitor from './components/PerformanceMonitor';
-import MultilingualSEO from './components/MultilingualSEO';
-import CookieBanner from './components/CookieBanner';
+import ChatInput from './src/components/ChatInput';
+import ChatMessageDisplay from './src/components/ChatMessageDisplay';
+import VirtualizedChat from './src/components/VirtualizedChat';
+import TextSizeSelector from './src/components/TextSizeSelector';
+import PromptSuggestions from './src/components/PromptSuggestions';
+import LanguageSelector from './src/components/LanguageSelector';
+import ClearChatButton from './src/components/ClearChatButton';
+import ShareButton from './src/components/ShareButton';
+import WelcomeMessage from './src/components/WelcomeMessage';
+import HelpButton from './src/components/HelpButton';
+import SEOContent from './src/components/SEOContent';
+import PerformanceMonitor from './src/components/PerformanceMonitor';
+import { MultilingualSEO } from './src/components/SEO';
+import CookieBanner from './src/components/CookieBanner';
 
 // Lazy load modal components
-const DisclaimerModal = React.lazy(() => import('./components/DisclaimerModal'));
-const ConfirmationModal = React.lazy(() => import('./components/ConfirmationModal'));
-const HelpModal = React.lazy(() => import('./components/HelpModal'));
-const CrisisInterventionModal = React.lazy(() => import('./components/CrisisInterventionModal'));
-const PrivacyPolicyModal = React.lazy(() => import('./components/PrivacyPolicyModal'));
-const TermsOfServiceModal = React.lazy(() => import('./components/TermsOfServiceModal'));
-import { useChatHistory } from './hooks/useChatHistory';
-import { useTextSize } from './hooks/useTextSize';
-import { useMessageHandler } from './hooks/useMessageHandler';
+const DisclaimerModal = React.lazy(() => import('./src/components/DisclaimerModal'));
+const ConfirmationModal = React.lazy(() => import('./src/components/ConfirmationModal'));
+const HelpModal = React.lazy(() => import('./src/components/HelpModal'));
+const CrisisInterventionModal = React.lazy(() => import('./src/components/CrisisInterventionModal'));
+const PrivacyPolicyModal = React.lazy(() => import('./src/components/PrivacyPolicyModal'));
+const TermsOfServiceModal = React.lazy(() => import('./src/components/TermsOfServiceModal'));
+import { useChatHistory } from './src/hooks/useChatHistory';
+import { useTextSize } from './src/hooks/useTextSize';
+import { useMessageHandler } from './src/hooks/useMessageHandler';
 
 
 // --- Main App Component ---

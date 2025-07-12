@@ -48,7 +48,7 @@ const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({ message, curren
   const aiBubbleColor = 'bg-sky-800/75';
   const bubbleColor = isUser ? userBubbleColor : aiBubbleColor;
 
-  const formattedTimestamp = message.timestamp.toLocaleTimeString(currentLang.split('-')[0], {
+  const formattedTimestamp = new Date(message.timestamp).toLocaleTimeString(currentLang.split('-')[0], {
     hour: '2-digit',
     minute: '2-digit',
   });

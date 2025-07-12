@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChatMessage, ApiError, MessageSender } from '../types';
+import { CrisisDetectionResult } from '../services/crisisDetectionService';
 import * as geminiService from '../services/geminiService';
 import { DuplicateAvoidanceService } from '../services/duplicateAvoidanceService';
 import { ErrorService } from '../services/errorService';
@@ -19,7 +20,7 @@ interface UseMessageHandlerReturn {
   // 危機検出関連
   isCrisisModalOpen: boolean;
   closeCrisisModal: () => void;
-  lastCrisisResult: any;
+  lastCrisisResult: CrisisDetectionResult | null;
 }
 
 /**
