@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import ChatInput from './src/components/ChatInput';
-import ChatMessageDisplay from './src/components/ChatMessageDisplay';
 import VirtualizedChat from './src/components/VirtualizedChat';
 import TextSizeSelector from './src/components/TextSizeSelector';
 import PromptSuggestions from './src/components/PromptSuggestions';

@@ -21,11 +21,11 @@ export default defineConfig({
           'ai-vendor': ['@google/generative-ai'],
           // Modal components (lazy loaded)
           'modal-components': [
-            './components/DisclaimerModal',
-            './components/PrivacyPolicyModal',
-            './components/HelpModal',
-            './components/ConfirmationModal',
-            './components/CrisisInterventionModal'
+            './src/components/DisclaimerModal',
+            './src/components/PrivacyPolicyModal',
+            './src/components/HelpModal',
+            './src/components/ConfirmationModal',
+            './src/components/CrisisInterventionModal'
           ]
         }
       }
