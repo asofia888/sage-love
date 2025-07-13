@@ -233,7 +233,7 @@ app.post('/api/chat', async (req, res) => {
     const genAI = new GoogleGenAI(process.env.API_KEY);
     
     const model = genAI.getGenerativeModel({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-2.5-pro',
       safetySettings: [
         {
           category: HarmCategory.HARM_CATEGORY_HARASSMENT,
