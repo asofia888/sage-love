@@ -1,12 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-// Mock environment variables
-vi.mock('process', () => ({
-  env: {
-    GEMINI_API_KEY: 'test-api-key-12345'
-  }
-}));
-
 // Mock Google Generative AI
 const mockGenerateContent = vi.fn();
 const mockGetGenerativeModel = vi.fn(() => ({
@@ -34,10 +27,12 @@ const chatHandler = await import('../../../api/chat');
 describe('Chat API Handler', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    process.env.GEMINI_API_KEY = 'test-api-key-12345';
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
+    delete process.env.GEMINI_API_KEY;
   });
 
   describe('POST /api/chat', () => {
