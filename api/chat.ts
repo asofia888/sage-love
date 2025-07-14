@@ -126,7 +126,7 @@ export default async function handler(req: Request) {
         temperature: 0.7,
         topP: 0.8,
         topK: 40,
-        maxOutputTokens: 512,
+        maxOutputTokens: 4096,
       },
       safetySettings: [
         {
@@ -173,15 +173,9 @@ export default async function handler(req: Request) {
       throw new Error('AI service returned empty response');
     }
 
-    // Ensure response doesn't exceed 850 characters
-    let finalText = text.trim();
-    if (finalText.length > 850) {
-      finalText = finalText.substring(0, 847) + '...';
-    }
-
     // Return successful response
     return new Response(JSON.stringify({
-      message: finalText,
+      message: text.trim(),
       timestamp: new Date().toISOString(),
       sessionId: req.headers.get('X-Session-ID') || 'unknown'
     }), {

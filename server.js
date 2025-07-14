@@ -278,7 +278,7 @@ app.post('/api/chat', async (req, res) => {
     res.setHeader('Connection', 'keep-alive');
     
     let totalResponseLength = 0;
-    const maxResponseLength = 850;
+    const maxResponseLength = 8000;
     let estimatedTokensUsed = 0;
 
     // ストリームの各チャンクをクライアントに書き込む
