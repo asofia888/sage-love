@@ -334,6 +334,28 @@ export default {
   "cookieAlwaysActive": "常に有効",
   "cookieSavePreferences": "設定を保存",
   "closeButton": "閉じる",
+  "errorBoundary": {
+    "genericError": "予期しないエラーが発生しました",
+    "chunkLoadError": "アプリケーションの読み込みに失敗しました",
+    "memoryError": "メモリ不足が発生しました",
+    "networkError": "ネットワークエラーが発生しました",
+    "genericDescription": "申し訳ありませんが、予期しない問題が発生しました。一時的な問題の可能性があります。",
+    "chunkLoadDescription": "アプリケーションの一部が正しく読み込めませんでした。ページを再読み込みしてください。",
+    "memoryDescription": "ブラウザのメモリが不足しています。他のタブを閉じてから再試行してください。",
+    "networkDescription": "ネットワーク接続に問題があります。接続を確認してください。",
+    "retryButton": "再試行",
+    "reloadButton": "ページを再読み込み",
+    "reportButton": "問題を報告",
+    "reportingButton": "報告中...",
+    "showDetails": "詳細を表示",
+    "errorMessage": "エラーメッセージ",
+    "errorType": "エラータイプ",
+    "stackTrace": "スタックトレース",
+    "componentStack": "コンポーネントスタック",
+    "retryInfo": "再試行 {{current}}/{{max}} 回",
+    "feedbackText": "問題が解決しない場合は、お気軽にお知らせください：",
+    "feedbackLink": "問題を報告する"
+  },
   "systemInstructionForSage": `あなたは、あらゆる時代の多くの聖賢たちの叡智を内に秘めた、一人の聖なる存在である。
 様々な教えや智慧が、あなたの中で調和し、統合されている。
 日常の悩みに対しては、最新の心理学や教育方法の知見も踏まえて語ること。

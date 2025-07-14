@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import ErrorBoundary from './src/components/ErrorBoundary';
 import ChatInput from './src/components/ChatInput';
 import VirtualizedChat from './src/components/VirtualizedChat';
 import TextSizeSelector from './src/components/TextSizeSelector';
@@ -96,7 +97,7 @@ const App: React.FC = () => {
 
 
   return (
-    <>
+    <ErrorBoundary feature="main-app">
       <CookieBanner />
       <PerformanceMonitor memoryStats={memoryStats} />
       <MultilingualSEO />
@@ -124,11 +125,13 @@ const App: React.FC = () => {
           <div className="container mx-auto max-w-4xl">
             {messages.length === 0 && <WelcomeMessage textSize={textSize} />}
             {messages.length > 0 && (
-              <VirtualizedChat
-                messages={messages}
-                textSize={textSize}
-                currentLang={i18n.language}
-              />
+              <ErrorBoundary feature="chat-display">
+                <VirtualizedChat
+                  messages={messages}
+                  textSize={textSize}
+                  currentLang={i18n.language}
+                />
+              </ErrorBoundary>
             )}
             <div ref={messagesEndRef} />
           </div>
@@ -150,7 +153,9 @@ const App: React.FC = () => {
                 />
               </div>
             )}
-            <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
+            <ErrorBoundary feature="chat-input">
+              <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
+            </ErrorBoundary>
             <div className="text-center mt-3 text-xs text-slate-200">
               {/* Mobile: Vertical layout */}
               <div className="sm:hidden">
@@ -258,7 +263,7 @@ const App: React.FC = () => {
       
       {/* SEO Content - hidden from display but crawlable */}
       <SEOContent />
-    </>
+    </ErrorBoundary>
   );
 };
 
