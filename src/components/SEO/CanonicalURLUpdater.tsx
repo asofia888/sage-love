@@ -16,8 +16,14 @@ const CanonicalURLUpdater: React.FC<CanonicalURLUpdaterProps> = ({
   useEffect(() => {
     const canonical = document.querySelector('link[rel="canonical"]');
     if (canonical) {
-      const url = currentLang === 'ja' ? baseUrl : `${baseUrl}?lang=${currentLang}`;
-      canonical.setAttribute('href', url);
+      // 全言語で同じcanonical URLを使用（重複回避）
+      canonical.setAttribute('href', `${baseUrl}/`);
+    }
+    
+    // OG URLも更新
+    const ogUrl = document.querySelector('meta[property="og:url"]');
+    if (ogUrl) {
+      ogUrl.setAttribute('content', `${baseUrl}/`);
     }
   }, [currentLang, baseUrl]);
 
