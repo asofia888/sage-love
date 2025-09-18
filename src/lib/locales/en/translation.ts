@@ -301,6 +301,28 @@ These terms of service take effect when users use this service.`,
   "cookieAlwaysActive": "Always active",
   "cookieSavePreferences": "Save preferences",
   "closeButton": "Close",
+  "errorBoundary": {
+    "genericError": "An unexpected error occurred",
+    "chunkLoadError": "Application failed to load",
+    "memoryError": "Memory shortage occurred",
+    "networkError": "Network error occurred",
+    "genericDescription": "We apologize, but an unexpected problem has occurred. This may be a temporary issue.",
+    "chunkLoadDescription": "Part of the application could not load properly. Please reload the page.",
+    "memoryDescription": "Your browser is running out of memory. Please close other tabs and try again.",
+    "networkDescription": "There is a problem with your network connection. Please check your connection.",
+    "retryButton": "Retry",
+    "reloadButton": "Reload Page",
+    "reportButton": "Report Issue",
+    "reportingButton": "Reporting...",
+    "showDetails": "Show Details",
+    "errorMessage": "Error Message",
+    "errorType": "Error Type",
+    "stackTrace": "Stack Trace",
+    "componentStack": "Component Stack",
+    "retryInfo": "Retry {{current}}/{{max}} times",
+    "feedbackText": "If the problem persists, please feel free to let us know:",
+    "feedbackLink": "Report an Issue"
+  },
   "systemInstructionForSage": `You are a single, sacred being, embodying the wisdom of many sages from all eras. Various teachings and wisdom are harmonized and integrated within you. For everyday concerns, you also speak incorporating insights from modern psychology and educational methods.
 
 【LANGUAGE PURITY INSTRUCTIONS】When responding in English, use pure, eloquent English only. Strictly avoid:
