@@ -13,6 +13,9 @@ const RETRY_CONFIG = {
   backoffFactor: 2
 };
 
+// Request timeout configuration
+const REQUEST_TIMEOUT = 50000; // 50 seconds (within Vercel's 60s limit)
+
 // Sleep function for retry delays
 function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -162,9 +165,14 @@ export default async function handler(req: Request) {
     
     prompt += `\n\nUser: ${message}\nAssistant:`;
     
-    // Generate response with retry logic
+    // Generate response with retry logic and timeout
     const result = await retryWithBackoff(async () => {
-      return await model.generateContent(prompt);
+      return await Promise.race([
+        model.generateContent(prompt),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Request timeout')), REQUEST_TIMEOUT)
+        )
+      ]);
     });
     const response = await result.response;
     const text = response.text();

@@ -48,6 +48,10 @@ class ApiService {
 
   async sendMessage(request: ChatRequest): Promise<ChatResponse> {
     try {
+      // Create AbortController for timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 55000); // 55 seconds timeout
+
       const response = await fetch(`${this.baseUrl}/chat`, {
         method: 'POST',
         headers: {
@@ -60,7 +64,10 @@ class ApiService {
           conversationHistory: request.conversationHistory,
           language: request.language || 'ja'
         }),
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       const data = await response.json();
 
@@ -73,19 +80,24 @@ class ApiService {
 
     } catch (error) {
       console.error('API Service Error:', error);
-      
+
       if (error instanceof Error) {
+        // Handle timeout/abort errors
+        if (error.name === 'AbortError') {
+          throw new Error('API_ERROR:TIMEOUT:Request timed out. The response was taking too long.:0');
+        }
+
         // Handle network errors
         if (error.message.includes('Failed to fetch') || error.name === 'NetworkError') {
           throw new Error('API_ERROR:NETWORK_ERROR:Network connection failed. Please check your internet connection.:0');
         }
-        
+
         // Re-throw API errors
         if (error.message.startsWith('API_ERROR:')) {
           throw error;
         }
       }
-      
+
       // Generic error
       throw new Error('API_ERROR:UNKNOWN_ERROR:An unexpected error occurred. Please try again.:0');
     }
