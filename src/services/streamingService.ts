@@ -1,52 +1,38 @@
 import { ChatMessage } from '../types';
+import { apiService, ChatRequest } from './apiService';
 
 /**
  * ストリーミングレスポンスを処理するサービス
+ * API呼び出しはapiService経由で統一
  */
 export class StreamingService {
   /**
    * API レスポンスからストリーミングテキストを生成
+   * apiService経由で統一されたエラーハンドリングとタイムアウト制御
    */
   static async* streamApiResponse(
     message: string,
     history: ChatMessage[],
-    systemInstruction: string
+    systemInstruction: string,
+    language: string = 'ja'
   ): AsyncGenerator<string, void, unknown> {
     try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message,
-          history,
-          systemInstruction
-        }),
-      });
+      const request: ChatRequest = {
+        message,
+        systemInstruction,
+        conversationHistory: history.map(msg => ({
+          sender: msg.sender === 'user' ? 'user' : 'assistant',
+          text: msg.text,
+          timestamp: msg.timestamp.toISOString()
+        })),
+        language
+      };
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ 
-          code: 'errorMessageDefault', 
-          details: response.statusText 
-        }));
-        const error = new Error(errorData.details || 'Failed to fetch') as Error & any;
-        error.code = errorData.code;
-        throw error;
-      }
+      // apiService経由で統一されたAPI呼び出し
+      const response = await apiService.sendMessage(request);
 
-      if (!response.body) {
-        throw new Error('Response body is null');
-      }
-
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        yield decoder.decode(value);
-      }
+      // レスポンスをストリーミング風に分割
+      yield* StreamingService.simulateStreaming(response.message);
 
     } catch (error: any) {
       console.error('Error in streaming service:', error);

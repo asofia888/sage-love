@@ -21,10 +21,11 @@ export class ChatService {
   async* streamChat(
     message: string,
     history: ChatMessage[],
-    systemInstruction: string
+    systemInstruction: string,
+    language: string = 'ja'
   ): AsyncGenerator<string, void, unknown> {
     try {
-      const stream = StreamingService.streamApiResponse(message, history, systemInstruction);
+      const stream = StreamingService.streamApiResponse(message, history, systemInstruction, language);
       for await (const chunk of stream) {
         yield chunk;
       }

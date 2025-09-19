@@ -9,6 +9,7 @@ import { ChatMessage } from '../types';
 
 /**
  * 翻訳サービスを初期化（レガシー互換性のため、現在は不要）
+ * @deprecated API key is now handled server-side
  */
 export function initializeTranslationService(_apiKey: string) {
   // No longer needed - API key is handled server-side
@@ -71,23 +72,17 @@ export async function sendSecureChat(
  * Returns message in chunks for compatibility
  */
 export async function* streamChat(
-    message: string, 
+    message: string,
     history: any[],
     systemInstruction: string
 ): AsyncGenerator<string, void, unknown> {
   try {
     const fullResponse = await sendSecureChat(message, history, systemInstruction);
-    
-    // Simulate streaming by yielding chunks
-    const words = fullResponse.split(' ');
-    for (let i = 0; i < words.length; i++) {
-      const chunk = i === 0 ? words[i] : ' ' + words[i];
-      yield chunk;
-      
-      // Small delay to simulate streaming
-      await new Promise(resolve => setTimeout(resolve, 50));
-    }
-    
+
+    // Use StreamingService for consistent streaming behavior
+    const { StreamingService } = await import('./streamingService');
+    yield* StreamingService.simulateStreaming(fullResponse, 50);
+
   } catch (error) {
     console.error('Stream chat error:', error);
     throw error;
@@ -105,17 +100,11 @@ export async function* streamChatWithTranslation(
 ): AsyncGenerator<string, void, unknown> {
   try {
     const fullResponse = await sendSecureChat(message, history, systemInstruction, targetLanguage);
-    
-    // Simulate streaming by yielding chunks
-    const words = fullResponse.split(' ');
-    for (let i = 0; i < words.length; i++) {
-      const chunk = i === 0 ? words[i] : ' ' + words[i];
-      yield chunk;
-      
-      // Small delay to simulate streaming
-      await new Promise(resolve => setTimeout(resolve, 50));
-    }
-    
+
+    // Use StreamingService for consistent streaming behavior
+    const { StreamingService } = await import('./streamingService');
+    yield* StreamingService.simulateStreaming(fullResponse, 50);
+
   } catch (error) {
     console.error('Stream chat with translation error:', error);
     throw error;
