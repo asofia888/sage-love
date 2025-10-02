@@ -365,5 +365,12 @@ POLITELY DECLINE NON-SPECIALIZED TOPICS: For specialized topics (stocks, medical
   "seoHeading4": "どのような相談ができるか",
   "seoDescription3": "人生の意味や目的、人間関係の悩み、スピリチュアルな疑問、日常の心配事まで、あらゆる心の問題について相談できます。聖者のような深い洞察と慈愛に満ちた助言で、あなたの心の平安を取り戻すお手伝いをいたします。",
   "seoHeading5": "安全性とプライバシー",
-  "seoDescription4": "すべての会話はお使いのブラウザ内にのみ保存され、外部に送信されることはありません。また、緊急時の安全確保のため、危機的な内容を自動検出し、適切なサポートリソースを提供する機能を備えています。"
+  "seoDescription4": "すべての会話はお使いのブラウザ内にのみ保存され、外部に送信されることはありません。また、緊急時の安全確保のため、危機的な内容を自動検出し、適切なサポートリソースを提供する機能を備えています。",
+  // Error Boundary translations
+  "errorBoundaryTitle": "An Unexpected Error Occurred",
+  "errorBoundaryMessage": "We apologize for the inconvenience. An error has occurred in the application.",
+  "errorBoundaryDetailsToggle": "Show technical details",
+  "errorBoundaryResetButton": "Try Again",
+  "errorBoundaryReloadButton": "Reload Page",
+  "errorBoundaryHelpText": "If the problem persists, please try clearing your browser cache."
 };

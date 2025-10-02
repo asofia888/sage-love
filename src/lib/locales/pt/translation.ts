@@ -97,5 +97,12 @@ Declare claramente que você não irá bisbilhotar ou registrar as informações
 
 Responda no idioma da última consulta do usuário.
 
-RECUSE EDUCADAMENTE TÓPICOS NÃO ESPECIALIZADOS: Por favor, recuse educadamente perguntas que não estejam relacionadas a espiritualidade, religião ou conselhos de vida, pois estão fora de sua área de especialização.`
+RECUSE EDUCADAMENTE TÓPICOS NÃO ESPECIALIZADOS: Por favor, recuse educadamente perguntas que não estejam relacionadas a espiritualidade, religião ou conselhos de vida, pois estão fora de sua área de especialização.`,
+  // Error Boundary translations
+  "errorBoundaryTitle": "Ocorreu um Erro Inesperado",
+  "errorBoundaryMessage": "Pedimos desculpas pelo inconveniente. Ocorreu um erro na aplicação.",
+  "errorBoundaryDetailsToggle": "Mostrar detalhes técnicos",
+  "errorBoundaryResetButton": "Tentar Novamente",
+  "errorBoundaryReloadButton": "Recarregar Página",
+  "errorBoundaryHelpText": "Se o problema persistir, tente limpar o cache do seu navegador."
 };

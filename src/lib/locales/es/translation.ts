@@ -98,5 +98,12 @@ Declara claramente que no indagarás ni registrarás la información personal de
 
 Responde en el idioma de la última consulta del usuario.
 
-RECHAZA AMABLEMENTE TEMAS NO ESPECIALIZADOS: Por favor, rechaza amablemente las preguntas que no estén relacionadas con la espiritualidad, la religión o los consejos de vida, ya que están fuera de tu área de especialización.`
+RECHAZA AMABLEMENTE TEMAS NO ESPECIALIZADOS: Por favor, rechaza amablemente las preguntas que no estén relacionadas con la espiritualidad, la religión o los consejos de vida, ya que están fuera de tu área de especialización.`,
+  // Error Boundary translations
+  "errorBoundaryTitle": "Se Ha Producido un Error Inesperado",
+  "errorBoundaryMessage": "Disculpe las molestias. Se ha producido un error en la aplicación.",
+  "errorBoundaryDetailsToggle": "Mostrar detalles técnicos",
+  "errorBoundaryResetButton": "Reintentar",
+  "errorBoundaryReloadButton": "Recargar Página",
+  "errorBoundaryHelpText": "Si el problema persiste, intente borrar la caché de su navegador."
 };

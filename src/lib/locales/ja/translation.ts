@@ -273,6 +273,16 @@ export default {
   "errorDailyCostLimit": "本日の利用上限に達した。明日また訪れてほしい。",
   "errorHourlyCostLimit": "一時間あたりの利用上限に達した。しばらく経ってから試してみてほしい。",
   "errorEmergencyCostLimit": "一時的にサービスを制限している。しばらく経ってから試してみてほしい。",
+  "BURST_LIMIT_EXCEEDED": "少し急ぎすぎているようだ。ゆっくりと質問してみてほしい。",
+  "IP_RATE_LIMIT": "このIPアドレスからのリクエストが多すぎます。しばらくしてから試してみてほしい。",
+  "SESSION_HOURLY_LIMIT": "一時間あたりのセッション上限に達した。しばらく経ってから試してみてほしい。",
+  "SESSION_DAILY_LIMIT": "本日のセッション上限に達した。明日また訪れてほしい。",
+  "MESSAGE_TOO_LONG": "メッセージが長すぎます。もう少し短くしてみてほしい。",
+  "HISTORY_TOO_LONG": "会話の履歴が長すぎます。チャットをクリアしてください。",
+  "PROJECTED_COST_LIMIT": "このリクエストは本日の利用上限を超える可能性があります。明日また訪れてほしい。",
+  "EMERGENCY_COST_LIMIT": "サービスが一時的に利用できません。しばらく経ってから試してみてほしい。",
+  "DAILY_COST_LIMIT": "本日のコスト上限に達しました。明日また訪れてほしい。",
+  "HOURLY_COST_LIMIT": "一時間あたりのコスト上限に達しました。しばらく経ってから試してみてほしい。",
   "languageSelectorLabel": "言語を選択",
   "textSizeLabel": "文字サイズ",
   "textSizeNormal": "標準",
@@ -407,5 +417,12 @@ export default {
 
 応答はユーザーが最後に使用した言語で行うこと。
 
-スピリチュアル、宗教、人生相談、ではない専門外の質問には、丁寧に断ると良い。`
+スピリチュアル、宗教、人生相談、ではない専門外の質問には、丁寧に断ると良い。`,
+  // Error Boundary translations
+  "errorBoundaryTitle": "予期しないエラーが発生しました",
+  "errorBoundaryMessage": "申し訳ございません。アプリケーションにエラーが発生しました。",
+  "errorBoundaryDetailsToggle": "技術的な詳細を表示",
+  "errorBoundaryResetButton": "再試行",
+  "errorBoundaryReloadButton": "ページをリロード",
+  "errorBoundaryHelpText": "問題が解決しない場合は、ブラウザのキャッシュをクリアしてお試しください。"
 };

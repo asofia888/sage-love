@@ -1,5 +1,6 @@
 
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
+import { shouldBlockRequest, recordActualCost } from './rate-limiter';
 
 export const config = {
   runtime: 'edge',
@@ -110,6 +111,35 @@ export default async function handler(req: Request) {
   try {
     const { message, conversationHistory, systemInstruction } = await req.json();
 
+    // Get client IP and session ID for rate limiting
+    const clientIP = req.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
+                     req.headers.get('x-real-ip') ||
+                     'unknown';
+    const sessionId = req.headers.get('X-Session-ID') || 'unknown';
+
+    // Check rate limits
+    const rateLimitResult = await shouldBlockRequest(
+      clientIP,
+      sessionId,
+      message?.length || 0,
+      conversationHistory?.length || 0
+    );
+
+    if (rateLimitResult.blocked) {
+      return new Response(JSON.stringify({
+        code: rateLimitResult.reason,
+        details: rateLimitResult.message,
+        retryAfter: rateLimitResult.retryAfter
+      }), {
+        status: 429,
+        headers: {
+          'Content-Type': 'application/json',
+          'Retry-After': String(rateLimitResult.retryAfter || 60),
+          'X-RateLimit-Reason': rateLimitResult.reason || 'RATE_LIMIT_EXCEEDED',
+        },
+      });
+    }
+
     if (!process.env.GEMINI_API_KEY) {
       throw new Error('API key is not configured on the server.');
     }
@@ -181,16 +211,23 @@ export default async function handler(req: Request) {
       throw new Error('AI service returned empty response');
     }
 
+    // Record actual cost after successful request
+    if (rateLimitResult.estimatedCost) {
+      await recordActualCost(rateLimitResult.estimatedCost);
+    }
+
     // Return successful response
     return new Response(JSON.stringify({
       message: text.trim(),
       timestamp: new Date().toISOString(),
-      sessionId: req.headers.get('X-Session-ID') || 'unknown'
+      sessionId: sessionId
     }), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
         'Cache-Control': 'no-cache',
+        'X-RateLimit-Remaining-IP': String(rateLimitResult.remainingRequests?.ip || 0),
+        'X-RateLimit-Remaining-Session': String(rateLimitResult.remainingRequests?.session || 0),
       },
     });
 
