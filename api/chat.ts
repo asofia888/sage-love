@@ -14,7 +14,7 @@ const RETRY_CONFIG = {
 };
 
 // Request timeout configuration
-const REQUEST_TIMEOUT = 50000; // 50 seconds (within Vercel's 60s limit)
+const REQUEST_TIMEOUT = 25000; // 25 seconds (within Vercel's 30s Edge Function limit)
 
 // Sleep function for retry delays
 function sleep(ms: number): Promise<void> {
@@ -123,8 +123,8 @@ export default async function handler(req: Request) {
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.5-flash",
+    const model = genAI.getGenerativeModel({
+      model: "gemini-flash-latest",
       generationConfig: {
         temperature: 0.7,
         topP: 0.8,
