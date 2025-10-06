@@ -6,16 +6,9 @@ const languages = [
     { code: 'en', name: 'English' },
     { code: 'es', name: 'Español' },
     { code: 'pt', name: 'Português' },
-    { code: 'de', name: 'Deutsch' },
     { code: 'fr', name: 'Français' },
-    { code: 'it', name: 'Italiano' },
-    { code: 'ru', name: 'Русский' },
     { code: 'hi', name: 'हिन्दी' },
     { code: 'ar', name: 'العربية' },
-    { code: 'bn', name: 'বাংলা' },
-    { code: 'ta', name: 'தமிழ்' },
-    { code: 'zh', name: '中文 (简体)' },
-    { code: 'ko', name: '한국어' },
     { code: 'ja', name: '日本語' },
 ];
 

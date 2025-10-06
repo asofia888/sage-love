@@ -7,6 +7,9 @@ import jaTranslation from './locales/ja/translation';
 import enTranslation from './locales/en/translation';
 import esTranslation from './locales/es/translation';
 import ptTranslation from './locales/pt/translation';
+import hiTranslation from './locales/hi/translation';
+import arTranslation from './locales/ar/translation';
+import frTranslation from './locales/fr/translation';
 
 // Resources configuration using imported modules
 const resources = {
@@ -21,6 +24,15 @@ const resources = {
   },
   pt: {
     translation: ptTranslation
+  },
+  hi: {
+    translation: hiTranslation
+  },
+  ar: {
+    translation: arTranslation
+  },
+  fr: {
+    translation: frTranslation
   }
 };
 
