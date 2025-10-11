@@ -96,16 +96,16 @@ if (isRedisConfigured()) {
  * Estimate the cost of a request based on message and history length
  */
 function estimateRequestCost(messageLength: number, historyLength: number = 0): number {
-  // Rough cost estimation for Gemini Flash:
-  // Input: ~$0.075 per 1K tokens
-  // Output: ~$0.30 per 1K tokens
+  // Cost estimation for Gemini 2.0 Flash (gemini-flash-latest):
+  // Input: $0.10 per 1M tokens = $0.0001 per 1K tokens
+  // Output: $0.40 per 1M tokens = $0.0004 per 1K tokens
   // Average character ≈ 1.5 tokens
 
   const inputTokens = (messageLength + historyLength * 100) * 1.5;
   const estimatedOutputTokens = Math.min(inputTokens * 2, 2000); // Max 2K output
 
-  const inputCost = (inputTokens / 1000) * 0.075;
-  const outputCost = (estimatedOutputTokens / 1000) * 0.30;
+  const inputCost = (inputTokens / 1000) * 0.0001;
+  const outputCost = (estimatedOutputTokens / 1000) * 0.0004;
 
   return Math.round((inputCost + outputCost) * 10000) / 10000; // Round to 4 decimal places
 }
