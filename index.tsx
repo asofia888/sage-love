@@ -3,6 +3,10 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import ErrorBoundary from './src/components/ErrorBoundary';
 import './src/lib/i18n'; // Initialize i18next
+import { setupGlobalErrorHandlers } from './src/lib/error-logger';
+
+// Setup global error handlers
+setupGlobalErrorHandlers();
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {

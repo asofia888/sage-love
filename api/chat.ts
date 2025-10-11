@@ -1,102 +1,39 @@
-
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 import { shouldBlockRequest, recordActualCost } from './rate-limiter';
+import { parseGeminiError, buildErrorResponse, ValidationError, TimeoutError, APIError } from './errors';
+import { retryWithBackoff, withTimeout, RetryStatsTracker } from './retry-utils';
+import { geminiCircuitBreaker } from './circuit-breaker';
 
 export const config = {
   runtime: 'edge',
 };
 
-// Retry configuration
-const RETRY_CONFIG = {
-  maxRetries: 3,
-  baseDelay: 1000, // 1 second
-  maxDelay: 10000, // 10 seconds
-  backoffFactor: 2
-};
-
 // Request timeout configuration
 const REQUEST_TIMEOUT = 25000; // 25 seconds (within Vercel's 30s Edge Function limit)
 
-// Sleep function for retry delays
-function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+// Retry stats tracker
+const retryStats = new RetryStatsTracker();
 
-// Retry function with exponential backoff
-async function retryWithBackoff<T>(
-  fn: () => Promise<T>,
-  maxRetries: number = RETRY_CONFIG.maxRetries,
-  baseDelay: number = RETRY_CONFIG.baseDelay
-): Promise<T> {
-  let lastError: any;
-  
-  for (let attempt = 0; attempt <= maxRetries; attempt++) {
-    try {
-      return await fn();
-    } catch (error: any) {
-      lastError = error;
-      
-      // Don't retry on authentication errors or invalid requests
-      if (error.message?.includes('API key not valid') || 
-          error.message?.includes('API key is not configured') ||
-          error.status === 400 || 
-          error.status === 401 || 
-          error.status === 403) {
-        throw error;
-      }
-      
-      // If this is the last attempt, throw the error
-      if (attempt === maxRetries) {
-        throw error;
-      }
-      
-      // Calculate delay with exponential backoff
-      const delay = Math.min(
-        baseDelay * Math.pow(RETRY_CONFIG.backoffFactor, attempt),
-        RETRY_CONFIG.maxDelay
-      );
-      
-      console.log(`Attempt ${attempt + 1} failed, retrying in ${delay}ms...`, error.message);
-      await sleep(delay);
-    }
-  }
-  
-  throw lastError;
-}
+/**
+ * Handle errors with improved error handling
+ */
+function handleError(error: unknown): Response {
+  console.error('Error in Vercel Edge Function:', error);
 
-function handleError(error: any) {
-    console.error('Error in Vercel Edge Function:', error);
-    let statusCode = 500;
-    let errorCode = 'errorGeneric'; // Corresponds to i18n key
+  // Parse error to APIError type
+  const apiError = error instanceof APIError ? error : parseGeminiError(error);
 
-    const errorMessage = error.message || 'An unknown error occurred';
+  // Log error details for monitoring
+  console.error('API Error Details:', {
+    category: apiError.category,
+    statusCode: apiError.statusCode,
+    errorCode: apiError.errorCode,
+    message: apiError.message,
+    timestamp: apiError.timestamp.toISOString(),
+    isRetryable: apiError.isRetryable,
+  });
 
-    if (errorMessage.includes('API key not valid')) {
-        statusCode = 401;
-        errorCode = 'errorAuth';
-    } else if (errorMessage.toLowerCase().includes('quota')) {
-        statusCode = 429;
-        errorCode = 'errorQuota';
-    } else if (errorMessage.includes('API key is not configured')) {
-        errorCode = 'errorNoApiKeyConfig';
-    } else if (errorMessage.includes('overloaded') || errorMessage.includes('503')) {
-        statusCode = 503;
-        errorCode = 'errorServiceUnavailable';
-    } else if (errorMessage.includes('timeout') || errorMessage.includes('TIMEOUT')) {
-        statusCode = 408;
-        errorCode = 'errorTimeout';
-    } else if (errorMessage.includes('rate limit') || errorMessage.includes('429')) {
-        statusCode = 429;
-        errorCode = 'errorRateLimit';
-    }
-
-    return new Response(JSON.stringify({
-      code: errorCode,
-      details: errorMessage
-    }), {
-      status: statusCode,
-      headers: { 'Content-Type': 'application/json' },
-    });
+  return buildErrorResponse(apiError);
 }
 
 
@@ -141,18 +78,15 @@ export default async function handler(req: Request) {
     }
 
     if (!process.env.GEMINI_API_KEY) {
-      throw new Error('API key is not configured on the server.');
+      throw new ValidationError('API key is not configured on the server.');
     }
 
     if (!message) {
-      return new Response(JSON.stringify({ code: 'errorGeneric', details: 'Message is required.' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      throw new ValidationError('Message is required.');
     }
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    
+
     const model = genAI.getGenerativeModel({
       model: "gemini-flash-latest",
       generationConfig: {
@@ -180,36 +114,59 @@ export default async function handler(req: Request) {
         },
       ],
     });
-    
+
     // Prepare conversation context
     let prompt = systemInstruction || '';
-    
+
     // Add conversation history if provided
     if (conversationHistory && Array.isArray(conversationHistory)) {
       const recentHistory = conversationHistory.slice(-10); // Limit to last 10 messages
       const historyText = recentHistory
-        .map(msg => `${msg.sender === 'user' ? 'User' : 'Assistant'}: ${msg.text}`)
+        .map((msg: { sender: string; text: string }) =>
+          `${msg.sender === 'user' ? 'User' : 'Assistant'}: ${msg.text}`)
         .join('\n');
       prompt += `\n\nConversation History:\n${historyText}`;
     }
-    
+
     prompt += `\n\nUser: ${message}\nAssistant:`;
-    
-    // Generate response with retry logic and timeout
-    const result = await retryWithBackoff(async () => {
-      return await Promise.race([
-        model.generateContent(prompt),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Request timeout')), REQUEST_TIMEOUT)
-        )
-      ]);
+
+    // Track retry attempts
+    let retryAttempts = 0;
+
+    // Generate response with circuit breaker, retry logic and timeout
+    const result = await geminiCircuitBreaker.execute(async () => {
+      return await retryWithBackoff(
+        async () => {
+          return await withTimeout(
+            model.generateContent(prompt),
+            REQUEST_TIMEOUT,
+            'Request timeout: AI service took too long to respond'
+          );
+        },
+        {
+          maxRetries: 3,
+          baseDelay: 1000,
+          maxDelay: 10000,
+          backoffFactor: 2,
+          jitterFactor: 0.3,
+        },
+        (attempt, error, delay) => {
+          retryAttempts = attempt;
+          console.log(`Retry attempt ${attempt}/3 after ${delay}ms`,
+            error instanceof Error ? error.message : String(error));
+        }
+      );
     });
+
     const response = await result.response;
     const text = response.text();
-    
+
     if (!text || text.trim().length === 0) {
-      throw new Error('AI service returned empty response');
+      throw new ValidationError('AI service returned empty response');
     }
+
+    // Record retry statistics
+    retryStats.recordAttempt(retryAttempts, true);
 
     // Record actual cost after successful request
     if (rateLimitResult.estimatedCost) {
@@ -231,7 +188,9 @@ export default async function handler(req: Request) {
       },
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    // Record failed attempt in retry statistics
+    retryStats.recordAttempt(0, false);
     return handleError(error);
   }
 }
