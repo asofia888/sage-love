@@ -59,7 +59,7 @@ export class EnhancedTranslationService {
       const enhancedPrompt = this.buildTranslationPrompt(text, targetLang, context, previousResponses);
       
       const response = await this.geminiTranslator.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-flash-latest',
         contents: [{ role: 'user', parts: [{ text: enhancedPrompt }] }],
         config: {
           temperature: 0.4, // 重複回避のため少し創造性を上げる
