@@ -20,7 +20,7 @@ export class ErrorService {
 
     // Parse API_ERROR format from backend
     if (error instanceof Error && error.message.startsWith('API_ERROR:')) {
-      return this.parseApiErrorMessage(error.message);
+      return this.parseApiErrorFormat(error.message);
     }
 
     // エラーメッセージに基づいて適切なエラーコードを決定
@@ -67,8 +67,9 @@ export class ErrorService {
 
   /**
    * Parse API_ERROR format: API_ERROR:CODE:MESSAGE:RETRY_AFTER
+   * Public method for external use
    */
-  private static parseApiErrorMessage(message: string): ApiError {
+  static parseApiErrorFormat(message: string): ApiError {
     const parts = message.split(':');
     if (parts.length >= 3) {
       const code = parts[1] as ErrorCode;

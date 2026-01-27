@@ -2,6 +2,9 @@
  * Secure API Service - Communicates with serverless backend
  */
 
+import { API, STORAGE } from '../config/constants';
+import { storage } from '../lib/storage';
+
 export interface ChatRequest {
   message: string;
   systemInstruction?: string;
@@ -30,18 +33,15 @@ class ApiService {
   private sessionId: string;
 
   constructor() {
-    // Use environment variable for API base URL
-    this.baseUrl = '/api';
-    
-    // Generate or retrieve session ID
+    this.baseUrl = API.BASE_URL;
     this.sessionId = this.getSessionId();
   }
 
   private getSessionId(): string {
-    let sessionId = localStorage.getItem('sage-session-id');
+    let sessionId = storage.getRaw(STORAGE.SESSION_ID_KEY);
     if (!sessionId) {
       sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-      localStorage.setItem('sage-session-id', sessionId);
+      storage.setRaw(STORAGE.SESSION_ID_KEY, sessionId);
     }
     return sessionId;
   }
@@ -50,7 +50,7 @@ class ApiService {
     try {
       // Create AbortController for timeout
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 55000); // 55 seconds timeout
+      const timeoutId = setTimeout(() => controller.abort(), API.TIMEOUT_MS);
 
       const response = await fetch(`${this.baseUrl}/chat`, {
         method: 'POST',
@@ -128,7 +128,7 @@ class ApiService {
 
   // Method to reset session (useful for testing or user logout)
   resetSession() {
-    localStorage.removeItem('sage-session-id');
+    storage.remove(STORAGE.SESSION_ID_KEY);
     this.sessionId = this.getSessionId();
   }
 }

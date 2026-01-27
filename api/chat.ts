@@ -1,15 +1,14 @@
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
-import { shouldBlockRequest, recordActualCost } from './rate-limiter';
+import { shouldBlockRequest, recordActualCost, recordCacheSavings } from './rate-limiter';
 import { parseGeminiError, buildErrorResponse, ValidationError, TimeoutError, APIError } from './errors';
 import { retryWithBackoff, withTimeout, RetryStatsTracker } from './retry-utils';
 import { geminiCircuitBreaker } from './circuit-breaker';
+import { getModelWithCache, calculateCacheSavings, getCacheStats } from './context-cache';
+import { API_CONFIG } from './config';
 
 export const config = {
   runtime: 'edge',
 };
-
-// Request timeout configuration
-const REQUEST_TIMEOUT = 25000; // 25 seconds (within Vercel's 30s Edge Function limit)
 
 // Retry stats tracker
 const retryStats = new RetryStatsTracker();
@@ -87,36 +86,49 @@ export default async function handler(req: Request) {
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-    const model = genAI.getGenerativeModel({
-      model: "gemini-flash-latest", // Currently: Gemini 2.5 Flash
-      generationConfig: {
-        temperature: 0.7,
-        topP: 0.8,
-        topK: 40,
-        maxOutputTokens: 4096,
-      },
-      safetySettings: [
-        {
-          category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-      ],
-    });
+    // Generation configuration
+    const generationConfig = {
+      temperature: 0.7,
+      topP: 0.8,
+      topK: 40,
+      maxOutputTokens: API_CONFIG.MAX_OUTPUT_TOKENS,
+    };
 
-    // Prepare conversation context
-    let prompt = systemInstruction || '';
+    // Safety settings
+    const safetySettings = [
+      {
+        category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      },
+    ];
+
+    // Get model with context caching for system instruction
+    const { model, cached, tokensSaved } = await getModelWithCache(
+      genAI,
+      systemInstruction || '',
+      generationConfig,
+      safetySettings
+    );
+
+    // Log cache status
+    if (cached) {
+      console.log(`📦 Context cache hit: ~${tokensSaved} tokens saved`);
+    }
+
+    // Prepare conversation context (without system instruction, as it's cached)
+    let prompt = '';
 
     // Add conversation history if provided
     if (conversationHistory && Array.isArray(conversationHistory)) {
@@ -139,7 +151,7 @@ export default async function handler(req: Request) {
         async () => {
           return await withTimeout(
             model.generateContent(prompt),
-            REQUEST_TIMEOUT,
+            API_CONFIG.REQUEST_TIMEOUT,
             'Request timeout: AI service took too long to respond'
           );
         },
@@ -173,11 +185,24 @@ export default async function handler(req: Request) {
       await recordActualCost(rateLimitResult.estimatedCost);
     }
 
+    // Record cache savings
+    if (cached && tokensSaved > 0) {
+      const savings = calculateCacheSavings(tokensSaved);
+      await recordCacheSavings(savings);
+    }
+
+    // Get cache stats for response
+    const cacheStats = getCacheStats();
+
     // Return successful response
     return new Response(JSON.stringify({
       message: text.trim(),
       timestamp: new Date().toISOString(),
-      sessionId: sessionId
+      sessionId: sessionId,
+      cache: {
+        hit: cached,
+        tokensSaved: tokensSaved,
+      }
     }), {
       status: 200,
       headers: {
@@ -185,6 +210,9 @@ export default async function handler(req: Request) {
         'Cache-Control': 'no-cache',
         'X-RateLimit-Remaining-IP': String(rateLimitResult.remainingRequests?.ip || 0),
         'X-RateLimit-Remaining-Session': String(rateLimitResult.remainingRequests?.session || 0),
+        'X-Context-Cache-Hit': String(cached),
+        'X-Context-Cache-Tokens-Saved': String(tokensSaved),
+        'X-Context-Cache-TTL': String(cacheStats.remainingTTL),
       },
     });
 
