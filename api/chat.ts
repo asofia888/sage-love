@@ -1,6 +1,6 @@
-import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
+import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold, GenerateContentResult } from '@google/generative-ai';
 import { shouldBlockRequest, recordActualCost, recordCacheSavings } from './rate-limiter';
-import { parseGeminiError, buildErrorResponse, ValidationError, TimeoutError, APIError } from './errors';
+import { parseGeminiError, buildErrorResponse, ValidationError, APIError } from './errors';
 import { retryWithBackoff, withTimeout, RetryStatsTracker } from './retry-utils';
 import { geminiCircuitBreaker } from './circuit-breaker';
 import { getModelWithCache, calculateCacheSavings, getCacheStats } from './context-cache';
@@ -146,7 +146,7 @@ export default async function handler(req: Request) {
     let retryAttempts = 0;
 
     // Generate response with circuit breaker, retry logic and timeout
-    const result = await geminiCircuitBreaker.execute(async () => {
+    const result = await geminiCircuitBreaker.execute<GenerateContentResult>(async () => {
       return await retryWithBackoff(
         async () => {
           return await withTimeout(

@@ -55,7 +55,7 @@ if (isRedisConfigured()) {
     // IP-based rate limiter (sliding window)
     ipRateLimiter = new Ratelimit({
       redis,
-      limiter: Ratelimit.slidingWindow(RATE_LIMIT_CONFIG.ip.requests, RATE_LIMIT_CONFIG.ip.window),
+      limiter: Ratelimit.slidingWindow(RATE_LIMIT_CONFIG.ip.requests, RATE_LIMIT_CONFIG.ip.window as `${number} m`),
       analytics: true,
       prefix: 'ratelimit:ip',
     });
@@ -63,7 +63,7 @@ if (isRedisConfigured()) {
     // Burst rate limiter (fixed window for quick bursts)
     burstRateLimiter = new Ratelimit({
       redis,
-      limiter: Ratelimit.fixedWindow(RATE_LIMIT_CONFIG.ip.burstLimit, RATE_LIMIT_CONFIG.ip.burstWindow),
+      limiter: Ratelimit.fixedWindow(RATE_LIMIT_CONFIG.ip.burstLimit, RATE_LIMIT_CONFIG.ip.burstWindow as `${number} m`),
       analytics: true,
       prefix: 'ratelimit:burst',
     });
@@ -96,10 +96,11 @@ if (isRedisConfigured()) {
  * Estimate the cost of a request based on message and history length
  */
 function estimateRequestCost(messageLength: number, historyLength: number = 0): number {
-  // Cost estimation for Gemini 2.5 Flash (gemini-flash-latest):
+  // Cost estimation for gemini-flash-latest (currently Gemini 2.5 Flash):
   // Input: $0.30 per 1M tokens = $0.0003 per 1K tokens
   // Output: $2.50 per 1M tokens = $0.0025 per 1K tokens
   // Average character ≈ 1.5 tokens
+  // Note: Prices may change when gemini-flash-latest points to a newer model
 
   const inputTokens = (messageLength + historyLength * 100) * 1.5;
   const estimatedOutputTokens = Math.min(inputTokens * 2, 2000); // Max 2K output
@@ -171,6 +172,67 @@ export async function recordActualCost(cost: number): Promise<void> {
     }
   } catch (error) {
     console.error('Error recording cost:', error);
+  }
+}
+
+/**
+ * Record cache savings for monitoring
+ */
+export async function recordCacheSavings(savings: number): Promise<void> {
+  if (!redis || savings <= 0) return;
+
+  try {
+    const today = new Date().toISOString().split('T')[0];
+
+    // Increment daily savings (expires after 2 days)
+    const savingsKey = `cache:savings:${today}`;
+    // Store as integer (multiply by 10000 to preserve 4 decimal places)
+    await redis.incrby(savingsKey, Math.round(savings * 10000));
+    await redis.expire(savingsKey, 172800); // 2 days in seconds
+
+    // Increment cache hit count
+    const hitCountKey = `cache:hits:${today}`;
+    await redis.incr(hitCountKey);
+    await redis.expire(hitCountKey, 172800);
+
+    console.log(`💰 Cache savings recorded: $${savings.toFixed(4)}`);
+  } catch (error) {
+    console.error('Error recording cache savings:', error);
+  }
+}
+
+/**
+ * Get daily cache savings
+ */
+async function getDailyCacheSavings(): Promise<number> {
+  if (!redis) return 0;
+
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const savingsKey = `cache:savings:${today}`;
+    const savings = await redis.get<number>(savingsKey);
+    // Convert back from integer (divide by 10000)
+    return (savings || 0) / 10000;
+  } catch (error) {
+    console.error('Error getting cache savings:', error);
+    return 0;
+  }
+}
+
+/**
+ * Get daily cache hit count
+ */
+async function getDailyCacheHits(): Promise<number> {
+  if (!redis) return 0;
+
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const hitCountKey = `cache:hits:${today}`;
+    const hits = await redis.get<number>(hitCountKey);
+    return hits || 0;
+  } catch (error) {
+    console.error('Error getting cache hits:', error);
+    return 0;
   }
 }
 
@@ -370,6 +432,11 @@ export async function getUsageStats() {
   try {
     const dailyCost = await getDailyCost();
     const hourlyCost = await getHourlyCost();
+    const cacheSavings = await getDailyCacheSavings();
+    const cacheHits = await getDailyCacheHits();
+
+    // Calculate effective cost (actual cost minus cache savings)
+    const effectiveDailyCost = Math.max(0, dailyCost - cacheSavings);
 
     return {
       redisConfigured: true,
@@ -378,6 +445,13 @@ export async function getUsageStats() {
       limits: RATE_LIMIT_CONFIG.global,
       remainingBudget: Math.max(0, RATE_LIMIT_CONFIG.global.maxCostPerDay - dailyCost),
       utilizationPercentage: (dailyCost / RATE_LIMIT_CONFIG.global.maxCostPerDay) * 100,
+      // Context cache statistics
+      contextCache: {
+        dailySavings: cacheSavings,
+        dailyHits: cacheHits,
+        effectiveCost: effectiveDailyCost,
+        savingsPercentage: dailyCost > 0 ? (cacheSavings / dailyCost) * 100 : 0,
+      },
     };
   } catch (error) {
     console.error('Error getting usage stats:', error);
