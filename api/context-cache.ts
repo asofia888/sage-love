@@ -5,7 +5,7 @@
  * Cache pricing: 1/4 of normal input token cost
  */
 
-import { GoogleGenerativeAI, Content } from '@google/generative-ai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Cache configuration
 const CACHE_CONFIG = {

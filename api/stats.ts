@@ -4,6 +4,7 @@
 
 import { geminiCircuitBreaker } from './circuit-breaker';
 import { getUsageStats } from './rate-limiter';
+import { getCacheStats, cacheConfig } from './context-cache';
 
 export const config = {
   runtime: 'edge',
@@ -36,6 +37,9 @@ export default async function handler(req: Request) {
     // Get rate limiting stats
     const rateLimitStats = await getUsageStats();
 
+    // Get context cache stats
+    const contextCacheStats = getCacheStats();
+
     // System health check
     const health = {
       status: circuitBreakerStats.state === 'CLOSED' ? 'healthy' : 'degraded',
@@ -58,6 +62,14 @@ export default async function handler(req: Request) {
           : '0%',
       },
       rateLimit: rateLimitStats,
+      contextCache: {
+        ...contextCacheStats,
+        config: {
+          ttlSeconds: cacheConfig.ttlSeconds,
+          minTokensForCaching: cacheConfig.minTokensForCaching,
+          model: cacheConfig.modelName,
+        },
+      },
     };
 
     return new Response(JSON.stringify(stats, null, 2), {

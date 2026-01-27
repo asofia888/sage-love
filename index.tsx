@@ -3,7 +3,11 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import ErrorBoundary from './src/components/ErrorBoundary';
 import './src/lib/i18n'; // Initialize i18next
+import { initSentry } from './src/lib/sentry';
 import { setupGlobalErrorHandlers } from './src/lib/error-logger';
+
+// Initialize Sentry first (before any errors can occur)
+initSentry();
 
 // Setup global error handlers
 setupGlobalErrorHandlers();

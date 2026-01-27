@@ -1,7 +1,14 @@
 /**
  * Error Logging Service
- * Centralized error logging and monitoring
+ * Centralized error logging and monitoring with Sentry integration
  */
+
+import {
+  captureException,
+  addBreadcrumb,
+  isSentryEnabled,
+  Sentry,
+} from './sentry';
 
 export enum ErrorSeverity {
   LOW = 'low',
@@ -9,6 +16,14 @@ export enum ErrorSeverity {
   HIGH = 'high',
   CRITICAL = 'critical',
 }
+
+// Map our severity levels to Sentry severity levels
+const severityToSentry: Record<ErrorSeverity, Sentry.SeverityLevel> = {
+  [ErrorSeverity.LOW]: 'info',
+  [ErrorSeverity.MEDIUM]: 'warning',
+  [ErrorSeverity.HIGH]: 'error',
+  [ErrorSeverity.CRITICAL]: 'fatal',
+};
 
 export interface ErrorContext {
   timestamp: Date;
@@ -105,20 +120,39 @@ class ErrorLogger {
   }
 
   /**
-   * Send error to external monitoring service (Sentry, LogRocket, etc.)
+   * Send error to external monitoring service (Sentry)
    */
   private sendToExternalService(error: LoggedError): void {
-    // Only send critical and high severity errors to external services
+    // Add breadcrumb for all errors
+    addBreadcrumb(
+      error.category,
+      error.message,
+      severityToSentry[error.severity],
+      {
+        errorId: error.id,
+        ...error.context.metadata,
+      }
+    );
+
+    // Only send critical and high severity errors to Sentry
     if (error.severity === ErrorSeverity.CRITICAL || error.severity === ErrorSeverity.HIGH) {
-      // TODO: Integrate with Sentry or other monitoring service
-      // Example:
-      // if (window.Sentry) {
-      //   window.Sentry.captureException(new Error(error.message), {
-      //     level: error.severity,
-      //     tags: { category: error.category },
-      //     extra: error.context,
-      //   });
-      // }
+      const sentryEventId = captureException(new Error(error.message), {
+        level: severityToSentry[error.severity],
+        tags: {
+          category: error.category,
+          component: error.context.component || 'unknown',
+          action: error.context.action || 'unknown',
+        },
+        extra: {
+          errorId: error.id,
+          stack: error.stack,
+          context: error.context,
+        },
+      });
+
+      if (sentryEventId) {
+        console.log(`📤 Error sent to Sentry: ${sentryEventId}`);
+      }
     }
   }
 
@@ -231,5 +265,11 @@ export function setupGlobalErrorHandlers(): void {
     );
   });
 
-  console.log('✅ Global error handlers initialized');
+  const sentryStatus = isSentryEnabled() ? 'enabled' : 'disabled (no DSN)';
+  console.log(`✅ Global error handlers initialized (Sentry: ${sentryStatus})`);
 }
+
+/**
+ * Export Sentry utilities for direct use
+ */
+export { captureException, addBreadcrumb, isSentryEnabled } from './sentry';

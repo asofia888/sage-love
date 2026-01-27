@@ -1,5 +1,6 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { captureException, addBreadcrumb, isSentryEnabled } from '../lib/sentry';
 
 interface Props {
   children: ReactNode;
@@ -51,9 +52,28 @@ class ErrorBoundary extends Component<Props, State> {
       this.props.onError(error, errorInfo);
     }
 
-    // In production, send to error tracking service (e.g., Sentry)
-    if (import.meta.env.PROD) {
-      // Example: Sentry.captureException(error, { contexts: { react: { componentStack: errorInfo.componentStack } } });
+    // Add breadcrumb for context
+    addBreadcrumb(
+      'react.error_boundary',
+      `Error caught: ${error.message}`,
+      'error',
+      {
+        componentStack: errorInfo.componentStack,
+      }
+    );
+
+    // Send to Sentry in production
+    if (isSentryEnabled()) {
+      captureException(error, {
+        level: 'fatal',
+        tags: {
+          component: 'ErrorBoundary',
+          type: 'react_error',
+        },
+        extra: {
+          componentStack: errorInfo.componentStack,
+        },
+      });
     }
   }
 
