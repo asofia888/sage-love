@@ -5,7 +5,244 @@ export default {
   "chatPlaceholder": "Escribe aquí tu pregunta para el Sabio...",
   "sendButton": "Enviar",
   "sendingButton": "Enviando...",
-  "comprehensiveDisclaimer": "Las respuestas de esta aplicación son generadas por IA y no sustituyen el asesoramiento médico, legal u otro profesional. La información proporcionada es solo para referencia. Además, aunque esta aplicación admite varios idiomas, algunas traducciones se generan automáticamente y no se puede garantizar su precisión. Gracias por su comprensión.",
+  "comprehensiveDisclaimer": `【AVISO LEGAL IMPORTANTE】
+
+**1. Contenido generado por IA**
+Las respuestas de esta aplicación son generadas por IA y no sustituyen el asesoramiento médico, legal, de salud mental u otro asesoramiento profesional. La información proporcionada es solo para referencia general.
+
+**2. Situaciones de emergencia**
+Esta aplicación incluye funciones de detección de crisis, pero en caso de emergencia o riesgo de autolesión/suicidio, por favor contacte inmediatamente:
+• España: Servicios de emergencia 112, Teléfono de la Esperanza 717 003 717
+• México: Línea de la Vida 800 911 2000, Emergencias 911
+• Argentina: Centro de Asistencia al Suicida 135
+• Estados Unidos: 911, 988 Suicide & Crisis Lifeline
+• Otros países: Servicios de emergencia locales
+
+**3. Medicina y salud mental**
+Para problemas graves de salud mental, depresión, trastornos de ansiedad u otros problemas de salud mental, consulte a profesionales médicos calificados. Esta aplicación no es un sustituto del tratamiento profesional.
+
+**4. Privacidad y datos**
+• El historial de conversaciones se almacena solo localmente en su navegador
+• El contenido de los mensajes se analiza para la detección de crisis pero la información personal no se almacena
+• Consulte nuestra Política de Privacidad para más detalles
+
+**5. Traducción e idioma**
+Aunque esta aplicación admite varios idiomas, algunas traducciones se generan automáticamente y no se puede garantizar su precisión.
+
+**6. Restricciones de uso**
+• Los usuarios menores de 18 años requieren consentimiento parental
+• El uso para actividades ilegales o para dañar a otros está prohibido
+
+**7. Limitación de responsabilidad**
+Los desarrolladores y operadores no son responsables de daños directos o indirectos derivados del uso de esta aplicación.
+
+Por favor, use esta aplicación de manera responsable y comprenda estas limitaciones.`,
+  "privacyPolicyLinkText": "Política de Privacidad",
+  "privacyPolicyModalTitle": "Política de Privacidad",
+  "termsOfServiceLinkText": "Términos de Servicio",
+  "termsOfServiceModalTitle": "Términos de Servicio",
+  "privacyPolicy": `【POLÍTICA DE PRIVACIDAD】
+
+Última actualización: Enero 2025
+
+**1. Información que recopilamos**
+
+**1.1 Información recopilada automáticamente**
+• Configuración de idioma del navegador
+• Información general de ubicación (código de país)
+• Información técnica básica (tipo de navegador, sistema operativo)
+
+**1.2 Información proporcionada por el usuario**
+• Contenido de conversaciones de chat
+• Datos de entrada de voz (solo procesamiento temporal)
+
+**1.3 Análisis de detección de crisis**
+• Los mensajes se analizan automáticamente para detectar contenido relacionado con crisis por seguridad
+• Este análisis es únicamente para mejora de seguridad y no para identificación u otros propósitos
+
+**2. Cómo usamos la información**
+
+**2.1 Provisión de servicios**
+• Funcionalidad de chatbot con IA
+• Soporte multilingüe y traducción
+• Funciones de entrada de voz
+
+**2.2 Garantía de seguridad**
+• Detección de situaciones de crisis y provisión de recursos apropiados
+• Protección de la seguridad y bienestar del usuario
+
+**2.3 Mejora del servicio**
+• Análisis estadístico anonimizado para mejora de funciones
+
+**3. Almacenamiento y procesamiento de datos**
+
+**3.1 Almacenamiento local**
+• El historial de conversaciones se almacena solo en su navegador
+• Esta información no se transmite a servidores externos
+
+**3.2 Procesamiento temporal**
+• Las conversaciones de IA se envían a Google Gemini API para procesamiento
+• El reconocimiento de voz se procesa dentro del navegador, los datos de voz no se almacenan
+• El análisis de detección de crisis se realiza temporalmente, solo se procesan los resultados
+
+**3.3 Sin almacenamiento de información personal**
+• No recopilamos ni almacenamos información de identificación personal (nombre, dirección, teléfono)
+• Las direcciones IP no se registran ni rastrean
+
+**4. Compartir información con terceros**
+
+**4.1 Proveedores de servicios de IA**
+• Google Gemini API: Para funcionalidad de chat y traducción
+• Información enviada: Contenido de conversación, configuración de idioma
+• Se aplica la Política de Privacidad de Google
+
+**4.2 Excepciones de emergencia**
+• Solicitudes legítimas de agencias de aplicación de la ley
+• Emergencias que amenazan la vida cuando se considere necesario
+
+**5. Protección de datos**
+
+**5.1 Salvaguardas técnicas**
+• Cifrado HTTPS para protección de comunicaciones
+• Principio de recopilación mínima de información
+• Actualizaciones de seguridad regulares
+
+**5.2 Restricciones de acceso**
+• Solo los desarrolladores pueden acceder a los datos
+• El acceso administrativo está mínimamente restringido
+
+**6. Sus derechos**
+
+**6.1 Eliminación de datos**
+• Puede eliminar el historial de conversaciones desde la configuración del navegador
+• Use la función de borrado dentro de la aplicación
+
+**6.2 Discontinuación del servicio**
+• Puede dejar de usar el servicio en cualquier momento
+• No se requieren procedimientos complejos ya que no es necesario registrar una cuenta
+
+**7. Procesamiento internacional de datos**
+
+• Este servicio está disponible internacionalmente
+• El procesamiento de datos ocurre principalmente en EE.UU. y Japón
+• Nos esforzamos por cumplir con las leyes de privacidad en cada país
+
+**8. Protección de menores**
+
+• Los usuarios menores de 18 años requieren consentimiento parental
+• No recopilamos intencionalmente información de niños menores de 13 años
+
+**9. Cookies y seguimiento**
+
+• Solo usamos cookies técnicas mínimas necesarias para la funcionalidad
+• No se utilizan cookies de publicidad o seguimiento
+• Puede desactivar las cookies en la configuración del navegador
+
+**10. Cambios en la política**
+
+• Los cambios importantes se notificarán dentro de la aplicación
+• El uso continuado constituye aceptación de los cambios
+
+**11. Contacto**
+
+Para preguntas o inquietudes relacionadas con la privacidad, contáctenos a través de la sección Issues de nuestro repositorio de GitHub.
+
+Esta Política de Privacidad se crea con la seguridad y privacidad del usuario como nuestra máxima prioridad.`,
+  "termsOfService": `【TÉRMINOS DE SERVICIO】
+
+Última actualización: Enero 2025
+
+**1. Descripción del servicio**
+
+Esta aplicación "Amor del Sabio (IA)" (en adelante "este Servicio") es un servicio de consulta espiritual y de vida que utiliza tecnología de IA. Los usuarios pueden consultar con una IA modelada según la sabiduría de los sabios sobre preocupaciones de vida y problemas espirituales a través del diálogo.
+
+**2. Condiciones de uso**
+
+**2.1 Restricciones de edad**
+• Los usuarios menores de 18 años requieren consentimiento parental
+• Los usuarios menores de 13 años no están autorizados a usar este servicio
+
+**2.2 Uso previsto**
+• Este servicio está destinado únicamente para propósitos de consulta espiritual, de vida y exploración religiosa
+• No puede usarse como sustituto de asesoramiento médico, legal o de salud mental profesional
+
+**3. Actividades prohibidas**
+
+Las siguientes actividades están prohibidas:
+• Actos que violen las leyes o estén relacionados con actividades criminales
+• Acoso, amenazas o difamación de otros
+• Publicar contenido obsceno, violento o discriminatorio
+• Actos que interfieran con la operación de este servicio
+• Uso no autorizado del servicio a través de medios técnicos
+• Actividades de publicidad comercial, promoción o solicitud
+• Recopilación o uso no autorizado de información personal
+• Usar mal las respuestas de IA para engañar a otros
+
+**4. Cuenta y limitaciones de uso**
+
+**4.1 Limitaciones de uso**
+• Existen ciertas limitaciones de uso para mantener la calidad del servicio
+• El uso del servicio puede restringirse sin previo aviso si se confirma un uso inapropiado
+
+**4.2 Almacenamiento de datos**
+• El historial de conversaciones se almacena localmente en el navegador y es gestionado por los propios usuarios
+• Los operadores no almacenan ni registran el contenido de las conversaciones de los usuarios
+
+**5. Características y limitaciones del servicio de IA**
+
+**5.1 Contenido generado por IA**
+• Las respuestas de este servicio son generadas por IA y no son consejos de sabios reales
+• Las respuestas de IA pueden contener errores o contenido inapropiado
+• No garantizamos la precisión o idoneidad del contenido generado
+
+**5.2 No es un sustituto del asesoramiento profesional**
+• No puede usarse como sustituto de asesoramiento médico, legal o de salud mental profesional
+• Para problemas graves, consulte a profesionales apropiados
+
+**6. Derechos de propiedad intelectual**
+
+• Los derechos de propiedad intelectual relacionados con el diseño, contenido y sistema de este servicio pertenecen a los operadores
+• Los derechos sobre el contenido ingresado por los usuarios pertenecen a los usuarios
+• El contenido generado por IA puede usarse libremente solo para propósitos personales no comerciales
+
+**7. Privacidad y protección de datos**
+
+• La protección de la privacidad del usuario se rige por la "Política de Privacidad" definida por separado
+• El contenido de las conversaciones puede ser analizado automáticamente por funciones de detección de crisis para garantizar la seguridad
+
+**8. Cambios, interrupciones y terminación del servicio**
+
+• Los operadores pueden cambiar, interrumpir temporalmente o terminar el contenido del servicio sin previo aviso
+• El servicio puede no estar disponible debido a mantenimiento del sistema, problemas técnicos u otras circunstancias inevitables
+
+**9. Exención de responsabilidad**
+
+**9.1 Limitación de responsabilidad del operador**
+• Los operadores no son responsables de daños directos o indirectos derivados del uso de este servicio, excepto en casos de dolo o negligencia grave
+• No son responsables de daños derivados de fallos del sistema, fallos de comunicación, acciones de terceros, etc.
+
+**9.2 Servicios de terceros**
+• Este servicio utiliza Google Gemini API, y también se aplican los términos de servicio de Google
+• Para problemas relacionados con servicios de terceros, contacte a los respectivos proveedores de servicios
+
+**10. Cambios en los términos**
+
+• Estos términos de servicio pueden cambiar sin previo aviso debido a cambios legales o cambios en el contenido del servicio
+• El uso continuado después de los cambios constituye aceptación del contenido modificado
+• Los cambios importantes se notificarán apropiadamente dentro de la aplicación
+
+**11. Ley aplicable y jurisdicción**
+
+• Estos términos de servicio se rigen e interpretan bajo la ley japonesa
+• Para disputas relacionadas con este servicio, el tribunal con jurisdicción sobre la ubicación de la sede del operador será el tribunal de jurisdicción acordada exclusiva
+
+**12. Contacto**
+
+Para preguntas o inquietudes sobre estos términos de servicio, contáctenos a través de la sección Issues de nuestro repositorio de GitHub.
+
+**13. Efectividad**
+
+Estos términos de servicio entran en vigor cuando los usuarios utilizan este servicio.`,
   "disclaimerLinkText": "Aviso Legal",
   "disclaimerModalTitle": "Aviso Legal",
   "closeModalButton": "Cerrar",

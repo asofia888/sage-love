@@ -41,8 +41,208 @@ Veuillez utiliser cette application de manière responsable et comprendre ces li
   "privacyPolicyModalTitle": "Politique de confidentialité",
   "termsOfServiceLinkText": "Conditions d'utilisation",
   "termsOfServiceModalTitle": "Conditions d'utilisation",
-  "privacyPolicy": "Contenu de la politique de confidentialité ici...",
-  "termsOfService": "Contenu des conditions d'utilisation ici...",
+  "privacyPolicy": `【POLITIQUE DE CONFIDENTIALITÉ】
+
+Dernière mise à jour : Janvier 2025
+
+**1. Informations que nous collectons**
+
+**1.1 Informations collectées automatiquement**
+• Paramètres de langue du navigateur
+• Informations générales de localisation (code pays)
+• Informations techniques de base (type de navigateur, système d'exploitation)
+
+**1.2 Informations fournies par l'utilisateur**
+• Contenu des conversations de chat
+• Données d'entrée vocale (traitement temporaire uniquement)
+
+**1.3 Analyse de détection de crise**
+• Les messages sont automatiquement analysés pour détecter le contenu lié aux crises pour la sécurité
+• Cette analyse est uniquement destinée à l'amélioration de la sécurité et non à l'identification ou à d'autres fins
+
+**2. Comment nous utilisons les informations**
+
+**2.1 Fourniture de services**
+• Fonctionnalité de chatbot IA
+• Support multilingue et traduction
+• Fonctionnalités d'entrée vocale
+
+**2.2 Assurance de sécurité**
+• Détection des situations de crise et fourniture de ressources appropriées
+• Protection de la sécurité et du bien-être de l'utilisateur
+
+**2.3 Amélioration du service**
+• Analyse statistique anonymisée pour l'amélioration des fonctionnalités
+
+**3. Stockage et traitement des données**
+
+**3.1 Stockage local**
+• L'historique des conversations est stocké uniquement dans votre navigateur
+• Ces informations ne sont pas transmises à des serveurs externes
+
+**3.2 Traitement temporaire**
+• Les conversations IA sont envoyées à l'API Google Gemini pour traitement
+• La reconnaissance vocale est traitée dans le navigateur, les données vocales ne sont pas stockées
+• L'analyse de détection de crise est effectuée temporairement, seuls les résultats sont traités
+
+**3.3 Aucun stockage d'informations personnelles**
+• Nous ne collectons ni ne stockons d'informations d'identification personnelle (nom, adresse, téléphone)
+• Les adresses IP ne sont pas enregistrées ni suivies
+
+**4. Partage d'informations avec des tiers**
+
+**4.1 Fournisseurs de services IA**
+• API Google Gemini : Pour les fonctionnalités de chat et de traduction
+• Informations envoyées : Contenu de la conversation, paramètres de langue
+• La politique de confidentialité de Google s'applique
+
+**4.2 Exceptions d'urgence**
+• Demandes légitimes des forces de l'ordre
+• Urgences mettant la vie en danger lorsque jugé nécessaire
+
+**5. Protection des données**
+
+**5.1 Mesures de sécurité techniques**
+• Chiffrement HTTPS pour la protection des communications
+• Principe de collecte minimale d'informations
+• Mises à jour de sécurité régulières
+
+**5.2 Restrictions d'accès**
+• Seuls les développeurs peuvent accéder aux données
+• L'accès administratif est minimalement restreint
+
+**6. Vos droits**
+
+**6.1 Suppression des données**
+• Vous pouvez supprimer l'historique des conversations depuis les paramètres du navigateur
+• Utilisez la fonction d'effacement dans l'application
+
+**6.2 Arrêt du service**
+• Vous pouvez arrêter d'utiliser le service à tout moment
+• Aucune procédure complexe n'est requise car aucune inscription de compte n'est nécessaire
+
+**7. Traitement international des données**
+
+• Ce service est disponible internationalement
+• Le traitement des données a lieu principalement aux États-Unis et au Japon
+• Nous nous efforçons de respecter les lois sur la confidentialité dans chaque pays
+
+**8. Protection des mineurs**
+
+• Les utilisateurs de moins de 18 ans nécessitent le consentement parental
+• Nous ne collectons pas intentionnellement d'informations auprès d'enfants de moins de 13 ans
+
+**9. Cookies et suivi**
+
+• Nous n'utilisons que les cookies techniques minimaux nécessaires au fonctionnement
+• Aucun cookie publicitaire ou de suivi n'est utilisé
+• Vous pouvez désactiver les cookies dans les paramètres du navigateur
+
+**10. Modifications de la politique**
+
+• Les modifications importantes seront notifiées dans l'application
+• L'utilisation continue constitue l'acceptation des modifications
+
+**11. Contact**
+
+Pour les questions ou préoccupations relatives à la confidentialité, veuillez nous contacter via la section Issues de notre dépôt GitHub.
+
+Cette politique de confidentialité est créée avec la sécurité et la confidentialité de l'utilisateur comme notre priorité absolue.`,
+  "termsOfService": `【CONDITIONS D'UTILISATION】
+
+Dernière mise à jour : Janvier 2025
+
+**1. Aperçu du service**
+
+Cette application « L'Amour du Sage (IA) » (ci-après « ce Service ») est un service de consultation spirituelle et de vie utilisant la technologie IA. Les utilisateurs peuvent consulter une IA modelée sur la sagesse des sages concernant les préoccupations de vie et les problèmes spirituels par le dialogue.
+
+**2. Conditions d'utilisation**
+
+**2.1 Restrictions d'âge**
+• Les utilisateurs de moins de 18 ans nécessitent le consentement parental
+• Les utilisateurs de moins de 13 ans ne sont pas autorisés à utiliser ce service
+
+**2.2 Utilisation prévue**
+• Ce service est destiné uniquement à des fins de consultation spirituelle, de vie et d'exploration religieuse
+• Ne peut pas être utilisé comme substitut aux conseils médicaux, juridiques ou de santé mentale professionnels
+
+**3. Activités interdites**
+
+Les activités suivantes sont interdites :
+• Actes qui violent les lois ou sont liés à des activités criminelles
+• Harcèlement, menaces ou diffamation d'autrui
+• Publication de contenu obscène, violent ou discriminatoire
+• Actes qui interfèrent avec le fonctionnement de ce service
+• Utilisation non autorisée du service par des moyens techniques
+• Activités de publicité commerciale, de promotion ou de sollicitation
+• Collecte ou utilisation non autorisée d'informations personnelles
+• Utilisation abusive des réponses IA pour tromper autrui
+
+**4. Compte et limitations d'utilisation**
+
+**4.1 Limitations d'utilisation**
+• Certaines limitations d'utilisation sont en place pour maintenir la qualité du service
+• L'utilisation du service peut être restreinte sans préavis si une utilisation inappropriée est confirmée
+
+**4.2 Stockage des données**
+• L'historique des conversations est stocké localement dans le navigateur et géré par les utilisateurs eux-mêmes
+• Les opérateurs ne stockent ni n'enregistrent le contenu des conversations des utilisateurs
+
+**5. Caractéristiques et limitations du service IA**
+
+**5.1 Contenu généré par l'IA**
+• Les réponses de ce service sont générées par l'IA et ne sont pas des conseils de vrais sages
+• Les réponses IA peuvent contenir des erreurs ou un contenu inapproprié
+• Nous ne garantissons pas l'exactitude ou la pertinence du contenu généré
+
+**5.2 Pas un substitut aux conseils professionnels**
+• Ne peut pas être utilisé comme substitut aux conseils médicaux, juridiques ou de santé mentale professionnels
+• Pour les problèmes graves, veuillez consulter des professionnels appropriés
+
+**6. Droits de propriété intellectuelle**
+
+• Les droits de propriété intellectuelle relatifs à la conception, au contenu et au système de ce service appartiennent aux opérateurs
+• Les droits sur le contenu saisi par les utilisateurs appartiennent aux utilisateurs
+• Le contenu généré par l'IA peut être utilisé librement uniquement à des fins personnelles non commerciales
+
+**7. Confidentialité et protection des données**
+
+• La protection de la vie privée des utilisateurs est régie par la « Politique de confidentialité » définie séparément
+• Le contenu des conversations peut être automatiquement analysé par les fonctions de détection de crise pour assurer la sécurité
+
+**8. Modifications, interruptions et résiliation du service**
+
+• Les opérateurs peuvent modifier, interrompre temporairement ou mettre fin au contenu du service sans préavis
+• Le service peut être indisponible en raison de la maintenance du système, de problèmes techniques ou d'autres circonstances inévitables
+
+**9. Clause de non-responsabilité**
+
+**9.1 Limitation de responsabilité de l'opérateur**
+• Les opérateurs ne sont pas responsables des dommages directs ou indirects résultant de l'utilisation de ce service, sauf en cas de faute intentionnelle ou de négligence grave
+• Non responsables des dommages résultant de pannes de système, de pannes de communication, d'actions de tiers, etc.
+
+**9.2 Services tiers**
+• Ce service utilise l'API Google Gemini, et les conditions de service de Google s'appliquent également
+• Pour les problèmes liés aux services tiers, veuillez contacter les fournisseurs de services respectifs
+
+**10. Modifications des conditions**
+
+• Ces conditions de service peuvent être modifiées sans préavis en raison de changements juridiques ou de modifications du contenu du service
+• L'utilisation continue après les modifications constitue l'acceptation du contenu modifié
+• Les modifications importantes seront notifiées de manière appropriée dans l'application
+
+**11. Droit applicable et juridiction**
+
+• Ces conditions de service sont régies et interprétées selon le droit japonais
+• Pour les litiges liés à ce service, le tribunal compétent pour l'emplacement du siège social de l'opérateur sera le tribunal de juridiction convenu exclusif
+
+**12. Contact**
+
+Pour les questions ou préoccupations concernant ces conditions de service, veuillez nous contacter via la section Issues de notre dépôt GitHub.
+
+**13. Entrée en vigueur**
+
+Ces conditions de service entrent en vigueur lorsque les utilisateurs utilisent ce service.`,
   "disclaimerLinkText": "Avertissement",
   "disclaimerModalTitle": "Avertissement",
   "closeModalButton": "Fermer",

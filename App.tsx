@@ -11,7 +11,7 @@ import ClearChatButton from './src/components/ClearChatButton';
 import ShareButton from './src/components/ShareButton';
 import WelcomeMessage from './src/components/WelcomeMessage';
 import HelpButton from './src/components/HelpButton';
-import SEOContent from './src/components/SEOContent';
+
 import PerformanceMonitor from './src/components/PerformanceMonitor';
 import { MultilingualSEO } from './src/components/SEO';
 import CookieBanner from './src/components/CookieBanner';
@@ -255,9 +255,6 @@ const App: React.FC = () => {
           />
         )}
       </React.Suspense>
-      
-      {/* SEO Content - hidden from display but crawlable */}
-      <SEOContent />
     </>
   );
 };
