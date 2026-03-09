@@ -2,30 +2,30 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import ChatInput from './src/components/ChatInput';
-import VirtualizedChat from './src/components/VirtualizedChat';
-import TextSizeSelector from './src/components/TextSizeSelector';
-import PromptSuggestions from './src/components/PromptSuggestions';
-import LanguageSelector from './src/components/LanguageSelector';
-import ClearChatButton from './src/components/ClearChatButton';
-import ShareButton from './src/components/ShareButton';
-import WelcomeMessage from './src/components/WelcomeMessage';
-import HelpButton from './src/components/HelpButton';
+import ChatInput from './components/ChatInput';
+import VirtualizedChat from './components/VirtualizedChat';
+import TextSizeSelector from './components/TextSizeSelector';
+import PromptSuggestions from './components/PromptSuggestions';
+import LanguageSelector from './components/LanguageSelector';
+import ClearChatButton from './components/ClearChatButton';
+import ShareButton from './components/ShareButton';
+import WelcomeMessage from './components/WelcomeMessage';
+import HelpButton from './components/HelpButton';
 
-import PerformanceMonitor from './src/components/PerformanceMonitor';
-import { MultilingualSEO } from './src/components/SEO';
-import CookieBanner from './src/components/CookieBanner';
+import PerformanceMonitor from './components/PerformanceMonitor';
+import { MultilingualSEO } from './components/SEO';
+import CookieBanner from './components/CookieBanner';
 
 // Lazy load modal components
-const DisclaimerModal = React.lazy(() => import('./src/components/DisclaimerModal'));
-const ConfirmationModal = React.lazy(() => import('./src/components/ConfirmationModal'));
-const HelpModal = React.lazy(() => import('./src/components/HelpModal'));
-const CrisisInterventionModal = React.lazy(() => import('./src/components/CrisisInterventionModal'));
-const PrivacyPolicyModal = React.lazy(() => import('./src/components/PrivacyPolicyModal'));
-const TermsOfServiceModal = React.lazy(() => import('./src/components/TermsOfServiceModal'));
-import { useChatHistory } from './src/hooks/useChatHistory';
-import { useTextSize } from './src/hooks/useTextSize';
-import { useMessageHandler } from './src/hooks/useMessageHandler';
+const DisclaimerModal = React.lazy(() => import('./components/DisclaimerModal'));
+const ConfirmationModal = React.lazy(() => import('./components/ConfirmationModal'));
+const HelpModal = React.lazy(() => import('./components/HelpModal'));
+const CrisisInterventionModal = React.lazy(() => import('./components/CrisisInterventionModal'));
+const PrivacyPolicyModal = React.lazy(() => import('./components/PrivacyPolicyModal'));
+const TermsOfServiceModal = React.lazy(() => import('./components/TermsOfServiceModal'));
+import { useChatHistory } from './hooks/useChatHistory';
+import { useTextSize } from './hooks/useTextSize';
+import { useMessageHandler } from './hooks/useMessageHandler';
 
 
 // --- Main App Component ---
@@ -39,15 +39,15 @@ const App: React.FC = () => {
   const [isTermsOfServiceOpen, setIsTermsOfServiceOpen] = useState<boolean>(false);
 
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
-  
+
   const [textSize, setTextSize] = useTextSize();
   const [messages, setMessages, clearChat, memoryStats] = useChatHistory(i18n.isInitialized);
-  
+
   // メッセージハンドリングロジックを分離
-  const { 
-    handleSendMessage, 
-    isLoading, 
-    error, 
+  const {
+    handleSendMessage,
+    isLoading,
+    error,
     setError,
     isCrisisModalOpen,
     closeCrisisModal,
@@ -56,13 +56,6 @@ const App: React.FC = () => {
     messages,
     setMessages
   });
-
-
-  // 翻訳サービスの初期化（安全のためサーバーサイドAPI経由で実行）
-  useEffect(() => {
-    // API Keyはサーバーサイドでのみ使用、フロントエンドでは初期化不要
-    // geminiService.initializeTranslationService(apiKey); // 削除
-  }, []);
 
   // Effect to update html lang, dir, and OGP url attributes for RTL/sharing support
   useEffect(() => {
@@ -87,7 +80,7 @@ const App: React.FC = () => {
   const handleClearChat = () => {
     setIsClearConfirmOpen(true);
   };
-  
+
   const confirmClearChat = () => {
     clearChat();
     setError(null);
@@ -157,9 +150,9 @@ const App: React.FC = () => {
                 <div className="mb-2">
                   <p>
                     {t('buyMeACoffeeText')}{' '}
-                    <a 
-                      href="https://buymeacoffee.com/asofia" 
-                      target="_blank" 
+                    <a
+                      href="https://buymeacoffee.com/asofia"
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="font-semibold text-sky-400 hover:text-sky-300 underline transition-colors"
                       aria-label={t('buyMeACoffeeButtonAria')}
@@ -194,9 +187,9 @@ const App: React.FC = () => {
                 <div className="bg-gradient-to-r from-sky-500/10 to-indigo-500/10 border border-sky-500/20 rounded-lg px-3 py-2 hover:from-sky-500/15 hover:to-indigo-500/15 hover:border-sky-400/30 transition-all duration-200 hover:scale-105">
                   <p className="text-sm">
                     {t('buyMeACoffeeText')}{' '}
-                    <a 
-                      href="https://buymeacoffee.com/asofia" 
-                      target="_blank" 
+                    <a
+                      href="https://buymeacoffee.com/asofia"
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="font-semibold text-sky-400 hover:text-sky-300 underline decoration-2 underline-offset-2 transition-colors"
                       aria-label={t('buyMeACoffeeButtonAria')}
@@ -243,7 +236,7 @@ const App: React.FC = () => {
         >
           <p>{t('confirmClearText')}</p>
         </ConfirmationModal>
-        
+
         {/* Crisis Intervention Modal */}
         {lastCrisisResult && (
           <CrisisInterventionModal
