@@ -32,11 +32,11 @@ import { useMessageHandler } from './hooks/useMessageHandler';
 
 const App: React.FC = () => {
   const { t, i18n } = useTranslation();
-  const [isDisclaimerOpen, setIsDisclaimerOpen] = useState<boolean>(false);
-  const [isClearConfirmOpen, setIsClearConfirmOpen] = useState<boolean>(false);
-  const [isHelpOpen, setIsHelpOpen] = useState<boolean>(false);
-  const [isPrivacyPolicyOpen, setIsPrivacyPolicyOpen] = useState<boolean>(false);
-  const [isTermsOfServiceOpen, setIsTermsOfServiceOpen] = useState<boolean>(false);
+
+  // Unified modal state: only one modal open at a time (except crisis modal)
+  type ModalType = null | 'disclaimer' | 'clearConfirm' | 'help' | 'privacyPolicy' | 'termsOfService';
+  const [activeModal, setActiveModal] = useState<ModalType>(null);
+  const closeModal = () => setActiveModal(null);
 
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
 
@@ -78,13 +78,13 @@ const App: React.FC = () => {
   useEffect(scrollToBottom, [messages]);
 
   const handleClearChat = () => {
-    setIsClearConfirmOpen(true);
+    setActiveModal('clearConfirm');
   };
 
   const confirmClearChat = () => {
     clearChat();
     setError(null);
-    setIsClearConfirmOpen(false);
+    closeModal();
   };
 
 
@@ -104,7 +104,7 @@ const App: React.FC = () => {
               <p className="text-xs sm:text-sm text-slate-200">{t('appSubtitle')}</p>
             </div>
             <div className="mt-2 sm:mt-0 flex items-center space-x-2 rtl:space-x-reverse sm:flex-1 sm:justify-end">
-              <HelpButton onClick={() => setIsHelpOpen(true)} />
+              <HelpButton onClick={() => setActiveModal('help')} />
               <ShareButton />
               <ClearChatButton onClear={handleClearChat} />
               <TextSizeSelector currentTextSize={textSize} onSetTextSize={setTextSize} />
@@ -163,19 +163,19 @@ const App: React.FC = () => {
                 </div>
                 <div className="text-slate-300 flex flex-row justify-center items-center gap-4">
                   <button
-                    onClick={() => setIsDisclaimerOpen(true)}
+                    onClick={() => setActiveModal('disclaimer')}
                     className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1 text-xs"
                   >
                     {t('disclaimerLinkText')}
                   </button>
                   <button
-                    onClick={() => setIsPrivacyPolicyOpen(true)}
+                    onClick={() => setActiveModal('privacyPolicy')}
                     className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1 text-xs"
                   >
                     {t('privacyPolicyLinkText')}
                   </button>
                   <button
-                    onClick={() => setIsTermsOfServiceOpen(true)}
+                    onClick={() => setActiveModal('termsOfService')}
                     className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1 text-xs"
                   >
                     {t('termsOfServiceLinkText')}
@@ -199,19 +199,19 @@ const App: React.FC = () => {
                   </p>
                 </div>
                 <button
-                  onClick={() => setIsDisclaimerOpen(true)}
+                  onClick={() => setActiveModal('disclaimer')}
                   className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1"
                 >
                   {t('disclaimerLinkText')}
                 </button>
                 <button
-                  onClick={() => setIsPrivacyPolicyOpen(true)}
+                  onClick={() => setActiveModal('privacyPolicy')}
                   className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1"
                 >
                   {t('privacyPolicyLinkText')}
                 </button>
                 <button
-                  onClick={() => setIsTermsOfServiceOpen(true)}
+                  onClick={() => setActiveModal('termsOfService')}
                   className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1"
                 >
                   {t('termsOfServiceLinkText')}
@@ -222,13 +222,13 @@ const App: React.FC = () => {
         </footer>
       </div>
       <React.Suspense fallback={<div />}>
-        <DisclaimerModal isOpen={isDisclaimerOpen} onClose={() => setIsDisclaimerOpen(false)} />
-        <PrivacyPolicyModal isOpen={isPrivacyPolicyOpen} onClose={() => setIsPrivacyPolicyOpen(false)} />
-        <TermsOfServiceModal isOpen={isTermsOfServiceOpen} onClose={() => setIsTermsOfServiceOpen(false)} />
-        <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
+        <DisclaimerModal isOpen={activeModal === 'disclaimer'} onClose={closeModal} />
+        <PrivacyPolicyModal isOpen={activeModal === 'privacyPolicy'} onClose={closeModal} />
+        <TermsOfServiceModal isOpen={activeModal === 'termsOfService'} onClose={closeModal} />
+        <HelpModal isOpen={activeModal === 'help'} onClose={closeModal} />
         <ConfirmationModal
-          isOpen={isClearConfirmOpen}
-          onClose={() => setIsClearConfirmOpen(false)}
+          isOpen={activeModal === 'clearConfirm'}
+          onClose={closeModal}
           onConfirm={confirmClearChat}
           title={t('confirmClearTitle')}
           confirmText={t('confirmClearButton')}
