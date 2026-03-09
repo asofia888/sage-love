@@ -1,5 +1,3 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
-
 export interface TranslationContext {
   domain: 'spiritual' | 'philosophical' | 'practical';
   tone: 'sage' | 'gentle' | 'formal';
@@ -29,12 +27,10 @@ export interface TranslationIssue {
 }
 
 export class EnhancedTranslationService {
-  private geminiTranslator: GoogleGenerativeAI;
   private cache = new Map<string, CachedTranslation>();
   private glossary = new Map<string, Map<string, string>>();
 
-  constructor(apiKey: string) {
-    this.geminiTranslator = new GoogleGenerativeAI(apiKey);
+  constructor() {
     this.loadSpiritualGlossary();
   }
 
@@ -55,32 +51,9 @@ export class EnhancedTranslationService {
       return cached.translation;
     }
 
-    try {
-      const enhancedPrompt = this.buildTranslationPrompt(text, targetLang, context, previousResponses);
-      
-      const response = await this.geminiTranslator.models.generateContent({
-        model: 'gemini-flash-latest',
-        contents: [{ role: 'user', parts: [{ text: enhancedPrompt }] }],
-        config: {
-          temperature: 0.4, // 重複回避のため少し創造性を上げる
-          topP: 0.9
-        }
-      });
-
-      const translation = response.text;
-
-      // キャッシュに保存
-      this.cache.set(cacheKey, {
-        translation,
-        timestamp: Date.now(),
-        expiryTime: Date.now() + (7 * 24 * 60 * 60 * 1000) // 7日間
-      });
-
-      return translation;
-    } catch (error) {
-      console.error('Translation error:', error);
-      return text; // フォールバックとして元のテキストを返す
-    }
+    // Translation is now handled server-side via api/chat.ts
+    // This client-side implementation is deprecated
+    return text;
   }
 
   private buildTranslationPrompt(

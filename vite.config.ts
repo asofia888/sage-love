@@ -17,8 +17,6 @@ export default defineConfig({
           'react-vendor': ['react', 'react-dom'],
           // i18n libraries
           'i18n-vendor': ['i18next', 'react-i18next', 'i18next-browser-languagedetector'],
-          // AI/API libraries
-          'ai-vendor': ['@google/generative-ai'],
           // Modal components (lazy loaded)
           'modal-components': [
             './src/components/DisclaimerModal.tsx',
