@@ -4,11 +4,20 @@ import { parseGeminiError, buildErrorResponse, ValidationError, APIError } from 
 import { retryWithBackoff, withTimeout, RetryStatsTracker } from './retry-utils';
 import { geminiCircuitBreaker } from './circuit-breaker';
 import { getModelWithCache, calculateCacheSavings, getCacheStats } from './context-cache';
-import { API_CONFIG } from './config';
+import { API_CONFIG, validateEnv } from './config';
 
 export const config = {
   runtime: 'edge',
 };
+
+// Validate environment variables at module load time
+const envValidation = validateEnv();
+if (envValidation.warnings.length > 0) {
+  console.warn('⚠️ Environment warnings:\n  ' + envValidation.warnings.join('\n  '));
+}
+if (!envValidation.valid) {
+  console.error('❌ Environment validation failed:\n  ' + envValidation.errors.join('\n  '));
+}
 
 // Retry stats tracker
 const retryStats = new RetryStatsTracker();
@@ -76,8 +85,10 @@ export default async function handler(req: Request) {
       });
     }
 
-    if (!process.env.GEMINI_API_KEY) {
-      throw new ValidationError('API key is not configured on the server.');
+    if (!envValidation.valid) {
+      throw new ValidationError(
+        'Server configuration error: ' + envValidation.errors.join('; ')
+      );
     }
 
     if (!message) {
