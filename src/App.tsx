@@ -1,9 +1,8 @@
 
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 import ChatInput from './components/ChatInput';
-import VirtualizedChat from './components/VirtualizedChat';
 import TextSizeSelector from './components/TextSizeSelector';
 import PromptSuggestions from './components/PromptSuggestions';
 import LanguageSelector from './components/LanguageSelector';
@@ -15,6 +14,10 @@ import HelpButton from './components/HelpButton';
 import PerformanceMonitor from './components/PerformanceMonitor';
 import { MultilingualSEO } from './components/SEO';
 import CookieBanner from './components/CookieBanner';
+
+// 初回の WelcomeMessage 表示時は仮想化不要なので、Virtuoso を含む
+// VirtualizedChat は最初のメッセージ送信まで読み込まない。
+const VirtualizedChat = React.lazy(() => import('./components/VirtualizedChat'));
 
 // Lazy load modal components
 const DisclaimerModal = React.lazy(() => import('./components/DisclaimerModal'));
@@ -37,8 +40,6 @@ const App: React.FC = () => {
   type ModalType = null | 'disclaimer' | 'clearConfirm' | 'help' | 'privacyPolicy' | 'termsOfService';
   const [activeModal, setActiveModal] = useState<ModalType>(null);
   const closeModal = () => setActiveModal(null);
-
-  const messagesEndRef = useRef<null | HTMLDivElement>(null);
 
   const [textSize, setTextSize] = useTextSize();
   const [messages, setMessages, clearChat, memoryStats] = useChatHistory(i18n.isInitialized);
@@ -70,12 +71,6 @@ const App: React.FC = () => {
       ogUrlMeta.setAttribute('content', canonicalUrl);
     }
   }, [i18n, i18n.language]);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  useEffect(scrollToBottom, [messages]);
 
   const handleClearChat = () => {
     setActiveModal('clearConfirm');
@@ -113,17 +108,18 @@ const App: React.FC = () => {
           </div>
         </header>
 
-        <main className="flex-grow overflow-y-auto p-4 bg-transparent">
-          <div className="container mx-auto max-w-4xl">
+        <main className="flex-grow flex flex-col min-h-0 p-4 bg-transparent">
+          <div className="container mx-auto max-w-4xl flex-grow flex flex-col min-h-0">
             {messages.length === 0 && <WelcomeMessage textSize={textSize} />}
             {messages.length > 0 && (
-              <VirtualizedChat
-                messages={messages}
-                textSize={textSize}
-                currentLang={i18n.language}
-              />
+              <Suspense fallback={null}>
+                <VirtualizedChat
+                  messages={messages}
+                  textSize={textSize}
+                  currentLang={i18n.language}
+                />
+              </Suspense>
             )}
-            <div ref={messagesEndRef} />
           </div>
         </main>
 
