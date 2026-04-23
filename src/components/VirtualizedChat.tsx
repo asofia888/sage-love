@@ -1,7 +1,7 @@
 import React, { useMemo, useCallback, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import ChatMessageDisplay from './ChatMessageDisplay';
-import { ChatMessage } from '../types';
+import { ChatMessage, MessageSender } from '../types';
 
 interface VirtualizedChatProps {
   messages: ChatMessage[];
@@ -105,7 +105,7 @@ const VirtualizedChat: React.FC<VirtualizedChatProps> = ({
         const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
         const isNearBottom = scrollTop + clientHeight >= scrollHeight - 100;
         
-        if (isNearBottom || lastMessage.role === 'user') {
+        if (isNearBottom || lastMessage.sender === MessageSender.USER) {
           requestAnimationFrame(scrollToBottom);
         }
       }

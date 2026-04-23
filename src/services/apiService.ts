@@ -1,9 +1,12 @@
 /**
- * Secure API Service - Communicates with serverless backend
+ * Secure API Service - Communicates with serverless backend.
+ *
+ * Session identity is managed by a server-issued HMAC-signed cookie (HttpOnly),
+ * so the client no longer generates or sends any session identifier. Cookies
+ * ride along automatically because requests are same-origin.
  */
 
-import { API, STORAGE } from '../config/constants';
-import { storage } from '../lib/storage';
+import { API } from '../config/constants';
 
 export interface ChatRequest {
   message: string;
@@ -30,20 +33,9 @@ export interface ApiError {
 
 class ApiService {
   private baseUrl: string;
-  private sessionId: string;
 
   constructor() {
     this.baseUrl = API.BASE_URL;
-    this.sessionId = this.getSessionId();
-  }
-
-  private getSessionId(): string {
-    let sessionId = storage.getRaw(STORAGE.SESSION_ID_KEY);
-    if (!sessionId) {
-      sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-      storage.setRaw(STORAGE.SESSION_ID_KEY, sessionId);
-    }
-    return sessionId;
   }
 
   async sendMessage(request: ChatRequest): Promise<ChatResponse> {
@@ -54,9 +46,9 @@ class ApiService {
 
       const response = await fetch(`${this.baseUrl}/chat`, {
         method: 'POST',
+        credentials: 'same-origin', // send signed session cookie
         headers: {
           'Content-Type': 'application/json',
-          'X-Session-ID': this.sessionId,
         },
         body: JSON.stringify({
           message: request.message,
@@ -108,9 +100,7 @@ class ApiService {
     try {
       const response = await fetch(`${this.baseUrl}/health`, {
         method: 'GET',
-        headers: {
-          'X-Session-ID': this.sessionId,
-        },
+        credentials: 'same-origin',
       });
       return response.ok;
     } catch {
@@ -118,18 +108,11 @@ class ApiService {
     }
   }
 
-  // Method to get current session info
+  // Method to get current service info
   getSessionInfo() {
     return {
-      sessionId: this.sessionId,
       baseUrl: this.baseUrl,
     };
-  }
-
-  // Method to reset session (useful for testing or user logout)
-  resetSession() {
-    storage.remove(STORAGE.SESSION_ID_KEY);
-    this.sessionId = this.getSessionId();
   }
 }
 

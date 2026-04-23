@@ -1,11 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-// Mock environment variables
-vi.mock('process', () => ({
-  env: {
-    GEMINI_API_KEY: 'test-api-key-12345'
-  }
-}));
+// Required env vars must be present before the handler module is imported.
+process.env.GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'test-api-key-12345';
+process.env.SESSION_SECRET = process.env.SESSION_SECRET || 'test-session-secret-for-vitest-0123456789';
 
 // Mock Google Generative AI
 const mockGenerateContent = vi.fn();
@@ -53,8 +50,7 @@ describe('Chat API Handler', () => {
       const request = new Request('http://localhost/api/chat', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'X-Session-ID': 'test-session-123'
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           message: 'こんにちは',
@@ -68,8 +64,11 @@ describe('Chat API Handler', () => {
 
       expect(response.status).toBe(200);
       expect(data.message).toBe('こんにちは、聖者です。');
-      expect(data.sessionId).toBe('test-session-123');
+      // Session ID is server-generated (base64url); not user-supplied.
+      expect(data.sessionId).toMatch(/^[A-Za-z0-9_-]+$/);
       expect(data.timestamp).toBeDefined();
+      // New sessions should issue a signed cookie.
+      expect(response.headers.get('Set-Cookie') || '').toContain('sid=');
     });
 
     it('should reject non-POST requests', async () => {

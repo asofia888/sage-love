@@ -37,11 +37,19 @@ Developers and operators are not responsible for direct or indirect damages aris
 Please use this app responsibly and understand these limitations.`,
   "privacyPolicyLinkText": "Privacy Policy",
   "privacyPolicyModalTitle": "Privacy Policy",
+  "privacyPolicyKeyPointsTitle": "Key Points",
+  "privacyPolicyKeyPoint1": "Conversation history is stored only in your browser",
+  "privacyPolicyKeyPoint2": "IP addresses and session cookies are used only temporarily for rate limiting",
+  "privacyPolicyKeyPoint3": "Anonymous usage and error data may be sent to Google Analytics and Sentry (based on your cookie consent)",
+  "privacyPolicyKeyPoint4": "You can delete your data and stop using the service at any time",
+  "privacyPolicyManagementTitle": "Data Management",
+  "privacyPolicyManagementBody": "To delete conversation history, use the in-app \"Clear Conversation\" button, or clear local storage and cookies from your browser settings.",
+  "privacyPolicyLastUpdated": "Last Updated: April 2026",
   "termsOfServiceLinkText": "Terms of Service",
   "termsOfServiceModalTitle": "Terms of Service",
   "privacyPolicy": `【PRIVACY POLICY】
 
-Last Updated: January 2025
+Last Updated: April 2026
 
 **1. Information We Collect**
 
@@ -49,6 +57,8 @@ Last Updated: January 2025
 • Browser language settings
 • General location information (country code)
 • Basic technical information (browser type, OS)
+• IP address (processed temporarily for rate limiting and abuse prevention)
+• HMAC-signed session cookie (\`sid\`): an anonymous server-issued identifier used for rate limiting
 
 **1.2 User-Provided Information**
 • Chat conversation content
@@ -68,24 +78,27 @@ Last Updated: January 2025
 **2.2 Safety Assurance**
 • Detection of crisis situations and provision of appropriate resources
 • Protection of user safety and welfare
+• Rate limiting and prevention of abusive or malicious requests
 
 **2.3 Service Improvement**
 • Anonymized statistical analysis for feature enhancement
+• Error detection and quality improvement
 
 **3. Data Storage and Processing**
 
 **3.1 Local Storage**
-• Conversation history is stored only in your browser
-• This information is not transmitted to external servers
+• Conversation history is stored only in your browser (local storage)
+• Conversation content is not stored on our servers
 
 **3.2 Temporary Processing**
 • AI conversations are sent to Google Gemini API for processing
 • Voice recognition is processed within the browser, voice data is not stored
 • Crisis detection analysis is performed temporarily, only results are processed
+• IP addresses and session cookies are used to evaluate rate limits and expire automatically after a short period (typically within 24 hours)
 
-**3.3 No Personal Information Storage**
-• We do not collect or store personally identifiable information (name, address, phone)
-• IP addresses are not recorded or tracked
+**3.3 Personal Information**
+• We do not actively collect personally identifiable information (name, address, phone number)
+• However, if you include personal information in your chat messages, that content will be sent to the AI service provider
 
 **4. Information Sharing with Third Parties**
 
@@ -94,7 +107,12 @@ Last Updated: January 2025
 • Information sent: Conversation content, language settings
 • Google's Privacy Policy applies
 
-**4.2 Emergency Exceptions**
+**4.2 Analytics and Monitoring**
+• Google Analytics: Collects anonymized usage metrics (page views, feature usage). Enabled only with your cookie consent
+• Sentry: Collects error logs and performance data, used solely for quality improvement
+• Infrastructure: Vercel (hosting) and Upstash Redis (temporary counters for rate limiting)
+
+**4.3 Emergency Exceptions**
 • Legitimate requests from law enforcement agencies
 • Life-threatening emergencies where deemed necessary
 
@@ -102,6 +120,7 @@ Last Updated: January 2025
 
 **5.1 Technical Safeguards**
 • HTTPS encryption for communication protection
+• HMAC-signed session cookie with HttpOnly, Secure, and SameSite=Lax attributes
 • Minimal information collection principle
 • Regular security updates
 
@@ -112,8 +131,9 @@ Last Updated: January 2025
 **6. Your Rights**
 
 **6.1 Data Deletion**
-• You can delete conversation history from browser settings
-• Use the in-app clear function
+• You can delete conversation history and local storage from browser settings
+• Use the in-app "Clear Conversation" function
+• Clearing cookies in your browser also removes the session cookie
 
 **6.2 Service Discontinuation**
 • You can stop using the service at any time
@@ -132,9 +152,12 @@ Last Updated: January 2025
 
 **9. Cookies and Tracking**
 
-• We use only minimal technical cookies necessary for functionality
-• No advertising or tracking cookies are used
-• You can disable cookies in browser settings
+The cookies and similar technologies we use:
+• **Essential cookies** (\`sid\`): a server-issued HMAC-signed session cookie used for rate limiting
+• **Consent-based cookies**: Google Analytics usage tracking; enabled only if you accept the in-app cookie consent banner
+• **Local storage**: used to persist conversation history, language preferences, and cookie consent state
+• We do not use advertising tracking cookies
+• You can disable or delete cookies through your browser settings
 
 **10. Policy Changes**
 

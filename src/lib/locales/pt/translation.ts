@@ -38,11 +38,19 @@ Os desenvolvedores e operadores não são responsáveis por danos diretos ou ind
 Por favor, use esta aplicação de forma responsável e compreenda estas limitações.`,
   "privacyPolicyLinkText": "Política de Privacidade",
   "privacyPolicyModalTitle": "Política de Privacidade",
+  "privacyPolicyKeyPointsTitle": "Pontos principais",
+  "privacyPolicyKeyPoint1": "O histórico de conversas é armazenado apenas no seu navegador",
+  "privacyPolicyKeyPoint2": "Os endereços IP e cookies de sessão são usados apenas temporariamente para limitação de taxa",
+  "privacyPolicyKeyPoint3": "Dados anônimos de uso e erros podem ser enviados ao Google Analytics e Sentry (com base no seu consentimento de cookies)",
+  "privacyPolicyKeyPoint4": "Você pode excluir seus dados e parar de usar o serviço a qualquer momento",
+  "privacyPolicyManagementTitle": "Gerenciamento de dados",
+  "privacyPolicyManagementBody": "Para excluir o histórico de conversas, use o botão \"Limpar conversa\" dentro da aplicação ou limpe o armazenamento local e os cookies nas configurações do navegador.",
+  "privacyPolicyLastUpdated": "Última atualização: Abril 2026",
   "termsOfServiceLinkText": "Termos de Serviço",
   "termsOfServiceModalTitle": "Termos de Serviço",
   "privacyPolicy": `【POLÍTICA DE PRIVACIDADE】
 
-Última atualização: Janeiro 2025
+Última atualização: Abril 2026
 
 **1. Informações que coletamos**
 
@@ -50,6 +58,8 @@ Por favor, use esta aplicação de forma responsável e compreenda estas limita�
 • Configurações de idioma do navegador
 • Informações gerais de localização (código do país)
 • Informações técnicas básicas (tipo de navegador, sistema operacional)
+• Endereço IP (processado temporariamente para limitação de taxa e prevenção de abuso)
+• Cookie de sessão assinado com HMAC (\`sid\`): identificador anônimo emitido pelo servidor, usado para limitação de taxa
 
 **1.2 Informações fornecidas pelo usuário**
 • Conteúdo de conversas de chat
@@ -84,9 +94,10 @@ Por favor, use esta aplicação de forma responsável e compreenda estas limita�
 • O reconhecimento de voz é processado dentro do navegador, os dados de voz não são armazenados
 • A análise de detecção de crise é realizada temporariamente, apenas os resultados são processados
 
-**3.3 Sem armazenamento de informações pessoais**
-• Não coletamos nem armazenamos informações de identificação pessoal (nome, endereço, telefone)
-• Os endereços IP não são registrados nem rastreados
+**3.3 Informações pessoais**
+• Não coletamos ativamente informações de identificação pessoal (nome, endereço, telefone)
+• No entanto, se você incluir informações pessoais em suas mensagens, esse conteúdo será enviado ao provedor do serviço de IA
+• Endereços IP e cookies de sessão são usados apenas para avaliar limites de taxa e expiram automaticamente após um curto período (normalmente em 24 horas)
 
 **4. Compartilhamento de informações com terceiros**
 
@@ -95,7 +106,12 @@ Por favor, use esta aplicação de forma responsável e compreenda estas limita�
 • Informações enviadas: Conteúdo da conversa, configurações de idioma
 • A Política de Privacidade do Google se aplica
 
-**4.2 Exceções de emergência**
+**4.2 Análise e monitoramento**
+• Google Analytics: coleta métricas de uso anonimizadas (visualizações de página, uso de recursos). Ativado apenas com seu consentimento de cookies
+• Sentry: coleta logs de erro e dados de desempenho, usados apenas para melhoria de qualidade
+• Infraestrutura: Vercel (hospedagem) e Upstash Redis (contadores temporários para limitação de taxa)
+
+**4.3 Exceções de emergência**
 • Solicitações legítimas de agências de aplicação da lei
 • Emergências que ameaçam a vida quando considerado necessário
 
@@ -133,9 +149,12 @@ Por favor, use esta aplicação de forma responsável e compreenda estas limita�
 
 **9. Cookies e rastreamento**
 
-• Usamos apenas cookies técnicos mínimos necessários para a funcionalidade
-• Não são utilizados cookies de publicidade ou rastreamento
-• Você pode desativar os cookies nas configurações do navegador
+Os cookies e tecnologias similares que usamos:
+• **Cookies essenciais** (\`sid\`): cookie de sessão assinado com HMAC emitido pelo servidor, usado para limitação de taxa
+• **Cookies baseados em consentimento**: rastreamento de uso pelo Google Analytics; ativado apenas se você aceitar o banner de consentimento na aplicação
+• **Armazenamento local**: usado para manter o histórico de conversas, preferências de idioma e o estado de consentimento de cookies
+• Não usamos cookies de rastreamento de publicidade
+• Você pode desativar ou excluir cookies nas configurações do navegador
 
 **10. Alterações na política**
 

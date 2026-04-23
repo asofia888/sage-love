@@ -39,11 +39,19 @@ Les développeurs et opérateurs ne sont pas responsables des dommages directs o
 Veuillez utiliser cette application de manière responsable et comprendre ces limitations.`,
   "privacyPolicyLinkText": "Politique de confidentialité",
   "privacyPolicyModalTitle": "Politique de confidentialité",
+  "privacyPolicyKeyPointsTitle": "Points clés",
+  "privacyPolicyKeyPoint1": "L'historique des conversations est stocké uniquement dans votre navigateur",
+  "privacyPolicyKeyPoint2": "Les adresses IP et les cookies de session sont utilisés temporairement uniquement pour la limitation de débit",
+  "privacyPolicyKeyPoint3": "Des données anonymes d'utilisation et d'erreurs peuvent être envoyées à Google Analytics et Sentry (selon votre consentement aux cookies)",
+  "privacyPolicyKeyPoint4": "Vous pouvez supprimer vos données et cesser d'utiliser le service à tout moment",
+  "privacyPolicyManagementTitle": "Gestion des données",
+  "privacyPolicyManagementBody": "Pour supprimer l'historique des conversations, utilisez le bouton « Effacer la conversation » dans l'application ou effacez le stockage local et les cookies depuis les paramètres de votre navigateur.",
+  "privacyPolicyLastUpdated": "Dernière mise à jour : Avril 2026",
   "termsOfServiceLinkText": "Conditions d'utilisation",
   "termsOfServiceModalTitle": "Conditions d'utilisation",
   "privacyPolicy": `【POLITIQUE DE CONFIDENTIALITÉ】
 
-Dernière mise à jour : Janvier 2025
+Dernière mise à jour : Avril 2026
 
 **1. Informations que nous collectons**
 
@@ -51,6 +59,8 @@ Dernière mise à jour : Janvier 2025
 • Paramètres de langue du navigateur
 • Informations générales de localisation (code pays)
 • Informations techniques de base (type de navigateur, système d'exploitation)
+• Adresse IP (traitée temporairement pour la limitation de débit et la prévention des abus)
+• Cookie de session signé par HMAC (\`sid\`) : identifiant anonyme émis par le serveur, utilisé pour la limitation de débit
 
 **1.2 Informations fournies par l'utilisateur**
 • Contenu des conversations de chat
@@ -85,9 +95,10 @@ Dernière mise à jour : Janvier 2025
 • La reconnaissance vocale est traitée dans le navigateur, les données vocales ne sont pas stockées
 • L'analyse de détection de crise est effectuée temporairement, seuls les résultats sont traités
 
-**3.3 Aucun stockage d'informations personnelles**
-• Nous ne collectons ni ne stockons d'informations d'identification personnelle (nom, adresse, téléphone)
-• Les adresses IP ne sont pas enregistrées ni suivies
+**3.3 Informations personnelles**
+• Nous ne collectons pas activement d'informations d'identification personnelle (nom, adresse, téléphone)
+• Toutefois, si vous incluez des informations personnelles dans vos messages, ce contenu sera envoyé au fournisseur du service IA
+• Les adresses IP et les cookies de session servent uniquement à évaluer les limites de débit et expirent automatiquement après une courte période (généralement sous 24 heures)
 
 **4. Partage d'informations avec des tiers**
 
@@ -96,7 +107,12 @@ Dernière mise à jour : Janvier 2025
 • Informations envoyées : Contenu de la conversation, paramètres de langue
 • La politique de confidentialité de Google s'applique
 
-**4.2 Exceptions d'urgence**
+**4.2 Analyse et surveillance**
+• Google Analytics : collecte des statistiques d'utilisation anonymisées (pages vues, utilisation des fonctionnalités). Activé uniquement avec votre consentement aux cookies
+• Sentry : collecte les journaux d'erreurs et les données de performance, utilisés uniquement pour l'amélioration de la qualité
+• Infrastructure : Vercel (hébergement) et Upstash Redis (compteurs temporaires pour la limitation de débit)
+
+**4.3 Exceptions d'urgence**
 • Demandes légitimes des forces de l'ordre
 • Urgences mettant la vie en danger lorsque jugé nécessaire
 
@@ -134,9 +150,12 @@ Dernière mise à jour : Janvier 2025
 
 **9. Cookies et suivi**
 
-• Nous n'utilisons que les cookies techniques minimaux nécessaires au fonctionnement
-• Aucun cookie publicitaire ou de suivi n'est utilisé
-• Vous pouvez désactiver les cookies dans les paramètres du navigateur
+Les cookies et technologies similaires que nous utilisons :
+• **Cookies essentiels** (\`sid\`) : cookie de session signé par HMAC émis par le serveur, utilisé pour la limitation de débit
+• **Cookies soumis au consentement** : suivi d'utilisation par Google Analytics ; activé uniquement si vous acceptez la bannière de consentement dans l'application
+• **Stockage local** : utilisé pour conserver l'historique des conversations, les préférences de langue et l'état du consentement aux cookies
+• Nous n'utilisons pas de cookies de suivi publicitaire
+• Vous pouvez désactiver ou supprimer les cookies depuis les paramètres de votre navigateur
 
 **10. Modifications de la politique**
 

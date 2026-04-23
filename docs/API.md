@@ -20,7 +20,7 @@ AIチャットメッセージを送信し、応答を取得します。
 | Header | Required | Description |
 |--------|----------|-------------|
 | `Content-Type` | Yes | `application/json` |
-| `X-Session-ID` | No | セッション識別子（レート制限用） |
+| `Cookie: sid=...` | Auto | サーバ発行の HMAC 署名付きセッション Cookie（HttpOnly）。ブラウザが自動送信するためクライアントコードからの操作不要。未保持の場合はサーバが自動発行する |
 
 **Body**
 ```json
@@ -39,8 +39,10 @@ AIチャットメッセージを送信し、応答を取得します。
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `message` | string | Yes | ユーザーのメッセージ（最大1000文字） |
-| `conversationHistory` | array | No | 会話履歴（最大5メッセージ） |
+| `conversationHistory` | array | No | 会話履歴（最大10メッセージ） |
 | `systemInstruction` | string | No | システムプロンプト |
+
+> **セッション管理の方針**: 以前の `X-Session-ID` ヘッダはクライアントから自由に改変できたためレート制限を回避される恐れがありました。現在はサーバが HMAC-SHA256 で署名した `sid` Cookie を発行・検証しており、クライアントは偽造できません。署名鍵は環境変数 `SESSION_SECRET` で設定します。
 
 #### Response
 
@@ -150,11 +152,21 @@ AIチャットメッセージを送信し、応答を取得します。
 #### Example
 
 ```bash
+# First request: server issues a signed `sid` cookie via Set-Cookie
 curl -X POST https://your-domain.vercel.app/api/chat \
+  -c cookies.txt \
   -H "Content-Type: application/json" \
-  -H "X-Session-ID: user-session-123" \
   -d '{
     "message": "What is the meaning of life?",
+    "conversationHistory": []
+  }'
+
+# Subsequent requests: reuse the signed cookie
+curl -X POST https://your-domain.vercel.app/api/chat \
+  -b cookies.txt -c cookies.txt \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "続けて教えてください",
     "conversationHistory": []
   }'
 ```

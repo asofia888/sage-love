@@ -18,6 +18,7 @@ interface EnvVarDef {
 
 const ENV_VARS: EnvVarDef[] = [
   { name: 'GEMINI_API_KEY', required: true, description: 'Google Gemini API key' },
+  { name: 'SESSION_SECRET', required: true, description: 'HMAC key for signing session cookies (min 16 chars; generate with `openssl rand -base64 32`)' },
   { name: 'UPSTASH_REDIS_REST_URL', required: false, description: 'Upstash Redis REST URL (required for rate limiting)' },
   { name: 'UPSTASH_REDIS_REST_TOKEN', required: false, description: 'Upstash Redis REST token (required for rate limiting)' },
   { name: 'ADMIN_TOKEN', required: false, description: 'Admin dashboard access token' },
@@ -47,6 +48,12 @@ export function validateEnv(): EnvValidationResult {
         warnings.push(`Missing optional env var: ${v.name} — ${v.description}`);
       }
     }
+  }
+
+  // Enforce minimum entropy on SESSION_SECRET (HMAC key strength).
+  const sessionSecret = process.env.SESSION_SECRET;
+  if (sessionSecret && sessionSecret.trim().length > 0 && sessionSecret.length < 16) {
+    errors.push('SESSION_SECRET is too short (min 16 chars). Generate with: openssl rand -base64 32');
   }
 
   // Paired variable check: UPSTASH URL and TOKEN must both be set or both unset

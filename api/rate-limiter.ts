@@ -27,7 +27,7 @@ const RATE_LIMIT_CONFIG = {
   // Content-based limits
   content: {
     maxMessageLength: 1000,    // Max 1000 characters
-    maxHistoryMessages: 5,     // Limit conversation history
+    maxHistoryMessages: 10,    // Limit conversation history (matches api/chat.ts slice(-10))
     maxTokensPerRequest: 2000, // Approximate token limit
   }
 };

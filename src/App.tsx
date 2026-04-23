@@ -129,7 +129,7 @@ const App: React.FC = () => {
 
         {error && (
           <div className="p-4 bg-red-700/80 text-white text-center backdrop-blur-sm" role="alert" onClick={() => setError(null)}>
-             <p>{t('errorSageResponsePrefix')}{t(error.code) || t('errorMessageDefault')}</p>
+             <p>{t('errorSageResponsePrefix')}{i18n.exists(error.code) ? t(error.code) : t('errorMessageDefault')}</p>
           </div>
         )}
 

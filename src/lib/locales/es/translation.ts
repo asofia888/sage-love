@@ -39,11 +39,19 @@ Los desarrolladores y operadores no son responsables de daños directos o indire
 Por favor, use esta aplicación de manera responsable y comprenda estas limitaciones.`,
   "privacyPolicyLinkText": "Política de Privacidad",
   "privacyPolicyModalTitle": "Política de Privacidad",
+  "privacyPolicyKeyPointsTitle": "Puntos clave",
+  "privacyPolicyKeyPoint1": "El historial de conversaciones se almacena solo en su navegador",
+  "privacyPolicyKeyPoint2": "Las direcciones IP y las cookies de sesión se utilizan temporalmente solo para limitar la tasa de solicitudes",
+  "privacyPolicyKeyPoint3": "Pueden enviarse datos anónimos de uso y errores a Google Analytics y Sentry (según su consentimiento de cookies)",
+  "privacyPolicyKeyPoint4": "Puede eliminar sus datos y dejar de usar el servicio en cualquier momento",
+  "privacyPolicyManagementTitle": "Gestión de datos",
+  "privacyPolicyManagementBody": "Para eliminar el historial de conversaciones, use el botón \"Borrar conversación\" dentro de la aplicación, o borre el almacenamiento local y las cookies desde la configuración del navegador.",
+  "privacyPolicyLastUpdated": "Última actualización: Abril 2026",
   "termsOfServiceLinkText": "Términos de Servicio",
   "termsOfServiceModalTitle": "Términos de Servicio",
   "privacyPolicy": `【POLÍTICA DE PRIVACIDAD】
 
-Última actualización: Enero 2025
+Última actualización: Abril 2026
 
 **1. Información que recopilamos**
 
@@ -51,6 +59,8 @@ Por favor, use esta aplicación de manera responsable y comprenda estas limitaci
 • Configuración de idioma del navegador
 • Información general de ubicación (código de país)
 • Información técnica básica (tipo de navegador, sistema operativo)
+• Dirección IP (procesada temporalmente para limitar solicitudes y prevenir abusos)
+• Cookie de sesión firmada con HMAC (\`sid\`): identificador anónimo emitido por el servidor, usado para limitar solicitudes
 
 **1.2 Información proporcionada por el usuario**
 • Contenido de conversaciones de chat
@@ -85,9 +95,10 @@ Por favor, use esta aplicación de manera responsable y comprenda estas limitaci
 • El reconocimiento de voz se procesa dentro del navegador, los datos de voz no se almacenan
 • El análisis de detección de crisis se realiza temporalmente, solo se procesan los resultados
 
-**3.3 Sin almacenamiento de información personal**
-• No recopilamos ni almacenamos información de identificación personal (nombre, dirección, teléfono)
-• Las direcciones IP no se registran ni rastrean
+**3.3 Información personal**
+• No recopilamos activamente información de identificación personal (nombre, dirección, teléfono)
+• Sin embargo, si incluye información personal en sus mensajes, ese contenido se enviará al proveedor del servicio de IA
+• Las direcciones IP y las cookies de sesión se usan solo para evaluar límites de tasa y expiran automáticamente tras un corto período (normalmente en 24 horas)
 
 **4. Compartir información con terceros**
 
@@ -96,7 +107,12 @@ Por favor, use esta aplicación de manera responsable y comprenda estas limitaci
 • Información enviada: Contenido de conversación, configuración de idioma
 • Se aplica la Política de Privacidad de Google
 
-**4.2 Excepciones de emergencia**
+**4.2 Analítica y monitoreo**
+• Google Analytics: recopila métricas de uso anonimizadas (vistas de página, uso de funciones). Se activa solo con su consentimiento de cookies
+• Sentry: recopila registros de errores y datos de rendimiento, usados solo para mejorar la calidad
+• Infraestructura: Vercel (hosting) y Upstash Redis (contadores temporales para limitar solicitudes)
+
+**4.3 Excepciones de emergencia**
 • Solicitudes legítimas de agencias de aplicación de la ley
 • Emergencias que amenazan la vida cuando se considere necesario
 
@@ -134,9 +150,12 @@ Por favor, use esta aplicación de manera responsable y comprenda estas limitaci
 
 **9. Cookies y seguimiento**
 
-• Solo usamos cookies técnicas mínimas necesarias para la funcionalidad
-• No se utilizan cookies de publicidad o seguimiento
-• Puede desactivar las cookies en la configuración del navegador
+Las cookies y tecnologías similares que utilizamos:
+• **Cookies esenciales** (\`sid\`): cookie de sesión firmada con HMAC emitida por el servidor, usada para limitar solicitudes
+• **Cookies basadas en consentimiento**: seguimiento de uso por Google Analytics; se activan solo si acepta el banner de consentimiento en la aplicación
+• **Almacenamiento local**: se utiliza para conservar el historial de conversaciones, las preferencias de idioma y el estado de consentimiento de cookies
+• No utilizamos cookies publicitarias de seguimiento
+• Puede desactivar o eliminar cookies desde la configuración del navegador
 
 **10. Cambios en la política**
 

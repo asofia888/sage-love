@@ -5,6 +5,7 @@ import { retryWithBackoff, withTimeout, RetryStatsTracker } from './retry-utils'
 import { geminiCircuitBreaker } from './circuit-breaker';
 import { getModelWithCache, calculateCacheSavings, getCacheStats } from './context-cache';
 import { API_CONFIG, validateEnv } from './config';
+import { getOrCreateSession, attachSessionCookie, SessionResult } from './session';
 
 export const config = {
   runtime: 'edge',
@@ -53,6 +54,22 @@ export default async function handler(req: Request) {
     });
   }
 
+  // Establish the signed session cookie before anything else so every response
+  // (including rate-limit and error responses) carries Set-Cookie when new.
+  let session: SessionResult;
+  try {
+    session = await getOrCreateSession(req);
+  } catch (e) {
+    console.error('Session init failed:', e);
+    return new Response(JSON.stringify({
+      code: 'SESSION_INIT_ERROR',
+      details: 'Server configuration error.',
+    }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
   try {
     const { message, conversationHistory, systemInstruction } = await req.json();
 
@@ -60,7 +77,7 @@ export default async function handler(req: Request) {
     const clientIP = req.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
                      req.headers.get('x-real-ip') ||
                      'unknown';
-    const sessionId = req.headers.get('X-Session-ID') || 'unknown';
+    const sessionId = session.sessionId;
 
     // Check rate limits
     const rateLimitResult = await shouldBlockRequest(
@@ -71,7 +88,7 @@ export default async function handler(req: Request) {
     );
 
     if (rateLimitResult.blocked) {
-      return new Response(JSON.stringify({
+      return attachSessionCookie(new Response(JSON.stringify({
         code: rateLimitResult.reason,
         details: rateLimitResult.message,
         retryAfter: rateLimitResult.retryAfter
@@ -82,7 +99,7 @@ export default async function handler(req: Request) {
           'Retry-After': String(rateLimitResult.retryAfter || 60),
           'X-RateLimit-Reason': rateLimitResult.reason || 'RATE_LIMIT_EXCEEDED',
         },
-      });
+      }), session);
     }
 
     if (!envValidation.valid) {
@@ -206,7 +223,7 @@ export default async function handler(req: Request) {
     const cacheStats = getCacheStats();
 
     // Return successful response
-    return new Response(JSON.stringify({
+    return attachSessionCookie(new Response(JSON.stringify({
       message: text.trim(),
       timestamp: new Date().toISOString(),
       sessionId: sessionId,
@@ -225,11 +242,11 @@ export default async function handler(req: Request) {
         'X-Context-Cache-Tokens-Saved': String(tokensSaved),
         'X-Context-Cache-TTL': String(cacheStats.remainingTTL),
       },
-    });
+    }), session);
 
   } catch (error: unknown) {
     // Record failed attempt in retry statistics
     retryStats.recordAttempt(0, false);
-    return handleError(error);
+    return attachSessionCookie(handleError(error), session);
   }
 }
