@@ -41,6 +41,7 @@ AIチャットメッセージを送信し、応答を取得します。
 | `message` | string | Yes | ユーザーのメッセージ（最大1000文字） |
 | `conversationHistory` | array | No | 会話履歴（最大10メッセージ） |
 | `systemInstruction` | string | No | システムプロンプト |
+| `stream` | boolean | No | `true` を指定すると Server-Sent Events (SSE) でチャンク配信（詳細は [Streaming Response](#streaming-response) 参照） |
 
 > **セッション管理の方針**: 以前の `X-Session-ID` ヘッダはクライアントから自由に改変できたためレート制限を回避される恐れがありました。現在はサーバが HMAC-SHA256 で署名した `sid` Cookie を発行・検証しており、クライアントは偽造できません。署名鍵は環境変数 `SESSION_SECRET` で設定します。
 
@@ -68,6 +69,38 @@ AIチャットメッセージを送信し、応答を取得します。
 | `X-Context-Cache-Tokens-Saved` | 節約されたトークン数 |
 | `X-Context-Cache-TTL` | キャッシュの残りTTL（秒） |
 | `Cache-Control` | `no-cache` |
+
+#### Streaming Response
+
+リクエスト body に `"stream": true` を設定すると、Gemini の `generateContentStream()` からのチャンクを SSE 形式で逐次配信します。
+
+**Response Headers**
+| Header | Value |
+|--------|-------|
+| `Content-Type` | `text/event-stream; charset=utf-8` |
+| `Cache-Control` | `no-cache, no-transform` |
+| `X-Accel-Buffering` | `no` |
+
+**SSE Event Format**
+
+各イベントは `data: <JSON>\n\n` 形式で配信されます。
+
+```
+data: {"type":"chunk","text":"こん"}
+
+data: {"type":"chunk","text":"にちは"}
+
+data: {"type":"done","sessionId":"abc","cache":{"hit":true,"tokensSaved":2500},"timestamp":"2026-04-23T12:00:00.000Z"}
+```
+
+**Event Types**
+| Type | Payload | Description |
+|------|---------|-------------|
+| `chunk` | `{ text: string }` | モデル出力の部分文字列。受信順に連結 |
+| `done` | `{ sessionId, cache, timestamp }` | 正常終了。ストリーム末尾に 1 件のみ |
+| `error` | `{ code, details, category, retryAfter }` | ストリーミング中にエラー。以降チャンクは来ない |
+
+ストリーム途中にエラーが発生した場合、HTTP ステータスはすでに 200 で返されているため、error は `event: error` としてボディ内に書き込まれます。レート制限やバリデーションなどストリーム開始前のエラーは通常通り 4xx/5xx の JSON レスポンスで返ります。
 
 #### Errors
 
