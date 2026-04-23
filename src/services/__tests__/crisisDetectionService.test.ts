@@ -277,7 +277,7 @@ describe('CrisisDetectionService', () => {
         recommendedAction: 'emergency_resources' as const,
       };
 
-      const response = CrisisDetectionService.generateCrisisResponse(crisisResult, 'fr');
+      const response = CrisisDetectionService.generateCrisisResponse(crisisResult, 'de');
 
       expect(response).toContain('深刻な心の痛み');
     });

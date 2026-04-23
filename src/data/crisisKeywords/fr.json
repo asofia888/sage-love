@@ -1,0 +1,56 @@
+{
+  "suicide": {
+    "keywords": [
+      { "word": "suicide", "confidence": "high" },
+      { "word": "me suicider", "confidence": "high" },
+      { "word": "me tuer", "confidence": "high" },
+      { "word": "je veux mourir", "confidence": "high" },
+      { "word": "envie de mourir", "confidence": "high" },
+      { "word": "en finir avec la vie", "confidence": "high" },
+      { "word": "plus envie de vivre", "confidence": "high" },
+      { "word": "mieux mort", "confidence": "high" },
+      { "word": "en finir", "confidence": "contextual" },
+      { "word": "mourir", "confidence": "contextual" }
+    ],
+    "exclusions": ["mourir de rire", "mourir d'envie", "mourir de faim", "mourir d'ennui", "à mourir de rire"]
+  },
+  "selfHarm": {
+    "keywords": [
+      { "word": "automutilation", "confidence": "high" },
+      { "word": "me faire du mal", "confidence": "high" },
+      { "word": "me couper", "confidence": "high" },
+      { "word": "me blesser", "confidence": "high" },
+      { "word": "me scarifier", "confidence": "high" },
+      { "word": "me mutiler", "confidence": "high" },
+      { "word": "envie de me couper", "confidence": "contextual" }
+    ],
+    "exclusions": ["couper les cheveux", "couper les ongles", "couper court", "couper la parole"]
+  },
+  "despair": {
+    "keywords": [
+      { "word": "désespoir", "confidence": "contextual" },
+      { "word": "sans espoir", "confidence": "contextual" },
+      { "word": "je n'en peux plus", "confidence": "contextual" },
+      { "word": "abandonner", "confidence": "contextual" },
+      { "word": "à bout", "confidence": "contextual" },
+      { "word": "plus la force", "confidence": "contextual" }
+    ],
+    "exclusions": ["abandonner le sucre", "abandonner la cigarette", "abandonner le café", "ne jamais abandonner"]
+  },
+  "isolation": {
+    "keywords": [
+      { "word": "personne ne me comprend", "confidence": "contextual" },
+      { "word": "seul au monde", "confidence": "contextual" },
+      { "word": "aidez-moi", "confidence": "contextual" },
+      { "word": "tout seul", "confidence": "contextual" },
+      { "word": "toute seule", "confidence": "contextual" }
+    ],
+    "exclusions": ["laissez-moi seul", "laissez-moi tranquille", "aidez-moi à comprendre", "aidez-moi à trouver"]
+  },
+  "responses": {
+    "emergency_resources": "Je perçois que vous traversez une douleur émotionnelle profonde. Votre vie est précieuse, et demander de l'aide est un acte de courage. Veuillez contacter un professionnel immédiatement.",
+    "immediate_intervention": "Je comprends que vous vivez une situation très difficile. Ne portez pas ce fardeau seul — parlez-en à une personne de confiance ou à un professionnel.",
+    "gentle_intervention": "Il semble que vous portiez un poids émotionnel lourd. Vos sentiments sont légitimes et compris. Souvenez-vous qu'il y a des personnes qui tiennent à vous.",
+    "monitor": "Je vois que vous traversez une période difficile. Je suis là pour vous écouter et vous soutenir."
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "suicide": {
+    "keywords": [
+      { "word": "انتحار", "confidence": "high" },
+      { "word": "أقتل نفسي", "confidence": "high" },
+      { "word": "اقتل نفسي", "confidence": "high" },
+      { "word": "أريد أن أموت", "confidence": "high" },
+      { "word": "اريد ان اموت", "confidence": "high" },
+      { "word": "أنهي حياتي", "confidence": "high" },
+      { "word": "انهي حياتي", "confidence": "high" },
+      { "word": "لا أريد العيش", "confidence": "high" },
+      { "word": "لا اريد الحياة", "confidence": "high" },
+      { "word": "أفضل ميتا", "confidence": "high" },
+      { "word": "لا فائدة من الحياة", "confidence": "contextual" },
+      { "word": "أموت", "confidence": "contextual" }
+    ],
+    "exclusions": ["يموت من الضحك", "أموت فيك", "اموت فيك", "أموت من الضحك", "اموت من الضحك", "أموت من الجوع", "اموت من الجوع"]
+  },
+  "selfHarm": {
+    "keywords": [
+      { "word": "إيذاء النفس", "confidence": "high" },
+      { "word": "ايذاء النفس", "confidence": "high" },
+      { "word": "أؤذي نفسي", "confidence": "high" },
+      { "word": "اؤذي نفسي", "confidence": "high" },
+      { "word": "أجرح نفسي", "confidence": "high" },
+      { "word": "اجرح نفسي", "confidence": "high" },
+      { "word": "أقطع نفسي", "confidence": "high" },
+      { "word": "اقطع نفسي", "confidence": "high" }
+    ],
+    "exclusions": ["قص الشعر", "قص الأظافر", "اقطع الاتصال", "قطع المكالمة"]
+  },
+  "despair": {
+    "keywords": [
+      { "word": "يأس", "confidence": "contextual" },
+      { "word": "لا أمل", "confidence": "contextual" },
+      { "word": "ما في أمل", "confidence": "contextual" },
+      { "word": "لا أستطيع الاستمرار", "confidence": "contextual" },
+      { "word": "لم أعد أتحمل", "confidence": "contextual" },
+      { "word": "استسلمت", "confidence": "contextual" }
+    ],
+    "exclusions": ["لا تستسلم أبدا", "استسلمت للعادة", "ترك التدخين"]
+  },
+  "isolation": {
+    "keywords": [
+      { "word": "وحيد", "confidence": "contextual" },
+      { "word": "وحيدة", "confidence": "contextual" },
+      { "word": "لا أحد يفهمني", "confidence": "contextual" },
+      { "word": "لا احد يفهمني", "confidence": "contextual" },
+      { "word": "ساعدني", "confidence": "contextual" },
+      { "word": "النجدة", "confidence": "contextual" }
+    ],
+    "exclusions": ["اتركني وحدي", "دعني وحدي", "ساعدني في فهم", "ساعدني في إيجاد"]
+  },
+  "responses": {
+    "emergency_resources": "أشعر أنك تمر بألم عاطفي عميق. حياتك ثمينة، وطلب المساعدة خطوة شجاعة. الرجاء التواصل مع مختص فورا.",
+    "immediate_intervention": "أفهم أنك في موقف صعب جدا. أرجوك لا تحمل هذا العبء وحدك — فكر في التحدث مع شخص تثق به أو مع مختص.",
+    "gentle_intervention": "يبدو أنك تحمل عبئا عاطفيا ثقيلا. مشاعرك حقيقية ومفهومة. تذكر أن هناك من يهتمون بأمرك.",
+    "monitor": "أرى أنك تمر بوقت صعب. أنا هنا لأدعمك وأستمع إليك."
+  }
+}

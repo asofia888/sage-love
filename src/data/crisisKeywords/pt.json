@@ -1,0 +1,43 @@
+{
+  "suicide": {
+    "keywords": [
+      { "word": "suicídio", "confidence": "high" },
+      { "word": "me matar", "confidence": "high" },
+      { "word": "quero morrer", "confidence": "high" },
+      { "word": "acabar com tudo", "confidence": "high" },
+      { "word": "não vale a pena viver", "confidence": "high" },
+      { "word": "melhor morto", "confidence": "high" }
+    ],
+    "exclusions": []
+  },
+  "selfHarm": {
+    "keywords": [
+      { "word": "autolesão", "confidence": "high" },
+      { "word": "me machucar", "confidence": "high" },
+      { "word": "me cortar", "confidence": "high" },
+      { "word": "me ferir", "confidence": "contextual" }
+    ],
+    "exclusions": []
+  },
+  "despair": {
+    "keywords": [
+      { "word": "sem esperança", "confidence": "contextual" },
+      { "word": "não aguento mais", "confidence": "contextual" },
+      { "word": "desistir", "confidence": "contextual" }
+    ],
+    "exclusions": []
+  },
+  "isolation": {
+    "keywords": [
+      { "word": "ninguém me entende", "confidence": "contextual" },
+      { "word": "me ajude", "confidence": "contextual" }
+    ],
+    "exclusions": []
+  },
+  "responses": {
+    "emergency_resources": "Posso sentir que você está experimentando uma dor emocional profunda. Sua vida é preciosa, e buscar ajuda é um passo corajoso. Por favor, procure um profissional imediatamente.",
+    "immediate_intervention": "Entendo que você está em uma situação muito difícil. Por favor, não carregue esse fardo sozinho - considere falar com alguém de confiança ou um profissional.",
+    "gentle_intervention": "Parece que você está carregando um fardo emocional pesado. Seus sentimentos são válidos e compreendidos. Lembre-se de que há pessoas que se importam com você.",
+    "monitor": "Posso ver que você está passando por um momento difícil. Quero estar aqui para apoiá-lo e ouvi-lo."
+  }
+}

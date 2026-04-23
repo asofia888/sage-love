@@ -1,0 +1,43 @@
+{
+  "suicide": {
+    "keywords": [
+      { "word": "suicidio", "confidence": "high" },
+      { "word": "matarme", "confidence": "high" },
+      { "word": "quiero morir", "confidence": "high" },
+      { "word": "acabar con todo", "confidence": "high" },
+      { "word": "no vale la pena vivir", "confidence": "high" },
+      { "word": "mejor muerto", "confidence": "high" }
+    ],
+    "exclusions": []
+  },
+  "selfHarm": {
+    "keywords": [
+      { "word": "autolesión", "confidence": "high" },
+      { "word": "hacerme daño", "confidence": "high" },
+      { "word": "cortarme", "confidence": "high" },
+      { "word": "lastimarse", "confidence": "contextual" }
+    ],
+    "exclusions": []
+  },
+  "despair": {
+    "keywords": [
+      { "word": "sin esperanza", "confidence": "contextual" },
+      { "word": "no puedo más", "confidence": "contextual" },
+      { "word": "rendirse", "confidence": "contextual" }
+    ],
+    "exclusions": []
+  },
+  "isolation": {
+    "keywords": [
+      { "word": "nadie me entiende", "confidence": "contextual" },
+      { "word": "ayúdame", "confidence": "contextual" }
+    ],
+    "exclusions": []
+  },
+  "responses": {
+    "emergency_resources": "Puedo sentir que estás experimentando un dolor emocional profundo. Tu vida es preciosa, y buscar ayuda es un paso valiente. Por favor, contacta a un profesional inmediatamente.",
+    "immediate_intervention": "Entiendo que estás en una situación muy difícil. Por favor, no cargues con esto solo - considera hablar con alguien de confianza o un profesional.",
+    "gentle_intervention": "Parece que llevas una carga emocional pesada. Tus sentimientos son válidos y comprendidos. Recuerda que hay personas que se preocupan por ti.",
+    "monitor": "Puedo ver que estás pasando por un momento difícil. Quiero estar aquí para apoyarte y escucharte."
+  }
+}

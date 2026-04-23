@@ -1,0 +1,47 @@
+{
+  "suicide": {
+    "keywords": [
+      { "word": "suicide", "confidence": "high" },
+      { "word": "kill myself", "confidence": "high" },
+      { "word": "want to die", "confidence": "high" },
+      { "word": "end it all", "confidence": "high" },
+      { "word": "no point living", "confidence": "high" },
+      { "word": "better off dead", "confidence": "high" },
+      { "word": "can't go on", "confidence": "contextual" }
+    ],
+    "exclusions": ["deadline", "die out", "diet", "died down"]
+  },
+  "selfHarm": {
+    "keywords": [
+      { "word": "self harm", "confidence": "high" },
+      { "word": "self-harm", "confidence": "high" },
+      { "word": "hurt myself", "confidence": "high" },
+      { "word": "cut myself", "confidence": "high" },
+      { "word": "self injury", "confidence": "high" },
+      { "word": "want to cut", "confidence": "contextual" }
+    ],
+    "exclusions": ["shortcut", "cut the", "cut down on", "cut back", "paper cut"]
+  },
+  "despair": {
+    "keywords": [
+      { "word": "hopeless", "confidence": "contextual" },
+      { "word": "no hope", "confidence": "contextual" },
+      { "word": "can't take it", "confidence": "contextual" },
+      { "word": "give up", "confidence": "contextual" }
+    ],
+    "exclusions": ["give up sugar", "give up smoking", "give up caffeine", "never give up"]
+  },
+  "isolation": {
+    "keywords": [
+      { "word": "nobody understands", "confidence": "contextual" },
+      { "word": "help me", "confidence": "contextual" }
+    ],
+    "exclusions": ["alone time", "standalone", "home alone", "leave me alone", "help me understand", "help me find", "help me with"]
+  },
+  "responses": {
+    "emergency_resources": "I can sense you are experiencing deep emotional pain. Your life is precious, and seeking help is a courageous step. Please reach out to a professional immediately.",
+    "immediate_intervention": "I understand you are in a very difficult situation. Please do not carry this burden alone - consider speaking with someone you trust or a professional.",
+    "gentle_intervention": "It seems you are carrying a heavy emotional burden. Your feelings are valid and understood. Remember that there are people who care about you.",
+    "monitor": "I can see you are going through a challenging time. I want to be here to support and listen to you."
+  }
+}

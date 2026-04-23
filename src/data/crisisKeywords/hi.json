@@ -1,0 +1,55 @@
+{
+  "suicide": {
+    "keywords": [
+      { "word": "आत्महत्या", "confidence": "high" },
+      { "word": "खुदकुशी", "confidence": "high" },
+      { "word": "खुद को मार", "confidence": "high" },
+      { "word": "मरना चाहता हूं", "confidence": "high" },
+      { "word": "मरना चाहती हूं", "confidence": "high" },
+      { "word": "जीना नहीं चाहता", "confidence": "high" },
+      { "word": "जीना नहीं चाहती", "confidence": "high" },
+      { "word": "सब खत्म कर", "confidence": "high" },
+      { "word": "जीने का कोई मतलब नहीं", "confidence": "high" },
+      { "word": "मर जाऊं", "confidence": "contextual" },
+      { "word": "मरना", "confidence": "contextual" }
+    ],
+    "exclusions": ["डर से मर", "भूख से मर", "हंसी से मर", "थक कर मर"]
+  },
+  "selfHarm": {
+    "keywords": [
+      { "word": "खुद को चोट", "confidence": "high" },
+      { "word": "खुद को नुकसान", "confidence": "high" },
+      { "word": "खुद को काटना", "confidence": "high" },
+      { "word": "खुद को जख्मी", "confidence": "high" },
+      { "word": "खुद को तकलीफ", "confidence": "contextual" }
+    ],
+    "exclusions": ["बाल काटना", "नाखून काटना", "फोन काट"]
+  },
+  "despair": {
+    "keywords": [
+      { "word": "निराशा", "confidence": "contextual" },
+      { "word": "कोई उम्मीद नहीं", "confidence": "contextual" },
+      { "word": "हार मान ली", "confidence": "contextual" },
+      { "word": "बहुत थक गया", "confidence": "contextual" },
+      { "word": "बहुत थक गई", "confidence": "contextual" },
+      { "word": "सहन नहीं कर सकता", "confidence": "contextual" }
+    ],
+    "exclusions": ["चीनी छोड़", "सिगरेट छोड़", "कभी हार मत मान"]
+  },
+  "isolation": {
+    "keywords": [
+      { "word": "अकेला", "confidence": "contextual" },
+      { "word": "अकेली", "confidence": "contextual" },
+      { "word": "कोई नहीं समझता", "confidence": "contextual" },
+      { "word": "कोई नहीं समझती", "confidence": "contextual" },
+      { "word": "मदद करो", "confidence": "contextual" }
+    ],
+    "exclusions": ["अकेला सफर", "अकेला छोड़ दो", "मदद करो समझने में"]
+  },
+  "responses": {
+    "emergency_resources": "मुझे महसूस हो रहा है कि आप गहरे भावनात्मक दर्द से गुज़र रहे हैं। आपका जीवन बहुमूल्य है, और मदद माँगना साहस का काम है। कृपया तुरंत किसी विशेषज्ञ से संपर्क करें।",
+    "immediate_intervention": "मैं समझता हूँ कि आप बहुत कठिन परिस्थिति में हैं। कृपया यह बोझ अकेले न उठाएँ — किसी विश्वसनीय व्यक्ति या विशेषज्ञ से बात करने पर विचार करें।",
+    "gentle_intervention": "ऐसा लगता है कि आप एक भारी भावनात्मक बोझ उठा रहे हैं। आपकी भावनाएँ वैध हैं और समझी जाती हैं। याद रखें कि ऐसे लोग हैं जो आपकी परवाह करते हैं।",
+    "monitor": "मैं देख सकता हूँ कि आप एक कठिन समय से गुज़र रहे हैं। मैं यहाँ आपको सुनने और सहारा देने के लिए हूँ।"
+  }
+}

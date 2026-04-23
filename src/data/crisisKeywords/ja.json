@@ -1,0 +1,54 @@
+{
+  "suicide": {
+    "keywords": [
+      { "word": "自殺", "confidence": "high" },
+      { "word": "死にたい", "confidence": "high" },
+      { "word": "消えたい", "confidence": "high" },
+      { "word": "終わりにしたい", "confidence": "high" },
+      { "word": "自分を殺", "confidence": "high" },
+      { "word": "死んでしまいたい", "confidence": "high" },
+      { "word": "生きていたくない", "confidence": "high" },
+      { "word": "死のう", "confidence": "high" },
+      { "word": "死ぬしかない", "confidence": "high" },
+      { "word": "生きる意味", "confidence": "contextual" },
+      { "word": "もう限界", "confidence": "contextual" },
+      { "word": "死ぬ", "confidence": "contextual" }
+    ],
+    "exclusions": ["必死", "死角", "死語", "死蔵", "死守", "死闘", "死球", "死後", "死因", "死者", "死亡事故", "死活問題", "生死", "死神", "死刑", "瀕死"]
+  },
+  "selfHarm": {
+    "keywords": [
+      { "word": "自傷", "confidence": "high" },
+      { "word": "自分を傷つけ", "confidence": "high" },
+      { "word": "リストカット", "confidence": "high" },
+      { "word": "切りたい", "confidence": "contextual" },
+      { "word": "痛みで忘れたい", "confidence": "high" }
+    ],
+    "exclusions": ["爪を切りたい", "髪を切りたい", "縁を切りたい", "電話を切りたい"]
+  },
+  "despair": {
+    "keywords": [
+      { "word": "絶望", "confidence": "contextual" },
+      { "word": "もうだめ", "confidence": "contextual" },
+      { "word": "希望がない", "confidence": "contextual" },
+      { "word": "生きていても", "confidence": "high" },
+      { "word": "意味がない", "confidence": "contextual" }
+    ],
+    "exclusions": ["絶望的に美味", "絶望先生"]
+  },
+  "isolation": {
+    "keywords": [
+      { "word": "ひとりぼっち", "confidence": "contextual" },
+      { "word": "誰もわかってくれない", "confidence": "contextual" },
+      { "word": "孤独", "confidence": "contextual" },
+      { "word": "助けて", "confidence": "contextual" }
+    ],
+    "exclusions": ["孤独のグルメ", "孤独な戦い", "孤独死"]
+  },
+  "responses": {
+    "emergency_resources": "深刻な心の痛みを感じておられることが伝わります。あなたの命は尊く、助けを求めることは勇気ある行動です。すぐに専門家にご相談ください。",
+    "immediate_intervention": "とても辛い状況におられることがわかります。一人で抱え込まず、信頼できる人や専門家に相談することをお勧めします。",
+    "gentle_intervention": "心に重い負担を感じておられるようですね。あなたの気持ちは理解できます。話を聞いてくれる人がそばにいることを忘れないでください。",
+    "monitor": "困難な時期を過ごしておられるのですね。あなたの気持ちに寄り添い、支えになりたいと思います。"
+  }
+}
