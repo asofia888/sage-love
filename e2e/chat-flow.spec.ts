@@ -12,7 +12,11 @@ const sseBody = (text: string) =>
 test.describe('Chat Flow E2E', () => {
   test.beforeEach(async ({ page }) => {
     await page.addInitScript(() => {
+      // addInitScript fires on every navigation (including reloads), so guard
+      // against wiping localStorage that tests intentionally populate.
+      if (localStorage.getItem('__e2eSeeded')) return;
       localStorage.clear();
+      localStorage.setItem('__e2eSeeded', '1');
       localStorage.setItem('i18nextLng', 'ja');
       localStorage.setItem(
         'cookieConsent',
@@ -163,8 +167,12 @@ test.describe('Chat Flow E2E', () => {
     // Modal content should be visible
     await expect(page.locator('[role="dialog"]')).toBeVisible();
 
-    // Close modal
-    await page.getByRole('button', { name: /閉じる|close/i }).click();
+    // Close modal (dialog has two "閉じる" buttons — text + icon — either is fine)
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: /閉じる|close/i })
+      .first()
+      .click();
     await expect(page.locator('[role="dialog"]')).not.toBeVisible();
   });
 
@@ -215,7 +223,11 @@ test.describe('Chat Flow E2E', () => {
 test.describe('Responsive & Accessibility', () => {
   test.beforeEach(async ({ page }) => {
     await page.addInitScript(() => {
+      // addInitScript fires on every navigation (including reloads), so guard
+      // against wiping localStorage that tests intentionally populate.
+      if (localStorage.getItem('__e2eSeeded')) return;
       localStorage.clear();
+      localStorage.setItem('__e2eSeeded', '1');
       localStorage.setItem('i18nextLng', 'ja');
       localStorage.setItem(
         'cookieConsent',
