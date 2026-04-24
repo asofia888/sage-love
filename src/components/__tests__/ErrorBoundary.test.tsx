@@ -377,9 +377,7 @@ describe('ErrorBoundary', () => {
 
     it('空の子コンポーネントでも動作する', () => {
       const { container } = render(
-        <ErrorBoundary>
-          {/* 空 */}
-        </ErrorBoundary>
+        <ErrorBoundary>{null}</ErrorBoundary>
       );
 
       expect(container).toBeInTheDocument();
