@@ -2,8 +2,15 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Chat Flow E2E', () => {
   test.beforeEach(async ({ page }) => {
-    // Clear localStorage to start fresh
-    await page.addInitScript(() => localStorage.clear());
+    await page.addInitScript(() => {
+      localStorage.clear();
+      localStorage.setItem('i18nextLng', 'ja');
+      localStorage.setItem(
+        'cookieConsent',
+        JSON.stringify({ necessary: true, functional: false })
+      );
+      localStorage.setItem('cookieConsentDate', new Date().toISOString());
+    });
     await page.goto('/');
   });
 
@@ -221,7 +228,15 @@ test.describe('Chat Flow E2E', () => {
 
 test.describe('Responsive & Accessibility', () => {
   test.beforeEach(async ({ page }) => {
-    await page.addInitScript(() => localStorage.clear());
+    await page.addInitScript(() => {
+      localStorage.clear();
+      localStorage.setItem('i18nextLng', 'ja');
+      localStorage.setItem(
+        'cookieConsent',
+        JSON.stringify({ necessary: true, functional: false })
+      );
+      localStorage.setItem('cookieConsentDate', new Date().toISOString());
+    });
     await page.goto('/');
   });
 
