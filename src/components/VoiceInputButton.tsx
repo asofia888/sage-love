@@ -88,7 +88,7 @@ const VoiceInputButton: React.FC<VoiceInputButtonProps> = ({
       setPermissionGranted(granted);
       
       if (!granted) {
-        onError?.('マイクへのアクセスが拒否されました。ブラウザの設定でマイクの許可を有効にしてください。');
+        onError?.(t('voiceMicPermissionDenied'));
         return;
       }
     }
@@ -145,12 +145,12 @@ const VoiceInputButton: React.FC<VoiceInputButtonProps> = ({
 
   const getTooltipText = () => {
     if (permissionGranted === false) {
-      return 'マイクへのアクセスが必要です';
+      return t('voiceMicPermissionRequired');
     }
     if (isListening) {
-      return '音声入力中 - クリックで停止';
+      return t('voiceListening');
     }
-    return '音声入力を開始';
+    return t('voiceStart');
   };
 
   const getButtonClass = () => {
@@ -178,7 +178,7 @@ const VoiceInputButton: React.FC<VoiceInputButtonProps> = ({
         onClick={isListening ? handleStopListening : handleStartListening}
         disabled={disabled}
         className={getButtonClass()}
-        aria-label={isListening ? '音声入力を停止' : '音声入力を開始'}
+        aria-label={isListening ? t('voiceStop') : t('voiceStart')}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         onFocus={handleMouseEnter}

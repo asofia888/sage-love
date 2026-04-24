@@ -58,7 +58,7 @@ const TranslationQualityIndicator: React.FC<TranslationQualityIndicatorProps> = 
   return (
     <div className="mt-2 flex items-center gap-3 text-xs">
       <div className="flex items-center gap-1">
-        <span className="text-slate-400">翻訳品質:</span>
+        <span className="text-slate-400">{t('translationQualityLabel')}</span>
         <div className="flex">
           {[1, 2, 3, 4, 5].map(star => (
             <StarIcon 
@@ -77,9 +77,9 @@ const TranslationQualityIndicator: React.FC<TranslationQualityIndicatorProps> = 
         <button
           onClick={handleReportIssue}
           className="text-yellow-400 hover:text-yellow-300 transition-colors text-xs underline"
-          title="翻訳品質の問題を報告"
+          title={t('translationReportTooltip')}
         >
-          品質を報告
+          {t('translationReportButton')}
         </button>
       )}
       
