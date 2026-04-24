@@ -1,13 +1,69 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
 
-const sseBody = (text: string) =>
-  `data: ${JSON.stringify({ type: 'chunk', text })}\n\n` +
-  `data: ${JSON.stringify({
-    type: 'done',
-    sessionId: 'test',
-    cache: { hit: false, tokensSaved: 0 },
-    timestamp: new Date().toISOString(),
-  })}\n\n`;
+type ChatMock =
+  | { kind: 'sse'; text: string; delayMs?: number }
+  | { kind: 'error'; status: number; body: unknown; headers?: Record<string, string> };
+
+/**
+ * Override window.fetch in the page so /api/chat returns a deterministic
+ * response. Mocking at the fetch layer (instead of page.route) lets us hand
+ * the app a real ReadableStream for SSE, bypassing any HTTP-layer quirks
+ * that may break line-ending-sensitive SSE parsing.
+ */
+async function installChatMock(page: Page) {
+  await page.addInitScript(() => {
+    (window as unknown as { __chatMock?: unknown }).__chatMock = null;
+    const origFetch = window.fetch.bind(window);
+    window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url =
+        typeof input === 'string'
+          ? input
+          : input instanceof URL
+          ? input.toString()
+          : input.url;
+      const mock = (window as unknown as { __chatMock?: ChatMock | null })
+        .__chatMock;
+      if (url.includes('/api/chat') && mock) {
+        if (mock.kind === 'sse') {
+          if (mock.delayMs) {
+            await new Promise((r) => setTimeout(r, mock.delayMs));
+          }
+          const encoder = new TextEncoder();
+          const events = [
+            `data: ${JSON.stringify({ type: 'chunk', text: mock.text })}\n\n`,
+            `data: ${JSON.stringify({
+              type: 'done',
+              sessionId: 'test',
+              cache: { hit: false, tokensSaved: 0 },
+              timestamp: new Date().toISOString(),
+            })}\n\n`,
+          ];
+          const stream = new ReadableStream({
+            start(controller) {
+              for (const ev of events) controller.enqueue(encoder.encode(ev));
+              controller.close();
+            },
+          });
+          return new Response(stream, {
+            status: 200,
+            headers: { 'Content-Type': 'text/event-stream' },
+          });
+        }
+        return new Response(JSON.stringify(mock.body), {
+          status: mock.status,
+          headers: { 'Content-Type': 'application/json', ...(mock.headers ?? {}) },
+        });
+      }
+      return origFetch(input, init);
+    };
+  });
+}
+
+async function setChatMock(page: Page, mock: ChatMock) {
+  await page.evaluate((m) => {
+    (window as unknown as { __chatMock: unknown }).__chatMock = m;
+  }, mock);
+}
 
 test.describe('Chat Flow E2E', () => {
   test.beforeEach(async ({ page }) => {
@@ -24,6 +80,7 @@ test.describe('Chat Flow E2E', () => {
       );
       localStorage.setItem('cookieConsentDate', new Date().toISOString());
     });
+    await installChatMock(page);
     await page.goto('/');
   });
 
@@ -49,22 +106,14 @@ test.describe('Chat Flow E2E', () => {
   });
 
   test('sending a message shows user message and loading state', async ({ page }) => {
-    // Mock the API to delay response so we can observe loading state
-    await page.route('**/api/chat', async (route) => {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      await route.fulfill({
-        status: 200,
-        contentType: 'text/event-stream',
-        body: sseBody('テストの応答です。'),
-      });
-    });
+    await setChatMock(page, { kind: 'sse', text: 'テストの応答です。', delayMs: 500 });
 
     const textarea = page.getByRole('textbox');
     await textarea.fill('テストメッセージ');
     await page.getByRole('button', { name: /送信/ }).click();
 
     // User message appears
-    await expect(page.getByText('テストメッセージ')).toBeVisible();
+    await expect(page.locator('main').getByText('テストメッセージ')).toBeVisible();
 
     // Welcome message disappears (messages > 0)
     await expect(page.getByText('ようこそ、真理の探究者よ。')).not.toBeVisible();
@@ -74,42 +123,32 @@ test.describe('Chat Flow E2E', () => {
   });
 
   test('full chat round-trip: send message and receive AI response', async ({ page }) => {
-    await page.route('**/api/chat', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'text/event-stream',
-        body: sseBody('心の平和を見つけるには、まず自分自身を受け入れることから始めましょう。'),
-      });
+    await setChatMock(page, {
+      kind: 'sse',
+      text: '心の平和を見つけるには、まず自分自身を受け入れることから始めましょう。',
     });
 
     const textarea = page.getByRole('textbox');
     await textarea.fill('心の平和とは何ですか？');
     await page.getByRole('button', { name: /送信/ }).click();
 
-    // Wait for AI response to appear
     await expect(
       page.getByText('心の平和を見つけるには、まず自分自身を受け入れることから始めましょう。')
     ).toBeVisible({ timeout: 10000 });
   });
 
   test('Enter key sends message, Shift+Enter does not', async ({ page }) => {
-    await page.route('**/api/chat', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'text/event-stream',
-        body: sseBody('応答'),
-      });
-    });
+    await setChatMock(page, { kind: 'sse', text: '応答' });
 
     const textarea = page.getByRole('textbox');
 
-    // Shift+Enter should NOT send — welcome stays visible, input retains value
+    // Shift+Enter must NOT send — no user bubble in <main>, input still has content
     await textarea.fill('一行目');
     await textarea.press('Shift+Enter');
-    await expect(page.getByText('ようこそ、真理の探究者よ。')).toBeVisible();
+    await expect(page.locator('main').getByText('一行目')).toHaveCount(0);
     await expect(textarea).not.toHaveValue('');
 
-    // Enter should send — input clears and user message bubble appears
+    // Enter sends — input clears and the message bubble renders in <main>
     await textarea.fill('送信テスト');
     await textarea.press('Enter');
     await expect(textarea).toHaveValue('');
@@ -117,99 +156,79 @@ test.describe('Chat Flow E2E', () => {
   });
 
   test('API error displays error banner', async ({ page }) => {
-    await page.route('**/api/chat', async (route) => {
-      await route.fulfill({
-        status: 500,
-        contentType: 'application/json',
-        body: JSON.stringify({ code: 'INTERNAL_ERROR', details: 'Server error' }),
-      });
+    await setChatMock(page, {
+      kind: 'error',
+      status: 500,
+      body: { code: 'INTERNAL_ERROR', details: 'Server error' },
     });
 
     const textarea = page.getByRole('textbox');
     await textarea.fill('エラーテスト');
     await page.getByRole('button', { name: /送信/ }).click();
 
-    // Error alert should appear
     await expect(page.locator('[role="alert"]')).toBeVisible({ timeout: 10000 });
   });
 
   test('clear chat flow works', async ({ page }) => {
-    // First send a message to have something to clear
-    await page.route('**/api/chat', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'text/event-stream',
-        body: sseBody('応答テスト'),
-      });
-    });
+    await setChatMock(page, { kind: 'sse', text: '応答テスト' });
 
     const textarea = page.getByRole('textbox');
     await textarea.fill('クリアテスト');
     await page.getByRole('button', { name: /送信/ }).click();
     await expect(page.locator('main').getByText('クリアテスト')).toBeVisible();
 
-    // Click clear chat button (trash icon button in header)
-    await page.getByRole('button', { name: /会話をクリア|チャットをクリア|clear/i }).click();
+    // Open reset dialog
+    await page
+      .getByRole('button', { name: /会話をクリア|チャットをクリア|clear/i })
+      .click();
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toContainText(/会話をリセット/);
 
-    // Confirmation modal should appear
-    await expect(page.getByRole('dialog')).toContainText(/会話をリセット/);
+    // Confirm (scope to dialog so we don't pick up the heading text)
+    await dialog.getByRole('button', { name: /^リセット$/ }).click();
 
-    // Confirm clear
-    await page.getByRole('button', { name: /^リセット$/ }).click();
-
-    // Welcome message should reappear
+    // Welcome message reappears
     await expect(page.getByText('ようこそ、真理の探究者よ。')).toBeVisible();
   });
 
   test('help modal opens and closes', async ({ page }) => {
     await page.getByRole('button', { name: /使い方|ヘルプ|help/i }).click();
 
-    // Modal content should be visible
-    await expect(page.locator('[role="dialog"]')).toBeVisible();
+    const dialog = page.locator('[role="dialog"]');
+    await expect(dialog).toBeVisible();
 
-    // Close modal (dialog has two "閉じる" buttons — text + icon — either is fine)
-    await page
-      .getByRole('dialog')
-      .getByRole('button', { name: /閉じる|close/i })
-      .first()
-      .click();
-    await expect(page.locator('[role="dialog"]')).not.toBeVisible();
+    // Close via Escape (more reliable than picking one of two "閉じる" buttons)
+    await page.keyboard.press('Escape');
+    await expect(dialog).not.toBeVisible();
   });
 
   test('chat history persists across page reload', async ({ page }) => {
-    await page.route('**/api/chat', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'text/event-stream',
-        body: sseBody('永続化テスト応答'),
-      });
-    });
+    await setChatMock(page, { kind: 'sse', text: '永続化テスト応答' });
 
     const textarea = page.getByRole('textbox');
     await textarea.fill('永続化テスト');
     await page.getByRole('button', { name: /送信/ }).click();
     await expect(page.getByText('永続化テスト応答')).toBeVisible({ timeout: 10000 });
 
-    // Reload page
     await page.reload();
 
-    // Messages should persist via localStorage
+    // Messages should persist via localStorage (addInitScript is guarded so
+    // reload doesn't wipe storage; fetch mock is re-installed before scripts
+    // load, but no new API calls fire from persisted history).
     await expect(page.getByText('永続化テスト')).toBeVisible({ timeout: 5000 });
     await expect(page.getByText('永続化テスト応答')).toBeVisible({ timeout: 5000 });
   });
 
   test('rate limit response shows appropriate error', async ({ page }) => {
-    await page.route('**/api/chat', async (route) => {
-      await route.fulfill({
-        status: 429,
-        contentType: 'application/json',
-        headers: { 'Retry-After': '60' },
-        body: JSON.stringify({
-          code: 'RATE_LIMIT_EXCEEDED',
-          details: 'Too many requests',
-          retryAfter: 60,
-        }),
-      });
+    await setChatMock(page, {
+      kind: 'error',
+      status: 429,
+      body: {
+        code: 'RATE_LIMIT_EXCEEDED',
+        details: 'Too many requests',
+        retryAfter: 60,
+      },
+      headers: { 'Retry-After': '60' },
     });
 
     const textarea = page.getByRole('textbox');
@@ -223,8 +242,6 @@ test.describe('Chat Flow E2E', () => {
 test.describe('Responsive & Accessibility', () => {
   test.beforeEach(async ({ page }) => {
     await page.addInitScript(() => {
-      // addInitScript fires on every navigation (including reloads), so guard
-      // against wiping localStorage that tests intentionally populate.
       if (localStorage.getItem('__e2eSeeded')) return;
       localStorage.clear();
       localStorage.setItem('__e2eSeeded', '1');
