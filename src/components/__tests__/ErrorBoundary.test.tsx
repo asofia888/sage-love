@@ -235,15 +235,15 @@ describe('ErrorBoundary', () => {
 
   describe('UI要素', () => {
     it('エラーアイコンが表示される', () => {
-      render(
+      const { container } = render(
         <ErrorBoundary>
           <ThrowError />
         </ErrorBoundary>
       );
 
       // SVGアイコンが存在する
-      const icon = screen.getByRole('img', { hidden: true });
-      expect(icon).toBeInTheDocument;
+      const icon = container.querySelector('svg');
+      expect(icon).toBeInTheDocument();
     });
 
     it('ヘルプテキストが表示される', () => {
@@ -335,15 +335,16 @@ describe('ErrorBoundary', () => {
       const onError1 = vi.fn();
       const onError2 = vi.fn();
 
-      const { rerender } = render(
+      const { unmount } = render(
         <ErrorBoundary onError={onError1}>
           <ThrowError errorMessage="エラー1" />
         </ErrorBoundary>
       );
 
       expect(onError1).toHaveBeenCalled();
+      unmount();
 
-      rerender(
+      render(
         <ErrorBoundary onError={onError2}>
           <ThrowError errorMessage="エラー2" />
         </ErrorBoundary>

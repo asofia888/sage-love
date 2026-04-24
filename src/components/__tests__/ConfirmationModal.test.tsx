@@ -1,7 +1,7 @@
 import React from 'react';
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '../../test/utils';
-import ConfirmationModal from '../../../components/ConfirmationModal';
+import ConfirmationModal from '../ConfirmationModal';
 
 describe('ConfirmationModal', () => {
   it('renders modal when open', () => {

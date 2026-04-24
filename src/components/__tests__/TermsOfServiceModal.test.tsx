@@ -1,12 +1,12 @@
 import React from 'react';
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '../../test/utils';
-import TermsOfServiceModal from '../../../components/TermsOfServiceModal';
+import TermsOfServiceModal from '../TermsOfServiceModal';
 
 describe('TermsOfServiceModal', () => {
   it('renders modal when open', () => {
     render(<TermsOfServiceModal isOpen={true} onClose={() => {}} />);
-    expect(screen.getByText(/利用規約|terms of service/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/利用規約/).length).toBeGreaterThan(0);
   });
 
   it('does not render when closed', () => {

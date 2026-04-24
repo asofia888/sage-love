@@ -20,16 +20,9 @@ Object.defineProperty(window, 'location', {
   writable: true,
 });
 
-// Mock document.documentElement
-Object.defineProperty(document, 'documentElement', {
-  value: {
-    ...document.documentElement,
-    lang: 'ja',
-    dir: 'ltr',
-    setAttribute: vi.fn(),
-  },
-  writable: true,
-});
+// Keep the real documentElement; React-DOM requires it.
+document.documentElement.lang = 'ja';
+document.documentElement.dir = 'ltr';
 
 // Mock localStorage with actual storage functionality
 const localStorageMock = (() => {
@@ -63,14 +56,10 @@ Object.defineProperty(window, 'sessionStorage', {
 // Mock fetch
 global.fetch = vi.fn();
 
-// Mock navigator
-Object.defineProperty(window, 'navigator', {
-  value: {
-    language: 'ja-JP',
-    languages: ['ja-JP', 'ja', 'en'],
-  },
-  writable: true,
-});
+// Preserve jsdom's real navigator (it provides userAgent etc. that React-DOM needs);
+// override individual fields only.
+Object.defineProperty(window.navigator, 'language', { value: 'ja-JP', configurable: true });
+Object.defineProperty(window.navigator, 'languages', { value: ['ja-JP', 'ja', 'en'], configurable: true });
 
 // Mock ResizeObserver
 global.ResizeObserver = vi.fn().mockImplementation(() => ({

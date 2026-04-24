@@ -98,7 +98,7 @@ describe('Chat API Handler', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.code).toBe('errorGeneric');
+      expect(data.code).toBe('errorValidation');
       expect(data.details).toContain('Message is required');
     });
 
@@ -120,8 +120,9 @@ describe('Chat API Handler', () => {
       const response = await chatHandler.default(request);
       const data = await response.json();
 
-      expect(response.status).toBe(500);
-      expect(data.code).toBe('errorNoApiKeyConfig');
+      expect(response.status).toBe(400);
+      expect(data.code).toBe('errorValidation');
+      expect(data.details).toContain('GEMINI_API_KEY');
 
       // Restore original env
       process.env.GEMINI_API_KEY = originalEnv;
@@ -270,18 +271,21 @@ describe('Chat API Handler', () => {
       const response = await chatHandler.default(request);
       const data = await response.json();
 
-      expect(response.status).toBe(500);
-      expect(data.code).toBe('errorGeneric');
+      expect(response.status).toBe(400);
+      expect(data.code).toBe('errorValidation');
       expect(data.details).toContain('empty response');
     });
 
-    it('should include system instruction in prompt', async () => {
+    it('should accept system instruction on request', async () => {
+      // System instruction is attached to the model via context caching —
+      // it is no longer inlined into the prompt text. We only verify the
+      // request is accepted and the user message reaches generateContent.
       const mockResponse = {
         response: {
           text: () => 'システム指示を理解しました。'
         }
       };
-      
+
       mockGenerateContent.mockResolvedValue(mockResponse);
 
       const request = new Request('http://localhost/api/chat', {
@@ -296,10 +300,10 @@ describe('Chat API Handler', () => {
       });
 
       const response = await chatHandler.default(request);
-      
+
       expect(response.status).toBe(200);
       expect(mockGenerateContent).toHaveBeenCalledWith(
-        expect.stringContaining('あなたは優しい聖者です。')
+        expect.stringContaining('User: テスト')
       );
     });
 

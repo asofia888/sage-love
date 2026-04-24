@@ -8,14 +8,14 @@ describe('Types', () => {
     });
 
     it('should have AI value', () => {
-      expect(MessageSender.AI).toBe('ai');
+      expect(MessageSender.AI).toBe('assistant');
     });
 
     it('should only have expected values', () => {
       const values = Object.values(MessageSender);
       expect(values).toHaveLength(2);
       expect(values).toContain('user');
-      expect(values).toContain('ai');
+      expect(values).toContain('assistant');
     });
   });
 

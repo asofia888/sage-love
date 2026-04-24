@@ -19,7 +19,7 @@ describe('ChatInput', () => {
       />
     );
     
-    const textArea = screen.getByPlaceholderText('メッセージを入力してください');
+    const textArea = screen.getByPlaceholderText(/聖者に尋ねたいことを入力/);
     expect(textArea).toBeInTheDocument();
   });
 
@@ -45,7 +45,7 @@ describe('ChatInput', () => {
       />
     );
     
-    const textArea = screen.getByPlaceholderText('メッセージを入力してください');
+    const textArea = screen.getByPlaceholderText(/聖者に尋ねたいことを入力/);
     const sendButton = screen.getByLabelText('送信');
     
     await user.type(textArea, 'テストメッセージ');
@@ -64,7 +64,7 @@ describe('ChatInput', () => {
       />
     );
     
-    const textArea = screen.getByPlaceholderText('メッセージを入力してください') as HTMLTextAreaElement;
+    const textArea = screen.getByPlaceholderText(/聖者に尋ねたいことを入力/) as HTMLTextAreaElement;
     const sendButton = screen.getByLabelText('送信');
     
     await user.type(textArea, 'テストメッセージ');
@@ -83,7 +83,7 @@ describe('ChatInput', () => {
       />
     );
     
-    const textArea = screen.getByPlaceholderText('メッセージを入力してください');
+    const textArea = screen.getByPlaceholderText(/聖者に尋ねたいことを入力/);
     
     await user.type(textArea, 'テストメッセージ');
     await user.keyboard('{Enter}');
@@ -101,7 +101,7 @@ describe('ChatInput', () => {
       />
     );
     
-    const textArea = screen.getByPlaceholderText('メッセージを入力してください');
+    const textArea = screen.getByPlaceholderText(/聖者に尋ねたいことを入力/);
     
     await user.type(textArea, 'テストメッセージ');
     await user.keyboard('{Shift>}{Enter}{/Shift}');
@@ -117,7 +117,7 @@ describe('ChatInput', () => {
       />
     );
     
-    const textArea = screen.getByPlaceholderText('メッセージを入力してください');
+    const textArea = screen.getByPlaceholderText(/聖者に尋ねたいことを入力/);
     const sendButton = screen.getByLabelText('送信中...');
     
     expect(textArea).toBeDisabled();
@@ -163,7 +163,7 @@ describe('ChatInput', () => {
       />
     );
     
-    const textArea = screen.getByPlaceholderText('メッセージを入力してください');
+    const textArea = screen.getByPlaceholderText(/聖者に尋ねたいことを入力/);
     const sendButton = screen.getByLabelText('送信');
     
     await user.type(textArea, '   ');
@@ -206,7 +206,7 @@ describe('ChatInput', () => {
       />
     );
     
-    const textArea = screen.getByPlaceholderText('メッセージを入力してください');
+    const textArea = screen.getByPlaceholderText(/聖者に尋ねたいことを入力/);
     const sendButton = screen.getByLabelText('送信');
     
     await user.type(textArea, 'テストメッセージ');
@@ -224,7 +224,7 @@ describe('ChatInput', () => {
       />
     );
     
-    const textArea = screen.getByPlaceholderText('メッセージを入力してください') as HTMLTextAreaElement;
+    const textArea = screen.getByPlaceholderText(/聖者に尋ねたいことを入力/) as HTMLTextAreaElement;
     
     // Simulate voice input by directly calling the component's voice handler
     // Note: This is a simplified test since VoiceInputButton is a separate component
@@ -243,7 +243,7 @@ describe('ChatInput', () => {
     
     // Note: Voice input state is internal to the component
     // This test would need to be expanded to properly test voice input state
-    const textArea = screen.getByPlaceholderText('メッセージを入力してください');
+    const textArea = screen.getByPlaceholderText(/聖者に尋ねたいことを入力/);
     expect(textArea).toBeInTheDocument();
   });
 });

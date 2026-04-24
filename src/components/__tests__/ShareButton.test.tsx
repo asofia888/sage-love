@@ -1,7 +1,7 @@
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '../../test/utils';
-import ShareButton from '../../../components/ShareButton';
+import ShareButton from '../ShareButton';
 
 describe('ShareButton', () => {
   it('renders share button', () => {

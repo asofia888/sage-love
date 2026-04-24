@@ -1,7 +1,7 @@
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '../../test/utils';
-import ClearChatButton from '../../../components/ClearChatButton';
+import ClearChatButton from '../ClearChatButton';
 
 describe('ClearChatButton', () => {
   it('renders clear chat button', () => {

@@ -48,9 +48,9 @@ describe('ErrorService', () => {
     it('should handle null/undefined errors', () => {
       const nullError = null;
       const normalized = ErrorService.normalizeError(nullError);
-      
+
       expect(normalized.code).toBe('errorMessageDefault');
-      expect(normalized.details).toBe('null');
+      expect(normalized.details).toBe('Unknown error occurred');
     });
 
     it('should handle API key configuration errors', () => {

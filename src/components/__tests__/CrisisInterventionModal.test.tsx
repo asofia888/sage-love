@@ -1,7 +1,7 @@
 import React from 'react';
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '../../test/utils';
-import CrisisInterventionModal from '../../../components/CrisisInterventionModal';
+import CrisisInterventionModal from '../CrisisInterventionModal';
 
 describe('CrisisInterventionModal', () => {
   const crisisResult = {

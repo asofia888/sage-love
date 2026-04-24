@@ -1,12 +1,12 @@
 import React from 'react';
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '../../test/utils';
-import PrivacyPolicyModal from '../../../components/PrivacyPolicyModal';
+import PrivacyPolicyModal from '../PrivacyPolicyModal';
 
 describe('PrivacyPolicyModal', () => {
   it('renders modal when open', () => {
     render(<PrivacyPolicyModal isOpen={true} onClose={() => {}} />);
-    expect(screen.getByText(/プライバシー|privacy/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/プライバシー/).length).toBeGreaterThan(0);
   });
 
   it('does not render when closed', () => {

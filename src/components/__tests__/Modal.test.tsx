@@ -1,7 +1,7 @@
 import React from 'react';
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '../../test/utils';
-import Modal from '../../../components/Modal';
+import Modal from '../Modal';
 
 describe('Modal', () => {
   it('renders children when open', () => {

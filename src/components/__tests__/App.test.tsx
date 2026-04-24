@@ -2,24 +2,31 @@ import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor } from '../../test/utils';
 import userEvent from '@testing-library/user-event';
-import App from '../../../App';
+import App from '../../App';
 
-// Mock API calls
-vi.mock('../../services/apiService', () => ({
-  default: {
-    sendMessage: vi.fn().mockResolvedValue({
-      message: 'モックされたAI応答です',
-      timestamp: new Date().toISOString(),
-      sessionId: 'test-session'
-    })
-  }
+// Mock geminiService — useMessageHandler imports it as a namespace (* as geminiService).
+vi.mock('../../services/geminiService', () => ({
+  streamChatWithTranslation: vi.fn().mockImplementation(async function* () {
+    yield 'モックされたAI応答です';
+  }),
+  streamChat: vi.fn().mockImplementation(async function* () {
+    yield 'モックされたAI応答です';
+  }),
+  sendSecureChat: vi.fn().mockResolvedValue('モックされたAI応答です'),
+  initializeTranslationService: vi.fn(),
 }));
 
 // Mock crisis detection service
 vi.mock('../../services/crisisDetectionService', () => ({
-  default: {
-    detectCrisis: vi.fn().mockReturnValue({ isCrisis: false })
-  }
+  CrisisDetectionService: {
+    detectCrisis: vi.fn().mockReturnValue({
+      isCrisis: false,
+      severity: 'low',
+      detectedKeywords: [],
+      triggerPatterns: [],
+      recommendedAction: 'monitor',
+    }),
+  },
 }));
 
 // Mock lazy-loaded components to avoid Suspense issues in tests
@@ -59,6 +66,18 @@ vi.mock('../../components/TermsOfServiceModal', () => ({
     isOpen ? <div data-testid="terms-modal" onClick={onClose}>Terms Modal</div> : null
 }));
 
+// jsdom give Virtuoso a 0px viewport, so virtualized items don't render.
+// Replace with a simple list so tests can assert on message text directly.
+vi.mock('../../components/VirtualizedChat', () => ({
+  default: ({ messages }: any) => (
+    <div data-testid="virtualized-chat">
+      {messages.map((msg: any) => (
+        <div key={msg.id} data-testid="chat-message">{msg.text}</div>
+      ))}
+    </div>
+  )
+}));
+
 describe('App Integration Tests', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -74,20 +93,20 @@ describe('App Integration Tests', () => {
       render(<App />);
 
       // ヘッダーの確認
-      expect(screen.getByText('聖者の愛')).toBeInTheDocument();
-      expect(screen.getByText('AI聖者があなたの悩みに寄り添います')).toBeInTheDocument();
+      expect(screen.getByText(/聖者の愛/)).toBeInTheDocument();
+      expect(screen.getByText(/賢人と語り/)).toBeInTheDocument();
     });
 
     it('ウェルカムメッセージが表示される', () => {
       render(<App />);
 
-      expect(screen.getByText(/ようこそ、心の迷える魂よ/)).toBeInTheDocument();
+      expect(screen.getByText(/ようこそ、真理の探究者よ/)).toBeInTheDocument();
     });
 
     it('チャット入力フィールドが表示される', () => {
       render(<App />);
 
-      const input = screen.getByPlaceholderText(/メッセージを入力してください/);
+      const input = screen.getByPlaceholderText(/聖者に尋ねたいことを入力/);
       expect(input).toBeInTheDocument();
     });
 
@@ -110,7 +129,7 @@ describe('App Integration Tests', () => {
       const user = userEvent.setup();
       render(<App />);
 
-      const input = screen.getByPlaceholderText(/メッセージを入力してください/);
+      const input = screen.getByPlaceholderText(/聖者に尋ねたいことを入力/);
       const sendButton = screen.getByLabelText('送信');
 
       await user.type(input, 'テストメッセージ');
@@ -126,7 +145,7 @@ describe('App Integration Tests', () => {
       const user = userEvent.setup();
       render(<App />);
 
-      const input = screen.getByPlaceholderText(/メッセージを入力してください/);
+      const input = screen.getByPlaceholderText(/聖者に尋ねたいことを入力/);
       const sendButton = screen.getByLabelText('送信');
 
       await user.type(input, 'こんにちは');
@@ -142,7 +161,7 @@ describe('App Integration Tests', () => {
       const user = userEvent.setup();
       render(<App />);
 
-      const input = screen.getByPlaceholderText(/メッセージを入力してください/);
+      const input = screen.getByPlaceholderText(/聖者に尋ねたいことを入力/);
       await user.type(input, 'テスト');
 
       const sendButton = screen.getByLabelText('送信');
@@ -165,7 +184,7 @@ describe('App Integration Tests', () => {
       expect(sendButton).toBeDisabled();
 
       // スペースのみのメッセージも送信できない
-      const input = screen.getByPlaceholderText(/メッセージを入力してください/);
+      const input = screen.getByPlaceholderText(/聖者に尋ねたいことを入力/);
       await user.type(input, '   ');
 
       expect(sendButton).toBeDisabled();
@@ -177,7 +196,7 @@ describe('App Integration Tests', () => {
       const user = userEvent.setup();
       render(<App />);
 
-      const input = screen.getByPlaceholderText(/メッセージを入力してください/);
+      const input = screen.getByPlaceholderText(/聖者に尋ねたいことを入力/);
 
       // 1つ目のメッセージ
       await user.type(input, '最初のメッセージ');
@@ -205,7 +224,7 @@ describe('App Integration Tests', () => {
       render(<App />);
 
       // メッセージを送信
-      const input = screen.getByPlaceholderText(/メッセージを入力してください/);
+      const input = screen.getByPlaceholderText(/聖者に尋ねたいことを入力/);
       await user.type(input, 'テストメッセージ');
       await user.click(screen.getByLabelText('送信'));
 
@@ -214,7 +233,7 @@ describe('App Integration Tests', () => {
       });
 
       // クリアボタンをクリック
-      const clearButton = screen.getByLabelText('チャット履歴をクリア');
+      const clearButton = screen.getByLabelText('会話をクリア');
       await user.click(clearButton);
 
       // 確認モーダルが表示される
@@ -227,7 +246,7 @@ describe('App Integration Tests', () => {
       // メッセージが削除され、ウェルカムメッセージが表示される
       await waitFor(() => {
         expect(screen.queryByText('テストメッセージ')).not.toBeInTheDocument();
-        expect(screen.getByText(/ようこそ、心の迷える魂よ/)).toBeInTheDocument();
+        expect(screen.getByText(/ようこそ、真理の探究者よ/)).toBeInTheDocument();
       });
     });
   });
@@ -237,7 +256,8 @@ describe('App Integration Tests', () => {
       const user = userEvent.setup();
       render(<App />);
 
-      const disclaimerButton = screen.getByText('免責事項');
+      // Footer renders mobile + PC layouts — use the first match
+      const disclaimerButton = screen.getAllByText('免責事項')[0];
       await user.click(disclaimerButton);
 
       expect(screen.getByTestId('disclaimer-modal')).toBeInTheDocument();
@@ -254,7 +274,7 @@ describe('App Integration Tests', () => {
       const user = userEvent.setup();
       render(<App />);
 
-      const helpButton = screen.getByLabelText('ヘルプを表示');
+      const helpButton = screen.getByLabelText('使い方');
       await user.click(helpButton);
 
       expect(screen.getByTestId('help-modal')).toBeInTheDocument();
@@ -270,7 +290,7 @@ describe('App Integration Tests', () => {
       const user = userEvent.setup();
       render(<App />);
 
-      const privacyButton = screen.getByText('プライバシーポリシー');
+      const privacyButton = screen.getAllByText('プライバシーポリシー')[0];
       await user.click(privacyButton);
 
       expect(screen.getByTestId('privacy-modal')).toBeInTheDocument();
@@ -286,7 +306,7 @@ describe('App Integration Tests', () => {
       const user = userEvent.setup();
       render(<App />);
 
-      const termsButton = screen.getByText('利用規約');
+      const termsButton = screen.getAllByText('利用規約')[0];
       await user.click(termsButton);
 
       expect(screen.getByTestId('terms-modal')).toBeInTheDocument();
@@ -301,18 +321,14 @@ describe('App Integration Tests', () => {
 
   describe('テキストサイズ変更機能', () => {
     it('テキストサイズを変更できる', async () => {
-      const user = userEvent.setup();
       render(<App />);
 
-      // テキストサイズセレクターを見つける
+      // TextSizeSelector buttons carry aria-label translations that include "文字サイズ"
       const textSizeButtons = screen.getAllByRole('button').filter(btn =>
-        btn.getAttribute('aria-label')?.includes('テキストサイズ')
+        btn.getAttribute('aria-label')?.includes('文字サイズ')
       );
 
       expect(textSizeButtons.length).toBeGreaterThan(0);
-
-      // テキストサイズ変更がlocalStorageに保存されることを確認
-      // （実際の変更はTextSizeSelectorコンポーネントのテストで詳細にテスト）
     });
   });
 
@@ -320,16 +336,9 @@ describe('App Integration Tests', () => {
     it('言語セレクターが表示される', () => {
       render(<App />);
 
-      // 言語ボタンを探す（国旗アイコンまたは言語名）
-      const languageButtons = screen.getAllByRole('button').filter(btn =>
-        btn.getAttribute('aria-label')?.includes('言語') ||
-        btn.textContent === '🇯🇵' ||
-        btn.textContent === '🇬🇧' ||
-        btn.textContent === '🇪🇸' ||
-        btn.textContent === '🇵🇹'
-      );
-
-      expect(languageButtons.length).toBeGreaterThan(0);
+      // LanguageSelector is a <select>, not a button
+      const languageSelector = screen.getByLabelText('言語を選択');
+      expect(languageSelector).toBeInTheDocument();
     });
   });
 
@@ -357,7 +366,7 @@ describe('App Integration Tests', () => {
       const user = userEvent.setup();
       render(<App />);
 
-      const input = screen.getByPlaceholderText(/メッセージを入力してください/);
+      const input = screen.getByPlaceholderText(/聖者に尋ねたいことを入力/);
       await user.type(input, 'テスト');
       await user.click(screen.getByLabelText('送信'));
 
@@ -374,15 +383,17 @@ describe('App Integration Tests', () => {
   describe('エラーハンドリング', () => {
     it('エラーメッセージが表示される', async () => {
       // エラーをシミュレート
-      const apiService = await import('../../services/apiService');
-      vi.mocked(apiService.default.sendMessage).mockRejectedValueOnce(
-        new Error('API_ERROR:errorGeneric')
-      );
+      const geminiService = await import('../../services/geminiService');
+      vi.mocked(geminiService.streamChatWithTranslation).mockImplementationOnce(async function* () {
+        throw new Error('API_ERROR:errorGeneric');
+        // eslint-disable-next-line no-unreachable
+        yield '';
+      });
 
       const user = userEvent.setup();
       render(<App />);
 
-      const input = screen.getByPlaceholderText(/メッセージを入力してください/);
+      const input = screen.getByPlaceholderText(/聖者に尋ねたいことを入力/);
       await user.type(input, 'エラーテスト');
       await user.click(screen.getByLabelText('送信'));
 
@@ -393,15 +404,17 @@ describe('App Integration Tests', () => {
     });
 
     it('エラーメッセージをクリックして消去できる', async () => {
-      const apiService = await import('../../services/apiService');
-      vi.mocked(apiService.default.sendMessage).mockRejectedValueOnce(
-        new Error('API_ERROR:errorGeneric')
-      );
+      const geminiService = await import('../../services/geminiService');
+      vi.mocked(geminiService.streamChatWithTranslation).mockImplementationOnce(async function* () {
+        throw new Error('API_ERROR:errorGeneric');
+        // eslint-disable-next-line no-unreachable
+        yield '';
+      });
 
       const user = userEvent.setup();
       render(<App />);
 
-      const input = screen.getByPlaceholderText(/メッセージを入力してください/);
+      const input = screen.getByPlaceholderText(/聖者に尋ねたいことを入力/);
       await user.type(input, 'エラーテスト');
       await user.click(screen.getByLabelText('送信'));
 
@@ -424,12 +437,12 @@ describe('App Integration Tests', () => {
       const user = userEvent.setup();
       render(<App />);
 
-      const input = screen.getByPlaceholderText(/メッセージを入力してください/);
+      const input = screen.getByPlaceholderText(/聖者に尋ねたいことを入力/);
       await user.type(input, '保存テスト');
       await user.click(screen.getByLabelText('送信'));
 
       await waitFor(() => {
-        const chatHistory = localStorage.getItem('chat_history');
+        const chatHistory = localStorage.getItem('chatHistory');
         expect(chatHistory).toBeTruthy();
 
         if (chatHistory) {
@@ -442,9 +455,9 @@ describe('App Integration Tests', () => {
     it('ページ再読み込み時にチャット履歴が復元される', async () => {
       // 事前にlocalStorageにデータを設定
       const mockHistory = [
-        { sender: 'user', text: '復元テスト', timestamp: new Date().toISOString() }
+        { id: 'restore-1', sender: 'user', text: '復元テスト', timestamp: new Date().toISOString() }
       ];
-      localStorage.setItem('chat_history', JSON.stringify(mockHistory));
+      localStorage.setItem('chatHistory', JSON.stringify(mockHistory));
 
       render(<App />);
 
@@ -459,21 +472,23 @@ describe('App Integration Tests', () => {
     it('主要な要素にaria-labelが設定されている', () => {
       render(<App />);
 
-      expect(screen.getByLabelText('チャット履歴をクリア')).toBeInTheDocument();
-      expect(screen.getByLabelText('ヘルプを表示')).toBeInTheDocument();
+      expect(screen.getByLabelText('会話をクリア')).toBeInTheDocument();
+      expect(screen.getByLabelText('使い方')).toBeInTheDocument();
       expect(screen.getByLabelText('送信')).toBeInTheDocument();
     });
 
     it('エラーメッセージにrole="alert"が設定される', async () => {
-      const apiService = await import('../../services/apiService');
-      vi.mocked(apiService.default.sendMessage).mockRejectedValueOnce(
-        new Error('API_ERROR:errorGeneric')
-      );
+      const geminiService = await import('../../services/geminiService');
+      vi.mocked(geminiService.streamChatWithTranslation).mockImplementationOnce(async function* () {
+        throw new Error('API_ERROR:errorGeneric');
+        // eslint-disable-next-line no-unreachable
+        yield '';
+      });
 
       const user = userEvent.setup();
       render(<App />);
 
-      const input = screen.getByPlaceholderText(/メッセージを入力してください/);
+      const input = screen.getByPlaceholderText(/聖者に尋ねたいことを入力/);
       await user.type(input, 'テスト');
       await user.click(screen.getByLabelText('送信'));
 

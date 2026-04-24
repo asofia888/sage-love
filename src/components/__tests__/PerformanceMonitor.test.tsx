@@ -1,7 +1,7 @@
 import React from 'react';
 import { describe, it, expect } from 'vitest';
 import { render } from '../../test/utils';
-import PerformanceMonitor from '../../../components/PerformanceMonitor';
+import PerformanceMonitor from '../PerformanceMonitor';
 
 describe('PerformanceMonitor', () => {
   it('renders without crashing', () => {

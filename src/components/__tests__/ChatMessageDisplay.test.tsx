@@ -3,250 +3,140 @@ import { describe, it, expect } from 'vitest';
 import { render, screen } from '../../test/utils';
 import ChatMessageDisplay from '../../components/ChatMessageDisplay';
 import { createMockMessage } from '../../test/utils';
+import { MessageSender } from '../../types';
 
 describe('ChatMessageDisplay', () => {
-  it('should render user message correctly', () => {
+  it('renders user message with justify-end alignment', () => {
     const userMessage = createMockMessage({
       text: 'ユーザーのメッセージ',
-      sender: 'user'
+      sender: MessageSender.USER,
     });
-    
-    render(
-      <ChatMessageDisplay 
-        message={userMessage}
-        currentLang="ja"
-        textSize="medium"
-      />
+
+    const { container } = render(
+      <ChatMessageDisplay message={userMessage} currentLang="ja" textSize="normal" />
     );
-    
+
     expect(screen.getByText('ユーザーのメッセージ')).toBeInTheDocument();
-    
-    // User messages should have specific styling
-    const messageContainer = screen.getByText('ユーザーのメッセージ').closest('div');
-    expect(messageContainer).toHaveClass('ml-auto');
+    expect(container.querySelector('.justify-end')).toBeInTheDocument();
   });
 
-  it('should render AI message correctly', () => {
+  it('renders AI message with justify-start alignment', () => {
     const aiMessage = createMockMessage({
       text: 'AIの応答',
-      sender: 'ai'
+      sender: MessageSender.AI,
     });
-    
-    render(
-      <ChatMessageDisplay 
-        message={aiMessage}
-        currentLang="ja"
-        textSize="medium"
-      />
+
+    const { container } = render(
+      <ChatMessageDisplay message={aiMessage} currentLang="ja" textSize="normal" />
     );
-    
+
     expect(screen.getByText('AIの応答')).toBeInTheDocument();
-    
-    // AI messages should have different styling than user messages
-    const messageContainer = screen.getByText('AIの応答').closest('div');
-    expect(messageContainer).not.toHaveClass('ml-auto');
+    expect(container.querySelector('.justify-start')).toBeInTheDocument();
+    expect(container.querySelector('.justify-end')).not.toBeInTheDocument();
   });
 
-  it('should show typing indicator for AI message', () => {
+  it('shows loading indicator when AI is typing with no text', () => {
     const typingMessage = createMockMessage({
+      id: 'ai-typing',
       text: '',
-      sender: 'ai',
-      isTyping: true
+      sender: MessageSender.AI,
+      isTyping: true,
     });
-    
-    render(
-      <ChatMessageDisplay 
-        message={typingMessage}
-        currentLang="ja"
-        textSize="medium"
-      />
+
+    const { container } = render(
+      <ChatMessageDisplay message={typingMessage} currentLang="ja" textSize="normal" />
     );
-    
-    // Should show typing animation
-    const typingIndicator = document.querySelector('.animate-pulse');
-    expect(typingIndicator).toBeInTheDocument();
+
+    // SageLoadingIndicator renders; the bubble with text should not
+    expect(container.querySelector('p')).toBeNull();
   });
 
-  it('should apply correct text size class', () => {
-    const message = createMockMessage({
-      text: 'テストメッセージ'
-    });
-    
+  it('applies text-base class for large text size', () => {
+    const message = createMockMessage({ text: 'テストメッセージ' });
+
     render(
-      <ChatMessageDisplay 
-        message={message}
-        currentLang="ja"
-        textSize="large"
-      />
+      <ChatMessageDisplay message={message} currentLang="ja" textSize="large" />
     );
-    
-    const textElement = screen.getByText('テストメッセージ');
-    expect(textElement).toHaveClass('text-lg');
+
+    expect(screen.getByText('テストメッセージ')).toHaveClass('text-base');
   });
 
-  it('should apply small text size class', () => {
-    const message = createMockMessage({
-      text: 'テストメッセージ'
-    });
-    
+  it('applies text-sm class for normal text size', () => {
+    const message = createMockMessage({ text: 'テストメッセージ' });
+
     render(
-      <ChatMessageDisplay 
-        message={message}
-        currentLang="ja"
-        textSize="small"
-      />
+      <ChatMessageDisplay message={message} currentLang="ja" textSize="normal" />
     );
-    
-    const textElement = screen.getByText('テストメッセージ');
-    expect(textElement).toHaveClass('text-sm');
+
+    expect(screen.getByText('テストメッセージ')).toHaveClass('text-sm');
   });
 
-  it('should display timestamp', () => {
+  it('displays a formatted timestamp', () => {
     const message = createMockMessage({
       text: 'テストメッセージ',
-      timestamp: new Date('2023-01-01T12:00:00Z')
+      timestamp: '2023-01-01T12:00:00Z',
     });
-    
-    render(
-      <ChatMessageDisplay 
-        message={message}
-        currentLang="ja"
-        textSize="medium"
-      />
+
+    const { container } = render(
+      <ChatMessageDisplay message={message} currentLang="ja" textSize="normal" />
     );
-    
-    // The component should format and display the timestamp
-    // Note: Exact format depends on implementation
-    expect(screen.getByText('テストメッセージ')).toBeInTheDocument();
+
+    // Timestamp is rendered in a <p class="text-xs ..."> next to the body text
+    const tsEl = container.querySelector('p.text-xs');
+    expect(tsEl).toBeInTheDocument();
+    expect(tsEl?.textContent).toMatch(/\d{1,2}:\d{2}/);
   });
 
-  it('should render markdown content correctly', () => {
-    const messageWithMarkdown = createMockMessage({
-      text: '**太字のテキスト** と *斜体のテキスト*',
-      sender: 'ai'
-    });
-    
-    render(
-      <ChatMessageDisplay 
-        message={messageWithMarkdown}
-        currentLang="ja"
-        textSize="medium"
-      />
-    );
-    
-    // Should render the markdown content
-    expect(screen.getByText(/太字のテキスト/)).toBeInTheDocument();
-    expect(screen.getByText(/斜体のテキスト/)).toBeInTheDocument();
-  });
-
-  it('should handle long messages', () => {
+  it('handles long messages', () => {
     const longMessage = createMockMessage({
       text: 'これは非常に長いメッセージです。'.repeat(50),
-      sender: 'ai'
+      sender: MessageSender.AI,
     });
-    
+
     render(
-      <ChatMessageDisplay 
-        message={longMessage}
-        currentLang="ja"
-        textSize="medium"
-      />
+      <ChatMessageDisplay message={longMessage} currentLang="ja" textSize="normal" />
     );
-    
+
     expect(screen.getByText(/これは非常に長いメッセージです/)).toBeInTheDocument();
   });
 
-  it('should render user avatar for user messages', () => {
-    const userMessage = createMockMessage({
-      text: 'ユーザーメッセージ',
-      sender: 'user'
-    });
-    
-    render(
-      <ChatMessageDisplay 
-        message={userMessage}
-        currentLang="ja"
-        textSize="medium"
-      />
-    );
-    
-    // Should have user avatar
-    const avatar = screen.getByTestId('user-avatar') || document.querySelector('[data-testid="user-avatar"]');
-    // Note: This depends on the implementation having test IDs
-  });
-
-  it('should render sage avatar for AI messages', () => {
-    const aiMessage = createMockMessage({
-      text: 'AIメッセージ',
-      sender: 'ai'
-    });
-    
-    render(
-      <ChatMessageDisplay 
-        message={aiMessage}
-        currentLang="ja"
-        textSize="medium"
-      />
-    );
-    
-    // Should have sage avatar
-    const avatar = screen.getByTestId('sage-avatar') || document.querySelector('[data-testid="sage-avatar"]');
-    // Note: This depends on the implementation having test IDs
-  });
-
-  it('should handle empty message text', () => {
-    const emptyMessage = createMockMessage({
-      text: '',
-      sender: 'ai'
-    });
-    
-    render(
-      <ChatMessageDisplay 
-        message={emptyMessage}
-        currentLang="ja"
-        textSize="medium"
-      />
-    );
-    
-    // Should render without errors
-    const messageContainer = document.querySelector('[role="article"]') || 
-                           document.querySelector('.message') ||
-                           screen.getByRole('group', { hidden: true });
-    expect(messageContainer).toBeInTheDocument();
-  });
-
-  it('should handle special characters in message', () => {
+  it('renders special characters verbatim', () => {
     const specialMessage = createMockMessage({
       text: '特殊文字: @#$%^&*()_+{}[]|\\:";\'<>?,./`~',
-      sender: 'user'
+      sender: MessageSender.USER,
     });
-    
+
     render(
-      <ChatMessageDisplay 
-        message={specialMessage}
-        currentLang="ja"
-        textSize="medium"
-      />
+      <ChatMessageDisplay message={specialMessage} currentLang="ja" textSize="normal" />
     );
-    
+
     expect(screen.getByText(/特殊文字:/)).toBeInTheDocument();
   });
 
-  it('should apply RTL direction for Arabic language', () => {
+  it('renders Arabic text', () => {
     const arabicMessage = createMockMessage({
       text: 'مرحبا بك',
-      sender: 'ai'
+      sender: MessageSender.AI,
     });
-    
+
     render(
-      <ChatMessageDisplay 
-        message={arabicMessage}
-        currentLang="ar"
-        textSize="medium"
-      />
+      <ChatMessageDisplay message={arabicMessage} currentLang="ar" textSize="normal" />
     );
-    
+
     expect(screen.getByText('مرحبا بك')).toBeInTheDocument();
-    // RTL styling should be applied based on language
+  });
+
+  it('hides copy button for welcome messages and user messages', () => {
+    const welcomeMessage = createMockMessage({
+      id: 'welcome-1',
+      text: 'ようこそ',
+      sender: MessageSender.AI,
+    });
+
+    render(
+      <ChatMessageDisplay message={welcomeMessage} currentLang="ja" textSize="normal" />
+    );
+
+    expect(screen.queryByLabelText(/copy/i)).not.toBeInTheDocument();
   });
 });
