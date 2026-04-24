@@ -24,7 +24,11 @@
     "noUncheckedSideEffectImports": true,
 
     "paths": {
-      "@/*" :  ["./*"]
+      "@/services/*": ["./src/services/*"],
+      "@/components/*": ["./src/components/*"],
+      "@/hooks/*": ["./src/hooks/*"],
+      "@/api/*": ["./api/*"],
+      "@/*": ["./src/*"]
     }
   }
 }
