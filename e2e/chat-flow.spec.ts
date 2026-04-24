@@ -1,5 +1,14 @@
 import { test, expect } from '@playwright/test';
 
+const sseBody = (text: string) =>
+  `data: ${JSON.stringify({ type: 'chunk', text })}\n\n` +
+  `data: ${JSON.stringify({
+    type: 'done',
+    sessionId: 'test',
+    cache: { hit: false, tokensSaved: 0 },
+    timestamp: new Date().toISOString(),
+  })}\n\n`;
+
 test.describe('Chat Flow E2E', () => {
   test.beforeEach(async ({ page }) => {
     await page.addInitScript(() => {
@@ -41,13 +50,8 @@ test.describe('Chat Flow E2E', () => {
       await new Promise((resolve) => setTimeout(resolve, 500));
       await route.fulfill({
         status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          message: 'テストの応答です。',
-          timestamp: new Date().toISOString(),
-          sessionId: 'test',
-          cache: { hit: false, tokensSaved: 0 },
-        }),
+        contentType: 'text/event-stream',
+        body: sseBody('テストの応答です。'),
       });
     });
 
@@ -69,13 +73,8 @@ test.describe('Chat Flow E2E', () => {
     await page.route('**/api/chat', async (route) => {
       await route.fulfill({
         status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          message: '心の平和を見つけるには、まず自分自身を受け入れることから始めましょう。',
-          timestamp: new Date().toISOString(),
-          sessionId: 'test',
-          cache: { hit: false, tokensSaved: 0 },
-        }),
+        contentType: 'text/event-stream',
+        body: sseBody('心の平和を見つけるには、まず自分自身を受け入れることから始めましょう。'),
       });
     });
 
@@ -93,27 +92,24 @@ test.describe('Chat Flow E2E', () => {
     await page.route('**/api/chat', async (route) => {
       await route.fulfill({
         status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          message: '応答',
-          timestamp: new Date().toISOString(),
-          sessionId: 'test',
-          cache: { hit: false, tokensSaved: 0 },
-        }),
+        contentType: 'text/event-stream',
+        body: sseBody('応答'),
       });
     });
 
     const textarea = page.getByRole('textbox');
 
-    // Shift+Enter should NOT send (adds newline)
+    // Shift+Enter should NOT send — welcome stays visible, input retains value
     await textarea.fill('一行目');
     await textarea.press('Shift+Enter');
-    await expect(page.getByText('一行目')).not.toBeVisible();
+    await expect(page.getByText('ようこそ、真理の探究者よ。')).toBeVisible();
+    await expect(textarea).not.toHaveValue('');
 
-    // Enter should send
+    // Enter should send — input clears and user message bubble appears
     await textarea.fill('送信テスト');
     await textarea.press('Enter');
-    await expect(page.getByText('送信テスト')).toBeVisible();
+    await expect(textarea).toHaveValue('');
+    await expect(page.locator('main').getByText('送信テスト')).toBeVisible();
   });
 
   test('API error displays error banner', async ({ page }) => {
@@ -138,36 +134,31 @@ test.describe('Chat Flow E2E', () => {
     await page.route('**/api/chat', async (route) => {
       await route.fulfill({
         status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          message: '応答テスト',
-          timestamp: new Date().toISOString(),
-          sessionId: 'test',
-          cache: { hit: false, tokensSaved: 0 },
-        }),
+        contentType: 'text/event-stream',
+        body: sseBody('応答テスト'),
       });
     });
 
     const textarea = page.getByRole('textbox');
     await textarea.fill('クリアテスト');
     await page.getByRole('button', { name: /送信/ }).click();
-    await expect(page.getByText('クリアテスト')).toBeVisible();
+    await expect(page.locator('main').getByText('クリアテスト')).toBeVisible();
 
     // Click clear chat button (trash icon button in header)
-    await page.getByRole('button', { name: /チャットをクリア|クリア|clear/i }).click();
+    await page.getByRole('button', { name: /会話をクリア|チャットをクリア|clear/i }).click();
 
     // Confirmation modal should appear
-    await expect(page.getByText(/本当に.*削除/)).toBeVisible();
+    await expect(page.getByRole('dialog')).toContainText(/会話をリセット/);
 
     // Confirm clear
-    await page.getByRole('button', { name: /削除|確認/ }).click();
+    await page.getByRole('button', { name: /^リセット$/ }).click();
 
     // Welcome message should reappear
     await expect(page.getByText('ようこそ、真理の探究者よ。')).toBeVisible();
   });
 
   test('help modal opens and closes', async ({ page }) => {
-    await page.getByRole('button', { name: /ヘルプ|help/i }).click();
+    await page.getByRole('button', { name: /使い方|ヘルプ|help/i }).click();
 
     // Modal content should be visible
     await expect(page.locator('[role="dialog"]')).toBeVisible();
@@ -181,13 +172,8 @@ test.describe('Chat Flow E2E', () => {
     await page.route('**/api/chat', async (route) => {
       await route.fulfill({
         status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          message: '永続化テスト応答',
-          timestamp: new Date().toISOString(),
-          sessionId: 'test',
-          cache: { hit: false, tokensSaved: 0 },
-        }),
+        contentType: 'text/event-stream',
+        body: sseBody('永続化テスト応答'),
       });
     });
 
