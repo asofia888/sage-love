@@ -3,7 +3,7 @@ import { describe, it, expect } from 'vitest';
 import { render, screen } from '../../test/utils';
 
 // Simple test component
-const TestComponent = ({ children }: { children: React.ReactNode }) => (
+const TestComponent = ({ children }: { children?: React.ReactNode }) => (
   <div data-testid="test-component">{children}</div>
 );
 

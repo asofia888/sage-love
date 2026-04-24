@@ -1,5 +1,4 @@
-import React from 'react';
-import { describe, it, expect } from 'vitest';
+import { describe, it } from 'vitest';
 import { render } from '../../test/utils';
 import { SageAvatarIcon } from '../icons/SageAvatarIcon';
 
