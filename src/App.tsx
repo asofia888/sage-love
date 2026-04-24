@@ -42,7 +42,7 @@ const App: React.FC = () => {
   const closeModal = () => setActiveModal(null);
 
   const [textSize, setTextSize] = useTextSize();
-  const [messages, setMessages, clearChat, memoryStats] = useChatHistory(i18n.isInitialized);
+  const [messages, setMessages, clearChat] = useChatHistory(i18n.isInitialized);
 
   // メッセージハンドリングロジックを分離
   const {
@@ -86,7 +86,7 @@ const App: React.FC = () => {
   return (
     <>
       <CookieBanner />
-      <PerformanceMonitor memoryStats={memoryStats} />
+      <PerformanceMonitor />
       <MultilingualSEO />
       <div className="flex flex-col h-screen bg-transparent text-slate-100">
         <header className="p-4 bg-slate-800/50 backdrop-blur-md shadow-lg sticky top-0 z-10">

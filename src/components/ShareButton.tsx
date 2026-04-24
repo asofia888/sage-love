@@ -10,10 +10,6 @@ const ShareButton: React.FC = () => {
         return new URL(window.location.pathname, window.location.origin).href;
     };
 
-    const getShareText = () => {
-        return `${t('appName')} - ${t('appSubtitle')}`;
-    };
-
     const handleShare = async () => {
         const canonicalUrl = getShareUrl();
         const shareData = {

@@ -1,4 +1,3 @@
-import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor } from '../../test/utils';
 import userEvent from '@testing-library/user-event';
@@ -371,11 +370,12 @@ describe('App Integration Tests', () => {
       await user.click(screen.getByLabelText('送信'));
 
       await waitFor(() => {
-        // メッセージが表示されたらプロンプト提案は非表示（条件: messages.length === 0）
-        const suggestions = screen.queryAllByRole('button').filter(btn =>
-          btn.textContent?.includes('恋愛について')
-        );
-        // プロンプト提案の親要素がhiddenクラスを持つはず
+        // メッセージ送信後はプロンプト提案（例：「恋愛について」）が非表示になる
+        expect(
+          screen
+            .queryAllByRole('button')
+            .filter((btn) => btn.textContent?.includes('恋愛について'))
+        ).toHaveLength(0);
       });
     });
   });

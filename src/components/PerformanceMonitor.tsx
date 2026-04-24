@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import type { PerformanceMetrics, CLSEntry, PerformanceResourceTiming } from '../types/performance';
+import type { CLSEntry, PerformanceResourceTiming } from '../types/performance';
 
 /**
  * パフォーマンス監視コンポーネント
@@ -36,7 +36,7 @@ const PerformanceMonitor: React.FC = () => {
       // FID (First Input Delay) の測定
       const measureFID = () => {
         const observer = new PerformanceObserver((list) => {
-          const entries = list.getEntries();
+          const entries = list.getEntries() as PerformanceEventTiming[];
           entries.forEach((entry) => {
             console.log('FID:', Math.round(entry.processingStart - entry.startTime), 'ms');
           });
@@ -53,7 +53,7 @@ const PerformanceMonitor: React.FC = () => {
       const measureCLS = () => {
         let clsEntries: CLSEntry[] = [];
         const observer = new PerformanceObserver((list) => {
-          const entries = list.getEntries() as CLSEntry[];
+          const entries = list.getEntries() as unknown as CLSEntry[];
           entries.forEach((entry: CLSEntry) => {
             if (!entry.hadRecentInput) {
               clsEntries.push(entry);

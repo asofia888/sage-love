@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { updateMetaTag } from './seoUtils';
 
 interface CanonicalURLUpdaterProps {
   currentLang: string;

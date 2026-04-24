@@ -13,8 +13,6 @@ const MultilingualSEO: React.FC = () => {
   
   useEffect(() => {
     const updateSEOForLanguage = () => {
-      const currentLang = i18n.language.split('-')[0];
-      
       // All SEO updates are now handled by individual components
       // This component only needs to trigger re-renders when language changes
     };
