@@ -88,17 +88,17 @@ const App: React.FC = () => {
       <CookieBanner />
       <PerformanceMonitor />
       <MultilingualSEO />
-      <div className="flex flex-col h-screen bg-transparent text-slate-100">
-        <header className="p-4 bg-slate-800/50 backdrop-blur-md shadow-lg sticky top-0 z-10">
+      <div className="flex flex-col min-h-screen min-h-dvh h-screen h-dvh bg-transparent text-slate-100">
+        <header className="px-3 py-3 sm:p-4 bg-slate-800/50 backdrop-blur-md shadow-lg sticky top-0 z-10">
           <div className="container mx-auto flex flex-col sm:flex-row items-center">
             <div className="hidden sm:flex sm:flex-1"></div>
             <div className="text-center py-1 sm:py-0">
-              <h1 className="text-xl sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-sky-400 to-indigo-500">
+              <h1 className="text-lg sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-sky-400 to-indigo-500">
                 {t('appName')}
               </h1>
               <p className="text-xs sm:text-sm text-slate-200">{t('appSubtitle')}</p>
             </div>
-            <div className="mt-2 sm:mt-0 flex items-center space-x-2 rtl:space-x-reverse sm:flex-1 sm:justify-end">
+            <div className="mt-2 sm:mt-0 flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 sm:flex-nowrap rtl:space-x-reverse sm:flex-1 sm:justify-end w-full sm:w-auto">
               <HelpButton onClick={() => setActiveModal('help')} />
               <ShareButton />
               <ClearChatButton onClear={handleClearChat} />
@@ -129,7 +129,7 @@ const App: React.FC = () => {
           </div>
         )}
 
-        <footer className="p-4 bg-slate-800/50 backdrop-blur-md shadow-up sticky bottom-0 z-10">
+        <footer className="px-3 py-3 sm:p-4 bg-slate-800/50 backdrop-blur-md shadow-up sticky bottom-0 z-10" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
           <div className="container mx-auto max-w-4xl">
             {messages.length === 0 && !isLoading && (
               <div className="hidden sm:block">
@@ -157,7 +157,7 @@ const App: React.FC = () => {
                     </a>
                   </p>
                 </div>
-                <div className="text-slate-300 flex flex-row justify-center items-center gap-4">
+                <div className="text-slate-300 flex flex-row flex-wrap justify-center items-center gap-x-3 gap-y-1">
                   <button
                     onClick={() => setActiveModal('disclaimer')}
                     className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1 text-xs"
