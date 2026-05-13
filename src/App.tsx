@@ -89,7 +89,7 @@ const App: React.FC = () => {
       <PerformanceMonitor />
       <MultilingualSEO />
       <div className="flex flex-col h-screen h-dvh bg-transparent text-slate-100">
-        <header className="px-3 py-3 sm:p-4 bg-slate-900/80 backdrop-blur-md shadow-lg sticky top-0 z-10">
+        <header className="px-3 py-3 sm:p-4 bg-slate-900/95 backdrop-blur-md shadow-lg sticky top-0 z-10">
           <div className="container mx-auto flex flex-col sm:flex-row items-center">
             <div className="hidden sm:flex sm:flex-1"></div>
             <div className="text-center py-1 sm:py-0">
@@ -129,7 +129,7 @@ const App: React.FC = () => {
           </div>
         )}
 
-        <footer className="px-3 py-3 sm:p-4 bg-slate-900/80 backdrop-blur-md shadow-up sticky bottom-0 z-10" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
+        <footer className="px-3 py-3 sm:p-4 bg-slate-900/95 backdrop-blur-md shadow-up sticky bottom-0 z-10" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
           <div className="container mx-auto max-w-4xl">
             {messages.length === 0 && !isLoading && (
               <div className="hidden sm:block">

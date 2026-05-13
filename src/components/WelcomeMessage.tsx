@@ -16,7 +16,7 @@ const WelcomeMessage: React.FC<WelcomeMessageProps> = ({ textSize }) => {
     return (
         <div className="flex items-end space-x-2 rtl:space-x-reverse justify-start">
             <SageAvatarIcon />
-            <div className="p-3 rounded-lg max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl bg-sky-800/75 backdrop-blur-sm shadow-lg text-slate-50 relative group">
+            <div className="p-3 rounded-lg max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl bg-sky-800/95 backdrop-blur-md shadow-lg text-slate-50 relative group">
                 <p className={`${textClass}`} style={{ whiteSpace: 'pre-wrap' }}>{t('welcomeMessage')}</p>
                 <p className="text-xs mt-1 text-sky-300 text-opacity-80">{formattedTimestamp}</p>
             </div>
