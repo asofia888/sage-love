@@ -88,7 +88,7 @@ const App: React.FC = () => {
       <CookieBanner />
       <PerformanceMonitor />
       <MultilingualSEO />
-      <div className="flex flex-col h-screen h-dvh bg-transparent text-slate-100">
+      <div className="flex flex-col app-viewport bg-transparent text-slate-100">
         <header className="px-3 py-3 sm:p-4 bg-slate-900/95 backdrop-blur-md shadow-lg sticky top-0 z-10">
           <div className="container mx-auto flex flex-col sm:flex-row items-center">
             <div className="hidden sm:flex sm:flex-1"></div>
