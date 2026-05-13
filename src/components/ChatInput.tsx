@@ -117,7 +117,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading }) => {
             onKeyDown={handleKeyDown}
             placeholder={isVoiceInput ? t('chatVoiceListening') : t('chatPlaceholder')}
             aria-label={t('chatPlaceholder')}
-            className={`w-full p-3 pr-20 border border-slate-600/70 rounded-lg bg-slate-800/60 text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none placeholder-slate-300 shadow-sm transition-colors duration-200 backdrop-blur-sm ${isVoiceInput ? 'bg-indigo-900/30 border-indigo-500/50' : ''}`}
+            className={`w-full p-3 pr-20 border border-slate-600/70 rounded-lg bg-slate-800/90 text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none placeholder-slate-300 shadow-sm transition-colors duration-200 backdrop-blur-md ${isVoiceInput ? 'bg-indigo-900/60 border-indigo-500/50' : ''}`}
             rows={2}
             disabled={isLoading}
             style={{ minHeight: '3rem', maxHeight: '10rem' }}

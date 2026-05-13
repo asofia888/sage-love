@@ -88,8 +88,8 @@ const App: React.FC = () => {
       <CookieBanner />
       <PerformanceMonitor />
       <MultilingualSEO />
-      <div className="flex flex-col min-h-screen min-h-dvh h-screen h-dvh bg-transparent text-slate-100">
-        <header className="px-3 py-3 sm:p-4 bg-slate-800/50 backdrop-blur-md shadow-lg sticky top-0 z-10">
+      <div className="flex flex-col h-screen h-dvh bg-transparent text-slate-100">
+        <header className="px-3 py-3 sm:p-4 bg-slate-900/80 backdrop-blur-md shadow-lg sticky top-0 z-10">
           <div className="container mx-auto flex flex-col sm:flex-row items-center">
             <div className="hidden sm:flex sm:flex-1"></div>
             <div className="text-center py-1 sm:py-0">
@@ -129,7 +129,7 @@ const App: React.FC = () => {
           </div>
         )}
 
-        <footer className="px-3 py-3 sm:p-4 bg-slate-800/50 backdrop-blur-md shadow-up sticky bottom-0 z-10" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
+        <footer className="px-3 py-3 sm:p-4 bg-slate-900/80 backdrop-blur-md shadow-up sticky bottom-0 z-10" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
           <div className="container mx-auto max-w-4xl">
             {messages.length === 0 && !isLoading && (
               <div className="hidden sm:block">
@@ -140,48 +140,10 @@ const App: React.FC = () => {
               </div>
             )}
             <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
-            <div className="text-center mt-3 text-xs text-slate-200">
-              {/* Mobile: Vertical layout */}
-              <div className="sm:hidden">
-                <div className="mb-2">
+            <div className="text-center mt-3 text-xs sm:text-sm text-slate-200">
+              <div className="flex flex-col sm:flex-row sm:flex-wrap sm:justify-center sm:items-center gap-y-2 sm:gap-x-6">
+                <div className="sm:bg-gradient-to-r sm:from-sky-500/10 sm:to-indigo-500/10 sm:border sm:border-sky-500/20 sm:rounded-lg sm:px-3 sm:py-2 sm:hover:from-sky-500/15 sm:hover:to-indigo-500/15 sm:hover:border-sky-400/30 sm:transition-all sm:duration-200">
                   <p>
-                    {t('buyMeACoffeeText')}{' '}
-                    <a
-                      href="https://buymeacoffee.com/asofia"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-semibold text-sky-400 hover:text-sky-300 underline transition-colors"
-                      aria-label={t('buyMeACoffeeButtonAria')}
-                    >
-                      {t('buyMeACoffeeButton')}
-                    </a>
-                  </p>
-                </div>
-                <div className="text-slate-300 flex flex-row flex-wrap justify-center items-center gap-x-3 gap-y-1">
-                  <button
-                    onClick={() => setActiveModal('disclaimer')}
-                    className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1 text-xs"
-                  >
-                    {t('disclaimerLinkText')}
-                  </button>
-                  <button
-                    onClick={() => setActiveModal('privacyPolicy')}
-                    className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1 text-xs"
-                  >
-                    {t('privacyPolicyLinkText')}
-                  </button>
-                  <button
-                    onClick={() => setActiveModal('termsOfService')}
-                    className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1 text-xs"
-                  >
-                    {t('termsOfServiceLinkText')}
-                  </button>
-                </div>
-              </div>
-              {/* PC: Horizontal layout */}
-              <div className="hidden sm:flex sm:justify-center sm:items-center sm:gap-6 text-slate-300">
-                <div className="bg-gradient-to-r from-sky-500/10 to-indigo-500/10 border border-sky-500/20 rounded-lg px-3 py-2 hover:from-sky-500/15 hover:to-indigo-500/15 hover:border-sky-400/30 transition-all duration-200 hover:scale-105">
-                  <p className="text-sm">
                     {t('buyMeACoffeeText')}{' '}
                     <a
                       href="https://buymeacoffee.com/asofia"
@@ -194,24 +156,26 @@ const App: React.FC = () => {
                     </a>
                   </p>
                 </div>
-                <button
-                  onClick={() => setActiveModal('disclaimer')}
-                  className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1"
-                >
-                  {t('disclaimerLinkText')}
-                </button>
-                <button
-                  onClick={() => setActiveModal('privacyPolicy')}
-                  className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1"
-                >
-                  {t('privacyPolicyLinkText')}
-                </button>
-                <button
-                  onClick={() => setActiveModal('termsOfService')}
-                  className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1"
-                >
-                  {t('termsOfServiceLinkText')}
-                </button>
+                <div className="text-slate-300 flex flex-row flex-wrap justify-center items-center gap-x-3 gap-y-1">
+                  <button
+                    onClick={() => setActiveModal('disclaimer')}
+                    className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1"
+                  >
+                    {t('disclaimerLinkText')}
+                  </button>
+                  <button
+                    onClick={() => setActiveModal('privacyPolicy')}
+                    className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1"
+                  >
+                    {t('privacyPolicyLinkText')}
+                  </button>
+                  <button
+                    onClick={() => setActiveModal('termsOfService')}
+                    className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1"
+                  >
+                    {t('termsOfServiceLinkText')}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
