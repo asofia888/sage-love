@@ -22,6 +22,7 @@ const ENV_VARS: EnvVarDef[] = [
   { name: 'UPSTASH_REDIS_REST_URL', required: false, description: 'Upstash Redis REST URL (required for rate limiting)' },
   { name: 'UPSTASH_REDIS_REST_TOKEN', required: false, description: 'Upstash Redis REST token (required for rate limiting)' },
   { name: 'ADMIN_TOKEN', required: false, description: 'Admin dashboard access token' },
+  { name: 'ALLOWED_ORIGIN', required: false, description: 'Comma-separated Origin allowlist for /api/chat (set in vercel.json)' },
 ];
 
 export interface EnvValidationResult {
@@ -67,4 +68,20 @@ export function validateEnv(): EnvValidationResult {
   }
 
   return { valid: errors.length === 0, errors, warnings };
+}
+
+/**
+ * Browser Origin allowlist, comma-separated in ALLOWED_ORIGIN (vercel.json).
+ * When the env var is unset (e.g. local dev), every origin is allowed.
+ * Requests without an Origin header also pass: the check exists to stop other
+ * websites from calling this API out of a browser, not to block non-browser
+ * clients (which can forge any header anyway).
+ */
+export function isOriginAllowed(origin: string | null): boolean {
+  const allowed = process.env.ALLOWED_ORIGIN;
+  if (!allowed || !origin) return true;
+
+  const normalize = (o: string) => o.trim().replace(/\/+$/, '').toLowerCase();
+  const allowlist = allowed.split(',').map(normalize).filter(Boolean);
+  return allowlist.includes(normalize(origin));
 }

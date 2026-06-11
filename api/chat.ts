@@ -4,7 +4,7 @@ import { parseGeminiError, buildErrorResponse, ValidationError, APIError } from 
 import { retryWithBackoff, withTimeout, RetryStatsTracker } from './retry-utils';
 import { geminiCircuitBreaker } from './circuit-breaker';
 import { getModelWithCache, calculateCacheSavings, getCacheStats } from './context-cache';
-import { API_CONFIG, validateEnv } from './config';
+import { API_CONFIG, validateEnv, isOriginAllowed } from './config';
 import { getOrCreateSession, attachSessionCookie, SessionResult } from './session';
 import { buildSystemInstruction } from './system-instruction';
 
@@ -60,9 +60,16 @@ function sseEvent(payload: object): string {
 function buildPrompt(conversationHistory: unknown, message: string): string {
   let prompt = '';
   if (Array.isArray(conversationHistory)) {
-    const recentHistory = conversationHistory.slice(-10);
+    // The history comes straight from the client; drop entries whose
+    // sender/text are not strings so objects don't stringify into the prompt.
+    const recentHistory = conversationHistory
+      .filter((msg): msg is { sender: string; text: string } =>
+        !!msg && typeof msg === 'object' &&
+        typeof (msg as Record<string, unknown>).sender === 'string' &&
+        typeof (msg as Record<string, unknown>).text === 'string')
+      .slice(-10);
     const historyText = recentHistory
-      .map((msg: { sender: string; text: string }) =>
+      .map((msg) =>
         `${msg.sender === 'user' ? 'User' : 'Assistant'}: ${msg.text}`)
       .join('\n');
     if (historyText) {
@@ -78,6 +85,18 @@ export default async function handler(req: Request) {
   if (req.method !== 'POST') {
     return new Response(JSON.stringify({ error: 'Method Not Allowed' }), {
       status: 405,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  const origin = req.headers.get('origin');
+  if (!isOriginAllowed(origin)) {
+    console.warn(`Blocked request from disallowed origin: ${origin}`);
+    return new Response(JSON.stringify({
+      code: 'FORBIDDEN_ORIGIN',
+      details: 'Origin not allowed.',
+    }), {
+      status: 403,
       headers: { 'Content-Type': 'application/json' },
     });
   }
