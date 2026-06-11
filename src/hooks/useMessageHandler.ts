@@ -30,7 +30,7 @@ export const useMessageHandler = ({
   messages, 
   setMessages 
 }: UseMessageHandlerProps): UseMessageHandlerReturn => {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<ApiError | null>(null);
   
@@ -40,8 +40,7 @@ export const useMessageHandler = ({
     checkMessageHistory,
     lastCrisisResult,
     isCrisisModalOpen,
-    closeCrisisModal,
-    getCrisisGuidance
+    closeCrisisModal
   } = useCrisisDetection({
     enabled: true,
     checkHistoryLength: 5,
@@ -52,9 +51,9 @@ export const useMessageHandler = ({
     if (isLoading) return;
     setError(null);
 
-    // 危機検出チェック
-    const crisisResult = checkForCrisis(userInput);
-    
+    // 危機検出チェック（モーダル表示用。プロンプトへの反映はサーバー側で行う）
+    checkForCrisis(userInput);
+
     // ユーザーメッセージを作成
     const newUserMessage: ChatMessage = {
       id: `user-${Date.now()}`,
@@ -81,26 +80,14 @@ export const useMessageHandler = ({
     setIsLoading(true);
 
     try {
-        // システムプロンプトに重複回避指示を追加
-        let baseSystemInstruction = t('systemInstructionForSage');
-        const duplicateAvoidancePrompt = DuplicateAvoidanceService.generateDuplicateAvoidancePrompt(historyForApi);
-        
-        // 危機が検出された場合はシステムプロンプトを調整
-        if (crisisResult.isCrisis) {
-          const crisisGuidance = getCrisisGuidance(crisisResult);
-          baseSystemInstruction += `\n\n【重要な注意】ユーザーは現在困難な状況にある可能性があります。以下のガイダンスを参考に、共感的で支援的な応答を心がけてください：\n${crisisGuidance}\n\nまた、専門的な支援を受けることの重要性を優しく伝えてください。`;
-        }
-        
-        const enhancedSystemInstruction = baseSystemInstruction + duplicateAvoidancePrompt;
-        
-        // 現在の言語を取得
+        // 現在の言語を取得（システムプロンプト・危機ガイダンス・重複回避指示は
+        // すべてサーバー側で言語別に構築される）
         const currentLang = i18n.language.split('-')[0];
-        
+
         // ストリーミングレスポンスを取得
         const stream = geminiService.streamChatWithTranslation(
-            userInput, 
-            historyForApi, 
-            enhancedSystemInstruction,
+            userInput,
+            historyForApi,
             currentLang
         );
         
@@ -144,7 +131,7 @@ export const useMessageHandler = ({
         );
         setIsLoading(false);
     }
-  }, [messages, isLoading, t, i18n.language, setMessages]);
+  }, [messages, isLoading, i18n.language, setMessages]);
 
   return {
     handleSendMessage,

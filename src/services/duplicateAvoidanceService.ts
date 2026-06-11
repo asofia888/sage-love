@@ -1,12 +1,21 @@
-import { ChatMessage } from '../types';
+/**
+ * 履歴メッセージの構造的最小型。フロントの ChatMessage（sender: 'ai'）と
+ * APIワイヤ形式（sender: 'assistant'）の両方を受けられるよう、サーバー側
+ * （api/system-instruction.ts）からも利用される。
+ */
+export interface HistoryMessageLike {
+  sender: string;
+  text: string;
+  isTyping?: boolean;
+}
 
 export class DuplicateAvoidanceService {
   /**
    * 会話履歴から最近のAI応答を抽出し、重複回避のためのプロンプト拡張を生成
    */
-  static generateDuplicateAvoidancePrompt(history: ChatMessage[]): string {
+  static generateDuplicateAvoidancePrompt(history: HistoryMessageLike[]): string {
     const recentAIResponses = history
-      .filter(msg => msg.sender === 'ai' && !msg.isTyping && msg.text.trim().length > 0)
+      .filter(msg => (msg.sender === 'ai' || msg.sender === 'assistant') && !msg.isTyping && msg.text.trim().length > 0)
       .slice(-3) // 最近の3つの応答
       .map(msg => msg.text);
 

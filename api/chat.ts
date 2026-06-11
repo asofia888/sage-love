@@ -6,6 +6,7 @@ import { geminiCircuitBreaker } from './circuit-breaker';
 import { getModelWithCache, calculateCacheSavings, getCacheStats } from './context-cache';
 import { API_CONFIG, validateEnv } from './config';
 import { getOrCreateSession, attachSessionCookie, SessionResult } from './session';
+import { buildSystemInstruction } from './system-instruction';
 
 export const config = {
   runtime: 'edge',
@@ -99,7 +100,10 @@ export default async function handler(req: Request) {
 
   try {
     const body = await req.json();
-    const { message, conversationHistory, systemInstruction, stream: streamRequested } = body || {};
+    // systemInstruction is intentionally NOT read from the body — the prompt
+    // is built server-side (see api/system-instruction.ts) so the endpoint
+    // cannot be repurposed as a generic Gemini proxy.
+    const { message, conversationHistory, language, stream: streamRequested } = body || {};
 
     // Get client IP and session ID for rate limiting
     const clientIP = req.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
@@ -136,7 +140,7 @@ export default async function handler(req: Request) {
       );
     }
 
-    if (!message) {
+    if (!message || typeof message !== 'string') {
       throw new ValidationError('Message is required.');
     }
 
@@ -160,9 +164,11 @@ export default async function handler(req: Request) {
       { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
     ];
 
+    const systemInstruction = buildSystemInstruction(language, message, conversationHistory);
+
     const { model, cached, tokensSaved } = await getModelWithCache(
       genAI,
-      systemInstruction || '',
+      systemInstruction,
       generationConfig,
       safetySettings
     );

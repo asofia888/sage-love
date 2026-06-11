@@ -10,7 +10,6 @@ import { API } from '../config/constants';
 
 export interface ChatRequest {
   message: string;
-  systemInstruction?: string;
   conversationHistory?: Array<{
     sender: 'user' | 'assistant';
     text: string;
@@ -102,7 +101,6 @@ class ApiService {
         },
         body: JSON.stringify({
           message: request.message,
-          systemInstruction: request.systemInstruction,
           conversationHistory: request.conversationHistory,
           language: request.language || 'ja'
         }),
@@ -167,7 +165,6 @@ class ApiService {
         },
         body: JSON.stringify({
           message: request.message,
-          systemInstruction: request.systemInstruction,
           conversationHistory: request.conversationHistory,
           language: request.language || 'ja',
           stream: true,

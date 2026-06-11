@@ -17,18 +17,18 @@ export function initializeTranslationService(_apiKey: string) {
 }
 
 /**
- * Secure chat function using serverless backend
+ * Secure chat function using serverless backend.
+ * The system prompt is built server-side from the language — the client no
+ * longer sends any instruction text.
  */
 export async function sendSecureChat(
   message: string,
   history: ChatMessage[],
-  systemInstruction: string,
   language: string = 'ja'
 ): Promise<string> {
   try {
     const request: ChatRequest = {
       message,
-      systemInstruction,
       conversationHistory: history.map(msg => ({
         sender: msg.sender === 'user' ? 'user' : 'assistant',
         text: msg.text,
@@ -83,10 +83,9 @@ function translateApiError(error: unknown): Error {
  */
 export async function* streamChat(
     message: string,
-    history: ChatMessage[],
-    systemInstruction: string
+    history: ChatMessage[]
 ): AsyncGenerator<string, void, unknown> {
-  yield* streamChatWithTranslation(message, history, systemInstruction, 'ja');
+  yield* streamChatWithTranslation(message, history, 'ja');
 }
 
 /**
@@ -96,12 +95,10 @@ export async function* streamChat(
 export async function* streamChatWithTranslation(
     message: string,
     history: ChatMessage[],
-    systemInstruction: string,
     targetLanguage: string = 'ja'
 ): AsyncGenerator<string, void, unknown> {
   const request: ChatRequest = {
     message,
-    systemInstruction,
     conversationHistory: history.map(msg => ({
       sender: msg.sender === 'user' ? 'user' : 'assistant',
       text: msg.text,
