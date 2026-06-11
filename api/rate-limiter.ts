@@ -284,6 +284,32 @@ export interface RateLimitResult {
 }
 
 /**
+ * Content limit checks. These need no Redis, so they must run unconditionally —
+ * even when Redis is unavailable and the rate-limit checks are bypassed.
+ */
+function checkContentLimits(messageLength: number, historyLength: number): RateLimitResult | null {
+  if (messageLength > RATE_LIMIT_CONFIG.content.maxMessageLength) {
+    return {
+      blocked: true,
+      reason: 'MESSAGE_TOO_LONG',
+      message: `Message too long. Maximum ${RATE_LIMIT_CONFIG.content.maxMessageLength} characters allowed.`,
+      retryAfter: 0,
+    };
+  }
+
+  if (historyLength > RATE_LIMIT_CONFIG.content.maxHistoryMessages) {
+    return {
+      blocked: true,
+      reason: 'HISTORY_TOO_LONG',
+      message: 'Too many messages in conversation history.',
+      retryAfter: 0,
+    };
+  }
+
+  return null;
+}
+
+/**
  * Check if a request should be blocked based on rate limits
  */
 export async function shouldBlockRequest(
@@ -292,7 +318,13 @@ export async function shouldBlockRequest(
   messageLength: number,
   historyLength: number = 0
 ): Promise<RateLimitResult> {
-  // If Redis is not configured, allow all requests with a warning
+  // 1. Check content limits first (no Redis needed)
+  const contentViolation = checkContentLimits(messageLength, historyLength);
+  if (contentViolation) {
+    return contentViolation;
+  }
+
+  // If Redis is not configured, bypass rate limiting (content limits above still apply)
   if (!redis || !ipRateLimiter || !burstRateLimiter || !sessionHourlyRateLimiter || !sessionDailyRateLimiter) {
     console.warn('⚠️ Rate limiting bypassed: Redis not configured');
     return {
@@ -302,25 +334,6 @@ export async function shouldBlockRequest(
   }
 
   try {
-    // 1. Check content limits (no Redis needed)
-    if (messageLength > RATE_LIMIT_CONFIG.content.maxMessageLength) {
-      return {
-        blocked: true,
-        reason: 'MESSAGE_TOO_LONG',
-        message: `Message too long. Maximum ${RATE_LIMIT_CONFIG.content.maxMessageLength} characters allowed.`,
-        retryAfter: 0,
-      };
-    }
-
-    if (historyLength > RATE_LIMIT_CONFIG.content.maxHistoryMessages) {
-      return {
-        blocked: true,
-        reason: 'HISTORY_TOO_LONG',
-        message: 'Too many messages in conversation history.',
-        retryAfter: 0,
-      };
-    }
-
     // 2. Check global cost limits
     const dailyCost = await getDailyCost();
     const hourlyCost = await getHourlyCost();
