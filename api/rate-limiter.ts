@@ -111,8 +111,13 @@ function estimateRequestCost(messageLength: number, historyLength: number = 0): 
   return Math.round((inputCost + outputCost) * 10000) / 10000; // Round to 4 decimal places
 }
 
+// Costs are stored in Redis as integers (dollars * COST_SCALE) because INCRBY
+// only accepts integers — passing a fractional dollar amount makes the command
+// fail and silently drops the cost record.
+const COST_SCALE = 10000; // preserves 4 decimal places
+
 /**
- * Get current daily cost from Redis
+ * Get current daily cost from Redis (in dollars)
  */
 async function getDailyCost(): Promise<number> {
   if (!redis) return 0;
@@ -121,7 +126,7 @@ async function getDailyCost(): Promise<number> {
     const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
     const costKey = `cost:daily:${today}`;
     const cost = await redis.get<number>(costKey);
-    return cost || 0;
+    return (cost || 0) / COST_SCALE;
   } catch (error) {
     console.error('Error getting daily cost:', error);
     return 0;
@@ -129,7 +134,7 @@ async function getDailyCost(): Promise<number> {
 }
 
 /**
- * Get current hourly cost from Redis
+ * Get current hourly cost from Redis (in dollars)
  */
 async function getHourlyCost(): Promise<number> {
   if (!redis) return 0;
@@ -138,7 +143,7 @@ async function getHourlyCost(): Promise<number> {
     const currentHour = new Date().toISOString().substring(0, 13); // YYYY-MM-DDTHH
     const costKey = `cost:hourly:${currentHour}`;
     const cost = await redis.get<number>(costKey);
-    return cost || 0;
+    return (cost || 0) / COST_SCALE;
   } catch (error) {
     console.error('Error getting hourly cost:', error);
     return 0;
@@ -146,10 +151,14 @@ async function getHourlyCost(): Promise<number> {
 }
 
 /**
- * Record actual cost after request completion
+ * Record actual cost (in dollars) after request completion
  */
 export async function recordActualCost(cost: number): Promise<void> {
   if (!redis || cost <= 0) return;
+
+  // Store as integer (multiply by COST_SCALE) — same scheme as cache savings
+  const scaledCost = Math.round(cost * COST_SCALE);
+  if (scaledCost <= 0) return;
 
   try {
     const today = new Date().toISOString().split('T')[0];
@@ -157,12 +166,12 @@ export async function recordActualCost(cost: number): Promise<void> {
 
     // Increment daily cost (expires after 2 days)
     const dailyKey = `cost:daily:${today}`;
-    await redis.incrby(dailyKey, cost);
+    await redis.incrby(dailyKey, scaledCost);
     await redis.expire(dailyKey, 172800); // 2 days in seconds
 
     // Increment hourly cost (expires after 2 hours)
     const hourlyKey = `cost:hourly:${currentHour}`;
-    await redis.incrby(hourlyKey, cost);
+    await redis.incrby(hourlyKey, scaledCost);
     await redis.expire(hourlyKey, 7200); // 2 hours in seconds
 
     // Log high-cost requests
