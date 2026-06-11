@@ -79,6 +79,9 @@ export const useMessageHandler = ({
     setMessages(prev => [...prev, newUserMessage, aiPlaceholderMessage]);
     setIsLoading(true);
 
+    // catch 節で部分応答を保持できるよう try の外で宣言する
+    let fullText = '';
+
     try {
         // 現在の言語を取得（システムプロンプト・危機ガイダンス・重複回避指示は
         // すべてサーバー側で言語別に構築される）
@@ -90,9 +93,8 @@ export const useMessageHandler = ({
             historyForApi,
             currentLang
         );
-        
+
         // ストリーミングレスポンスを処理
-        let fullText = '';
         for await (const chunk of stream) {
             fullText += chunk;
             setMessages(prev => 
@@ -122,8 +124,11 @@ export const useMessageHandler = ({
         const apiError = ErrorService.normalizeError(e);
         ErrorService.logError(apiError, 'message-handler');
         setError(apiError);
-        // エラー時はプレースホルダーを削除
-        setMessages(prev => prev.filter(m => m.id !== aiMessageId));
+        // 途中までの応答が届いていればメッセージとして残し（エラーバナーのみ表示）、
+        // 1文字も届いていない場合だけプレースホルダーを削除する
+        if (!fullText.trim()) {
+            setMessages(prev => prev.filter(m => m.id !== aiMessageId));
+        }
     } finally {
         // ストリーミング完了後、typing状態を解除
         setMessages(prev => 

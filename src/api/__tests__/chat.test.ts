@@ -172,15 +172,9 @@ describe('Chat API Handler', () => {
       );
     });
 
-    it('should limit conversation history to last 10 messages', async () => {
-      const mockResponse = {
-        response: {
-          text: () => '履歴制限テスト'
-        }
-      };
-      
-      mockGenerateContent.mockResolvedValue(mockResponse);
-
+    it('should reject conversation history longer than 10 messages', async () => {
+      // 履歴10件超はプロンプト組み立て前に入力検証で拒否される
+      // （rate-limiter.ts の checkContentLimits / maxHistoryMessages）
       const conversationHistory = Array.from({ length: 15 }, (_, i) => ({
         sender: i % 2 === 0 ? 'user' : 'assistant',
         text: `メッセージ ${i + 1}`,
@@ -199,14 +193,48 @@ describe('Chat API Handler', () => {
       });
 
       const response = await chatHandler.default(request);
-      
+      const data = await response.json();
+
+      expect(response.status).toBe(429);
+      expect(data.code).toBe('HISTORY_TOO_LONG');
+      expect(mockGenerateContent).not.toHaveBeenCalled();
+    });
+
+    it('should accept conversation history of exactly 10 messages', async () => {
+      const mockResponse = {
+        response: {
+          text: () => '履歴上限テスト'
+        }
+      };
+
+      mockGenerateContent.mockResolvedValue(mockResponse);
+
+      const conversationHistory = Array.from({ length: 10 }, (_, i) => ({
+        sender: i % 2 === 0 ? 'user' : 'assistant',
+        text: `メッセージ ${i + 1}`,
+        timestamp: new Date().toISOString()
+      }));
+
+      const request = new Request('http://localhost/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: '新しい質問',
+          conversationHistory
+        })
+      });
+
+      const response = await chatHandler.default(request);
+
       expect(response.status).toBe(200);
-      
-      // Should include recent messages (6-15) but not older ones (1-5)
+
+      // 上限ちょうどの履歴は最初から最後まで全件プロンプトに含まれる
+      // （\n 付きで照合し「メッセージ 10」への部分一致を防ぐ）
       const callArgs = mockGenerateContent.mock.calls[0][0];
-      expect(callArgs).toContain('メッセージ 15');
-      expect(callArgs).toContain('メッセージ 6');
-      expect(callArgs).not.toContain('メッセージ 5');
+      expect(callArgs).toContain('メッセージ 1\n');
+      expect(callArgs).toContain('メッセージ 10');
     });
 
     it('should handle Gemini API errors', async () => {
