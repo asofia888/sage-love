@@ -90,6 +90,9 @@ export function initSentry(): void {
         // Rate limit (expected)
         'ERR_RATE_LIMIT',
         'ERR_SESSION_LIMIT',
+        // Content limits (expected user input errors, not bugs)
+        'MESSAGE_TOO_LONG',
+        'HISTORY_TOO_LONG',
       ],
 
       // Performance integrations

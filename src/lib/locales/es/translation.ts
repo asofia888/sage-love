@@ -349,6 +349,8 @@ Estos términos de servicio entran en vigor cuando los usuarios utilizan este se
   "errorQuota": "Parece que muchos buscan sabiduría en este momento. Por favor, inténtalo de nuevo en un momento. (QUOTA_ERR)",
   "errorModel": "Podría haber un problema con la configuración interna del servicio. Sería útil si pudieras informar al administrador. (MODEL_ERR)",
   "errorGeneric": "Surgió un problema al tejer palabras de sabiduría. Por favor, inténtalo de nuevo más tarde. (GEN_ERR)",
+  "MESSAGE_TOO_LONG": "Tu mensaje es un poco largo. Por favor, redúcelo a 1000 caracteres e inténtalo de nuevo.",
+  "HISTORY_TOO_LONG": "Esta conversación se ha alargado. Guarda lo que sea importante, usa «Limpiar conversación» y luego continúa.",
   "languageSelectorLabel": "Seleccionar idioma",
   "textSizeLabel": "Tamaño del Texto",
   "textSizeNormal": "Normal",

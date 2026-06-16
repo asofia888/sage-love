@@ -54,13 +54,18 @@ function translateApiError(error: unknown): Error {
   if (error instanceof Error && error.message.startsWith('API_ERROR:')) {
     const [, errorCode] = error.message.split(':');
     switch (errorCode) {
+      // Content-limit errors carry actionable guidance (shorten the message /
+      // clear the conversation). Keep the original API_ERROR so the UI can show
+      // the specific MESSAGE_TOO_LONG / HISTORY_TOO_LONG text instead of the
+      // generic rate-limit message (ErrorService.parseApiErrorFormat reads the code).
+      case 'MESSAGE_TOO_LONG':
+      case 'HISTORY_TOO_LONG':
+        return error;
       case 'RATE_LIMIT_EXCEEDED':
       case 'IP_RATE_LIMIT':
       case 'SESSION_HOURLY_LIMIT':
       case 'SESSION_DAILY_LIMIT':
       case 'BURST_LIMIT_EXCEEDED':
-      case 'MESSAGE_TOO_LONG':
-      case 'HISTORY_TOO_LONG':
         return new Error('ERR_RATE_LIMIT');
       case 'SESSION_LIMIT_EXCEEDED':
         return new Error('ERR_SESSION_LIMIT');

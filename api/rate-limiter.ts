@@ -20,8 +20,8 @@ const RATE_LIMIT_CONFIG = {
   // Global cost controls
   global: {
     maxCostPerHour: 5.0,    // $5 per hour limit
-    maxCostPerDay: 50.0,    // $50 per day limit
-    emergencyStopCost: 75.0, // Emergency stop at $75
+    maxCostPerDay: 10.0,    // $10 per day limit
+    emergencyStopCost: 15.0, // Emergency stop at $15 (must stay above maxCostPerDay)
   },
 
   // Content-based limits

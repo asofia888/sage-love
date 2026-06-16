@@ -36,14 +36,16 @@ export interface AIMessage extends BaseMessage {
 export type ChatMessage = UserMessage | AIMessage;
 
 // エラー型の強化
-export type ErrorCode = 
+export type ErrorCode =
   | 'errorMessageDefault'
   | 'errorAuth'
   | 'errorQuota'
   | 'errorNoApiKeyConfig'
   | 'errorNetwork'
   | 'errorTranslation'
-  | 'errorStreaming';
+  | 'errorStreaming'
+  | 'MESSAGE_TOO_LONG'
+  | 'HISTORY_TOO_LONG';
 
 export interface ApiError {
   code: ErrorCode;

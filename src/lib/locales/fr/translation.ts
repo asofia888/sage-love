@@ -303,6 +303,8 @@ Ces conditions de service entrent en vigueur lorsque les utilisateurs utilisent 
   "errorQuota": "Il semble que beaucoup cherchent la sagesse en ce moment. Veuillez réessayer dans un moment. (QUOTA_ERR)",
   "errorModel": "Il pourrait y avoir un problème avec les paramètres internes du service. Il serait utile si vous pouviez en informer l'administrateur. (MODEL_ERR)",
   "errorGeneric": "Un problème est survenu lors du tissage de mots de sagesse. Veuillez réessayer plus tard. (GEN_ERR)",
+  "MESSAGE_TOO_LONG": "Votre message est un peu trop long. Veuillez le limiter à 1000 caractères et réessayer.",
+  "HISTORY_TOO_LONG": "Cette conversation est devenue longue. Veuillez sauvegarder ce qui est important, utilisez « Effacer la conversation », puis poursuivez.",
   "languageSelectorLabel": "Sélectionner la langue",
   "textSizeLabel": "Taille du texte",
   "textSizeNormal": "Normal",
