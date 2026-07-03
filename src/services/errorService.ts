@@ -72,6 +72,7 @@ export class ErrorService {
   private static readonly WIRE_CODE_MAP: Record<string, ErrorCode> = {
     RATE_LIMIT_EXCEEDED: 'errorRateLimit',
     IP_RATE_LIMIT: 'errorRateLimit',
+    IP_DAILY_LIMIT: 'errorRateLimit',
     BURST_LIMIT_EXCEEDED: 'errorBurstLimit',
     SESSION_HOURLY_LIMIT: 'errorSessionLimit',
     SESSION_DAILY_LIMIT: 'errorSessionLimit',

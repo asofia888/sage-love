@@ -37,11 +37,12 @@ vi.mock('@upstash/ratelimit', () => {
   return { Ratelimit };
 });
 
-// h.limiters のインデックス（生成順）
+// h.limiters のインデックス（生成順: ip → ipDaily → burst → sessionHourly → sessionDaily）
 const IP = 0;
-const BURST = 1;
-const SESSION_HOURLY = 2;
-const SESSION_DAILY = 3;
+const IP_DAILY = 1;
+const BURST = 2;
+const SESSION_HOURLY = 3;
+const SESSION_DAILY = 4;
 
 const COST_SCALE = 10000;
 
@@ -83,9 +84,10 @@ describe('rate-limiter (Redis paths)', () => {
     expect(result.blocked).toBe(false);
     expect(result.estimatedCost).toBeGreaterThan(0);
     expect(result.remainingRequests).toBeDefined();
-    // 4リミッターすべて評価される（ip/burst は IP、session系は sessionId がキー）
-    expect(h.limiters).toHaveLength(4);
+    // 5リミッターすべて評価される（ip/ipDaily/burst は IP、session系は sessionId がキー）
+    expect(h.limiters).toHaveLength(5);
     expect(h.limiters[IP].limit).toHaveBeenCalledWith('1.2.3.4');
+    expect(h.limiters[IP_DAILY].limit).toHaveBeenCalledWith('1.2.3.4');
     expect(h.limiters[BURST].limit).toHaveBeenCalledWith('1.2.3.4');
     expect(h.limiters[SESSION_HOURLY].limit).toHaveBeenCalledWith('session-1');
     expect(h.limiters[SESSION_DAILY].limit).toHaveBeenCalledWith('session-1');
@@ -117,6 +119,7 @@ describe('rate-limiter (Redis paths)', () => {
 
   it.each([
     [BURST, 'BURST_LIMIT_EXCEEDED'],
+    [IP_DAILY, 'IP_DAILY_LIMIT'],
     [IP, 'IP_RATE_LIMIT'],
     [SESSION_HOURLY, 'SESSION_HOURLY_LIMIT'],
     [SESSION_DAILY, 'SESSION_DAILY_LIMIT'],

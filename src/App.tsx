@@ -139,8 +139,19 @@ const App: React.FC = () => {
         </div>
 
         {error && (
-          <div className="p-4 bg-red-700/80 text-white text-center backdrop-blur-sm" role="alert" onClick={() => setError(null)}>
+          <div className="relative p-4 pe-12 bg-red-700/80 text-white text-center backdrop-blur-sm" role="alert">
              <p>{t('errorSageResponsePrefix')}{i18n.exists(error.code) ? t(error.code) : t('errorMessageDefault')}</p>
+             <button
+               type="button"
+               onClick={() => setError(null)}
+               aria-label={t('closeButton')}
+               title={t('closeButton')}
+               className="absolute top-1/2 -translate-y-1/2 end-3 p-1.5 rounded-full text-white/90 hover:text-white hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/70 transition-colors"
+             >
+               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+               </svg>
+             </button>
           </div>
         )}
 

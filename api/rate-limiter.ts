@@ -9,6 +9,10 @@ const RATE_LIMIT_CONFIG = {
     window: '15 m',         // per 15 minutes
     burstLimit: 3,          // Max 3 requests per minute
     burstWindow: '1 m',     // 1 minute burst window
+    // IP単位の日次上限。署名Cookieを毎回捨てる濫用でもセッション制限を
+    // すり抜けられないための天井。NAT/CGNAT共有IPを考慮しセッション日次(30)より
+    // 十分高くしつつ、1IPで日次コスト上限を食い潰せない値に抑える
+    daily: 100,             // 100 requests per day per IP
   },
 
   // Per session limits
@@ -38,6 +42,7 @@ const RATE_LIMIT_CONFIG = {
 // Initialize Redis client only if credentials are available
 let redis: Redis | null = null;
 let ipRateLimiter: Ratelimit | null = null;
+let ipDailyRateLimiter: Ratelimit | null = null;
 let burstRateLimiter: Ratelimit | null = null;
 let sessionHourlyRateLimiter: Ratelimit | null = null;
 let sessionDailyRateLimiter: Ratelimit | null = null;
@@ -61,6 +66,14 @@ if (isRedisConfigured()) {
       limiter: Ratelimit.slidingWindow(RATE_LIMIT_CONFIG.ip.requests, RATE_LIMIT_CONFIG.ip.window as `${number} m`),
       analytics: true,
       prefix: 'ratelimit:ip',
+    });
+
+    // IP-based daily limiter (cookie-drop abuse ceiling)
+    ipDailyRateLimiter = new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(RATE_LIMIT_CONFIG.ip.daily, '1 d'),
+      analytics: true,
+      prefix: 'ratelimit:ip:daily',
     });
 
     // Burst rate limiter (fixed window for quick bursts)
@@ -274,7 +287,7 @@ export async function shouldBlockRequest(
   }
 
   // If Redis is not configured, bypass rate limiting (content limits above still apply)
-  if (!redis || !ipRateLimiter || !burstRateLimiter || !sessionHourlyRateLimiter || !sessionDailyRateLimiter) {
+  if (!redis || !ipRateLimiter || !ipDailyRateLimiter || !burstRateLimiter || !sessionHourlyRateLimiter || !sessionDailyRateLimiter) {
     console.warn('⚠️ Rate limiting bypassed: Redis not configured');
     return {
       blocked: false,
@@ -348,7 +361,18 @@ export async function shouldBlockRequest(
       };
     }
 
-    // 5. Check IP-based rate limit
+    // 5. Check IP-based daily limit (cookie-drop abuse ceiling)
+    const ipDailyResult = await ipDailyRateLimiter.limit(clientIP);
+    if (!ipDailyResult.success) {
+      return {
+        blocked: true,
+        reason: 'IP_DAILY_LIMIT',
+        message: 'Daily request limit reached for this network. Please try again tomorrow.',
+        retryAfter: getTimeUntilReset('daily'),
+      };
+    }
+
+    // 6. Check IP-based rate limit (short window)
     const ipResult = await ipRateLimiter.limit(clientIP);
     if (!ipResult.success) {
       return {

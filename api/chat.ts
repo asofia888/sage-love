@@ -53,6 +53,19 @@ function sseEvent(payload: object): string {
 }
 
 /**
+ * ユーザー入力に含まれる行頭の役割マーカー（User:/Assistant:/System:）を無効化する。
+ * これらがそのままプロンプトに入ると、攻撃者が偽の会話ターンを注入して
+ * 文脈を乗っ取れる余地が生まれるため、コロンを全角に置換して構文的に殺す。
+ * 本文は読めるまま保持される（ペルソナはサーバー側で固定済みだが多層防御）。
+ */
+function sanitizeRoleMarkers(text: string): string {
+  return text.replace(
+    /(^|\n)([ \t]*)(user|assistant|system)([ \t]*):/gi,
+    (_m, br, ws, role) => `${br}${ws}${role}：`
+  );
+}
+
+/**
  * Build the prompt text fed to Gemini. System instruction is attached to the
  * model separately so context caching can deduplicate it.
  */
@@ -69,13 +82,13 @@ function buildPrompt(conversationHistory: unknown, message: string): string {
       .slice(-10);
     const historyText = recentHistory
       .map((msg) =>
-        `${msg.sender === 'user' ? 'User' : 'Assistant'}: ${msg.text}`)
+        `${msg.sender === 'user' ? 'User' : 'Assistant'}: ${sanitizeRoleMarkers(msg.text)}`)
       .join('\n');
     if (historyText) {
       prompt += `\n\nConversation History:\n${historyText}`;
     }
   }
-  prompt += `\n\nUser: ${message}\nAssistant:`;
+  prompt += `\n\nUser: ${sanitizeRoleMarkers(message)}\nAssistant:`;
   return prompt;
 }
 
@@ -164,9 +177,10 @@ export default async function handler(req: Request) {
     }
 
     if (!envValidation.valid) {
-      throw new ValidationError(
-        'Server configuration error: ' + envValidation.errors.join('; ')
-      );
+      // 具体的な不足env名はサーバーログにのみ残し、クライアントには汎用文言を返す
+      // （どの環境変数が欠けているか等の構成情報を発信者に漏らさない）
+      console.error('Server configuration invalid:', envValidation.errors.join('; '));
+      throw new ValidationError('Server configuration error.');
     }
 
     if (!message || typeof message !== 'string') {
