@@ -113,14 +113,14 @@ Sage's Love AIは、React + Vite フロントエンドと Vercel Edge Functions 
 sage-love/
 ├── api/                          # Backend (Vercel Edge Functions)
 │   ├── chat.ts                   # Main chat endpoint
-│   ├── stats.ts                  # Statistics endpoint
-│   ├── health.js                 # Health check endpoint
+│   ├── health.ts                 # Health check endpoint
+│   ├── session.ts                # HMAC-signed session cookie
 │   ├── errors.ts                 # Custom error classes
 │   ├── rate-limiter.ts           # Rate limiting logic
 │   ├── circuit-breaker.ts        # Circuit breaker pattern
 │   ├── retry-utils.ts            # Retry utilities
-│   ├── context-cache.ts          # Context caching for cost optimization
-│   └── admin/                    # Admin endpoints
+│   ├── system-instruction.ts     # Server-side prompt builder
+│   └── admin/stats.ts            # Admin statistics endpoint (ADMIN_TOKEN)
 │
 ├── src/                          # Frontend (React + Vite)
 │   ├── components/               # React components
@@ -374,78 +374,6 @@ src/lib/locales/
 ├── fr/translation.ts    # French
 ├── hi/translation.ts    # Hindi
 └── ar/translation.ts    # Arabic
-```
-
-## Context Caching
-
-システムプロンプトをキャッシュしてAPIコストを最大75%削減します。
-
-### Architecture
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    Chat Request                              │
-└───────────────────────────┬─────────────────────────────────┘
-                            │
-                            ▼
-┌─────────────────────────────────────────────────────────────┐
-│              Context Cache Manager                           │
-│  ┌─────────────────────────────────────────────────────────┐│
-│  │  1. Check cache validity                                ││
-│  │  2. If miss: Cache system instruction (~2500 tokens)    ││
-│  │  3. If hit: Reuse cached instruction (75% cost saving)  ││
-│  └─────────────────────────────────────────────────────────┘│
-└───────────────────────────┬─────────────────────────────────┘
-                            │
-                            ▼
-┌─────────────────────────────────────────────────────────────┐
-│              Gemini API with Cached Context                  │
-│  • System instruction: From cache (reduced cost)            │
-│  • User message: Normal cost                                │
-└─────────────────────────────────────────────────────────────┘
-```
-
-### Configuration
-
-| Parameter | Value | Description |
-|-----------|-------|-------------|
-| TTL | 3600s | Cache expires after 1 hour |
-| Min Tokens | 1000 | Only cache if ≥1000 tokens |
-| Model | gemini-2.0-flash | Target model |
-
-### Cost Savings
-
-```
-Without Caching:
-  System Prompt: ~2500 tokens × $0.10/1M = $0.00025/request
-
-With Caching:
-  System Prompt: ~2500 tokens × $0.025/1M = $0.0000625/request
-
-Savings: 75% on system prompt tokens
-```
-
-### Monitoring
-
-```bash
-# Check cache status
-curl -H "Authorization: Bearer $ADMIN_TOKEN" /api/admin/stats
-
-# Response includes:
-{
-  "contextCache": {
-    "active": true,
-    "tokenCount": 2500,
-    "remainingTTL": 3200
-  },
-  "rateLimit": {
-    "contextCache": {
-      "dailySavings": 0.45,
-      "dailyHits": 150,
-      "savingsPercentage": 22.5
-    }
-  }
-}
 ```
 
 ## Performance Optimizations

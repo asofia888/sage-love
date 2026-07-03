@@ -97,12 +97,10 @@ curl -H "Authorization: Bearer YOUR_ADMIN_TOKEN" \
 ```
 
 2. Increase limits (if needed):
-```bash
-# .env.local
-DAILY_COST_LIMIT=100.0
-HOURLY_COST_LIMIT=10.0
-EMERGENCY_STOP_LIMIT=150.0
-```
+
+コスト上限（$5/時間・$10/日・$15緊急停止）は環境変数ではなく
+`api/rate-limiter.ts` の `RATE_LIMIT_CONFIG.global` にハードコードされています。
+変更する場合はコードを編集して再デプロイしてください。
 
 ---
 

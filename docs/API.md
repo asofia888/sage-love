@@ -54,11 +54,7 @@ AIチャットメッセージを送信し、応答を取得します。
 {
   "message": "AIの応答テキスト",
   "timestamp": "2025-01-27T12:00:00.000Z",
-  "sessionId": "abc123",
-  "cache": {
-    "hit": true,
-    "tokensSaved": 2500
-  }
+  "sessionId": "abc123"
 }
 ```
 
@@ -67,9 +63,6 @@ AIチャットメッセージを送信し、応答を取得します。
 |--------|-------------|
 | `X-RateLimit-Remaining-IP` | IP制限の残りリクエスト数 |
 | `X-RateLimit-Remaining-Session` | セッション制限の残りリクエスト数 |
-| `X-Context-Cache-Hit` | キャッシュヒットしたか |
-| `X-Context-Cache-Tokens-Saved` | 節約されたトークン数 |
-| `X-Context-Cache-TTL` | キャッシュの残りTTL（秒） |
 | `Cache-Control` | `no-cache` |
 
 #### Streaming Response
@@ -92,14 +85,14 @@ data: {"type":"chunk","text":"こん"}
 
 data: {"type":"chunk","text":"にちは"}
 
-data: {"type":"done","sessionId":"abc","cache":{"hit":true,"tokensSaved":2500},"timestamp":"2026-04-23T12:00:00.000Z"}
+data: {"type":"done","sessionId":"abc","timestamp":"2026-04-23T12:00:00.000Z"}
 ```
 
 **Event Types**
 | Type | Payload | Description |
 |------|---------|-------------|
 | `chunk` | `{ text: string }` | モデル出力の部分文字列。受信順に連結 |
-| `done` | `{ sessionId, cache, timestamp }` | 正常終了。ストリーム末尾に 1 件のみ |
+| `done` | `{ sessionId, timestamp }` | 正常終了。ストリーム末尾に 1 件のみ |
 | `error` | `{ code, details, category, retryAfter }` | ストリーミング中にエラー。以降チャンクは来ない |
 
 ストリーム途中にエラーが発生した場合、HTTP ステータスはすでに 200 で返されているため、error は `event: error` としてボディ内に書き込まれます。レート制限やバリデーションなどストリーム開始前のエラーは通常通り 4xx/5xx の JSON レスポンスで返ります。
@@ -155,14 +148,16 @@ data: {"type":"done","sessionId":"abc","cache":{"hit":true,"tokensSaved":2500},"
 | Reason | Description |
 |--------|-------------|
 | `MESSAGE_TOO_LONG` | メッセージが1000文字超 |
-| `HISTORY_TOO_LONG` | 履歴が5メッセージ超 |
+| `HISTORY_TOO_LONG` | 履歴が10メッセージ超 |
+| `HISTORY_MESSAGE_TOO_LONG` | 履歴1件の本文が8000文字超 |
 | `BURST_LIMIT_EXCEEDED` | バースト制限（3/分）超過 |
 | `IP_RATE_LIMIT` | IP制限（10/15分）超過 |
 | `SESSION_HOURLY_LIMIT` | セッション時間制限（15/時）超過 |
 | `SESSION_DAILY_LIMIT` | セッション日次制限（30/日）超過 |
 | `HOURLY_COST_LIMIT` | 時間コスト制限（$5）超過 |
-| `DAILY_COST_LIMIT` | 日次コスト制限（$50）超過 |
-| `EMERGENCY_COST_LIMIT` | 緊急停止コスト（$75）超過 |
+| `DAILY_COST_LIMIT` | 日次コスト制限（$10）超過 |
+| `EMERGENCY_COST_LIMIT` | 緊急停止コスト（$15）超過 |
+| `COST_CHECK_UNAVAILABLE` | コスト残高を確認できない（Redis障害時のfail-closed） |
 
 **500 Internal Server Error**
 ```json
@@ -404,64 +399,3 @@ CLOSED → (5 failures) → OPEN → (60s timeout) → HALF_OPEN → (2 successe
 - Validation errors (400)
 - Quota errors
 
----
-
-## Context Caching
-
-システムプロンプトをキャッシュしてコストを最大75%削減します。
-
-### How It Works
-
-1. **初回リクエスト**: システムプロンプトがキャッシュに保存される
-2. **後続リクエスト**: キャッシュからシステムプロンプトを再利用
-3. **コスト削減**: キャッシュされたトークンは通常の25%のコストで処理
-
-### Configuration
-
-| Parameter | Value |
-|-----------|-------|
-| TTL | 3600 seconds (1 hour) |
-| Min Tokens for Caching | 1000 tokens |
-| Model | gemini-2.0-flash |
-
-### Cost Savings
-
-| Type | Cost per 1M tokens |
-|------|-------------------|
-| Normal Input | $0.10 |
-| Cached Input | $0.025 |
-| **Savings** | **75%** |
-
-### Response Headers
-
-| Header | Description |
-|--------|-------------|
-| `X-Context-Cache-Hit` | `true` if cache was used |
-| `X-Context-Cache-Tokens-Saved` | Number of tokens saved |
-| `X-Context-Cache-TTL` | Remaining cache TTL in seconds |
-
-### Stats Endpoint Response
-
-```json
-{
-  "contextCache": {
-    "active": true,
-    "tokenCount": 2500,
-    "remainingTTL": 3200,
-    "createdAt": "2025-01-27T12:00:00.000Z",
-    "config": {
-      "ttlSeconds": 3600,
-      "minTokensForCaching": 1000,
-      "model": "gemini-2.0-flash"
-    }
-  },
-  "rateLimit": {
-    "contextCache": {
-      "dailySavings": 0.45,
-      "dailyHits": 150,
-      "effectiveCost": 1.55,
-      "savingsPercentage": 22.5
-    }
-  }
-}
-```
