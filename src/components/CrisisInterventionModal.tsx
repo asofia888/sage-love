@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CrisisDetectionResult } from '../services/crisisDetectionService';
 import { EmergencyResource, EmergencyResourceService } from '../data/emergencyResources';
+import Modal from './Modal';
 
 interface CrisisInterventionModalProps {
   isOpen: boolean;
@@ -91,38 +92,34 @@ const CrisisInterventionModal: React.FC<CrisisInterventionModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-75 flex items-center justify-center p-4">
-      <div className="bg-slate-800 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-        {/* ヘッダー */}
-        <div className={`px-6 py-4 border-b border-slate-700 ${getSeverityColor(crisisResult.severity)}`}>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd"/>
-              </svg>
-              <div>
-                <h2 className="text-xl font-bold text-white">
-                  {t('crisis.title', '重要なお知らせ')}
-                </h2>
-                <span className="text-sm text-white opacity-90">
-                  {getSeverityText(crisisResult.severity)}
-                </span>
-              </div>
-            </div>
-            <button
-              onClick={onClose}
-              className="text-white hover:text-gray-300 p-2"
-              aria-label={t('closeButton', '閉じる')}
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/>
-              </svg>
-            </button>
-          </div>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      titleId="crisis-intervention-title"
+      title={t('crisis.title', '重要なお知らせ')}
+      panelClassName="max-w-4xl max-h-[90vh] overflow-y-auto"
+      footer={
+        <div className="flex justify-between items-center gap-4 pt-4 border-t border-slate-700">
+          <p className="text-sm text-slate-400">
+            {t('crisis.footer', 'あなたの命は大切です。助けを求めることを躊躇しないでください。')}
+          </p>
+          <button
+            onClick={onClose}
+            className="px-4 py-2 bg-slate-600 hover:bg-slate-500 text-slate-200 rounded-lg transition-colors flex-shrink-0"
+          >
+            {t('understood', '理解しました')}
+          </button>
         </div>
-
-        {/* メインコンテンツ */}
-        <div className="px-6 py-6 space-y-6">
+      }
+    >
+      <div className="space-y-6">
+        {/* 深刻度バッジ */}
+        <div className={`inline-flex items-center space-x-2 rtl:space-x-reverse px-3 py-1 rounded-full border text-white ${getSeverityColor(crisisResult.severity)}`}>
+          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd"/>
+          </svg>
+          <span className="text-sm font-medium">{getSeverityText(crisisResult.severity)}</span>
+        </div>
           {/* 緊急メッセージ */}
           <div className="bg-slate-700 rounded-lg p-6 border-l-4 border-blue-500">
             <div className="flex items-start space-x-3">
@@ -249,22 +246,8 @@ const CrisisInterventionModal: React.FC<CrisisInterventionModalProps> = ({
               {t('crisis.emergencyNote', '生命に関わる緊急事態の場合は、救急サービス（日本: 119、米国: 911など）にすぐに連絡してください。')}
             </p>
           </div>
-        </div>
-
-        {/* フッター */}
-        <div className="px-6 py-4 bg-slate-750 border-t border-slate-700 flex justify-between items-center">
-          <p className="text-sm text-slate-400">
-            {t('crisis.footer', 'あなたの命は大切です。助けを求めることを躊躇しないでください。')}
-          </p>
-          <button
-            onClick={onClose}
-            className="px-4 py-2 bg-slate-600 hover:bg-slate-500 text-slate-200 rounded-lg transition-colors"
-          >
-            {t('understood', '理解しました')}
-          </button>
-        </div>
       </div>
-    </div>
+    </Modal>
   );
 };
 

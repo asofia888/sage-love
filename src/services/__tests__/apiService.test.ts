@@ -36,7 +36,6 @@ describe('ApiService', () => {
 
       const result = await apiService.sendMessage({
         message: 'テストメッセージ',
-        systemInstruction: 'テストシステム',
         language: 'ja'
       });
 

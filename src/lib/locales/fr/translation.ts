@@ -24,6 +24,7 @@ export default {
   "termsLastUpdated": "Dernière mise à jour : janvier 2025",
   "sendButton": "Envoyer",
   "sendingButton": "Envoi en cours...",
+  "stopGeneratingButton": "Arrêter la réponse",
   "comprehensiveDisclaimer": `【AVERTISSEMENT IMPORTANT】
 
 **1. Contenu généré par l'IA**
@@ -303,6 +304,16 @@ Ces conditions de service entrent en vigueur lorsque les utilisateurs utilisent 
   "errorQuota": "Il semble que beaucoup cherchent la sagesse en ce moment. Veuillez réessayer dans un moment. (QUOTA_ERR)",
   "errorModel": "Il pourrait y avoir un problème avec les paramètres internes du service. Il serait utile si vous pouviez en informer l'administrateur. (MODEL_ERR)",
   "errorGeneric": "Un problème est survenu lors du tissage de mots de sagesse. Veuillez réessayer plus tard. (GEN_ERR)",
+  "errorRateLimit": "L'accès est temporairement saturé. Veuillez patienter un instant et réessayer.",
+  "errorBurstLimit": "Vous semblez un peu pressé. Respirez profondément et posez votre question calmement.",
+  "errorSessionLimit": "Vous avez atteint la limite d'utilisation du jour. Veuillez réessayer demain.",
+  "errorContentSafety": "Le contenu de votre message semble poser problème. Essayez de le formuler autrement.",
+  "errorNetwork": "Il semble y avoir un problème de connexion réseau. Veuillez vérifier votre connexion internet.",
+  "errorTimeout": "La connexion a pris trop de temps. Veuillez patienter un instant et réessayer.",
+  "errorServiceUnavailable": "Le service est temporairement indisponible. Veuillez réessayer dans un moment.",
+  "errorDailyCostLimit": "La limite d'utilisation du jour est atteinte. Revenez demain.",
+  "errorHourlyCostLimit": "La limite d'utilisation horaire est atteinte. Veuillez réessayer plus tard.",
+  "errorEmergencyCostLimit": "Le service est temporairement restreint. Veuillez réessayer plus tard.",
   "MESSAGE_TOO_LONG": "Votre message est un peu trop long. Veuillez le limiter à 1000 caractères et réessayer.",
   "HISTORY_TOO_LONG": "Cette conversation est devenue longue. Veuillez sauvegarder ce qui est important, utilisez « Effacer la conversation », puis poursuivez.",
   "languageSelectorLabel": "Sélectionner la langue",

@@ -28,7 +28,7 @@ const PerformanceMonitor: React.FC = () => {
         
         try {
           observer.observe({ type: 'largest-contentful-paint', buffered: true });
-        } catch (e) {
+        } catch {
           console.log('LCP measurement not supported');
         }
       };
@@ -44,14 +44,14 @@ const PerformanceMonitor: React.FC = () => {
         
         try {
           observer.observe({ type: 'first-input', buffered: true });
-        } catch (e) {
+        } catch {
           console.log('FID measurement not supported');
         }
       };
       
       // CLS (Cumulative Layout Shift) の測定
       const measureCLS = () => {
-        let clsEntries: CLSEntry[] = [];
+        const clsEntries: CLSEntry[] = [];
         const observer = new PerformanceObserver((list) => {
           const entries = list.getEntries() as unknown as CLSEntry[];
           entries.forEach((entry: CLSEntry) => {
@@ -70,7 +70,7 @@ const PerformanceMonitor: React.FC = () => {
         
         try {
           observer.observe({ type: 'layout-shift', buffered: true });
-        } catch (e) {
+        } catch {
           console.log('CLS measurement not supported');
         }
       };
@@ -95,7 +95,7 @@ const PerformanceMonitor: React.FC = () => {
         
         try {
           observer.observe({ type: 'paint', buffered: true });
-        } catch (e) {
+        } catch {
           console.log('FCP measurement not supported');
         }
       };

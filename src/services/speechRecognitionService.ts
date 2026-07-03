@@ -1,4 +1,9 @@
 // Web Speech API の型定義
+// SpeechGrammarList は lib.dom.d.ts に含まれないため最小定義を用意
+interface SpeechGrammarList {
+  readonly length: number;
+}
+
 interface SpeechRecognitionEvent extends Event {
   results: SpeechRecognitionResultList;
   resultIndex: number;
@@ -165,8 +170,8 @@ export class SpeechRecognitionService {
     this.recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
       this.isListening = false;
       
-      let errorType: SpeechRecognitionError['type'] = 'unknown';
-      let message = event.error;
+      let errorType: SpeechRecognitionError['type'];
+      let message: string;
 
       switch (event.error) {
         case 'not-allowed':
@@ -205,7 +210,7 @@ export class SpeechRecognitionService {
 
     try {
       this.recognition.start();
-    } catch (error) {
+    } catch {
       this.isListening = false;
       onError({
         type: 'unknown',

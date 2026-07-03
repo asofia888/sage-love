@@ -110,29 +110,36 @@ describe('ChatInput', () => {
 
   it('should disable input and button when loading', () => {
     render(
-      <ChatInput 
-        onSendMessage={mockOnSendMessage} 
-        isLoading={true} 
+      <ChatInput
+        onSendMessage={mockOnSendMessage}
+        isLoading={true}
       />
     );
-    
+
     const textArea = screen.getByPlaceholderText(/聖者に尋ねたいことを入力/);
-    const sendButton = screen.getByLabelText('送信中...');
-    
+    const sendButton = screen.getByLabelText('送信');
+
     expect(textArea).toBeDisabled();
     expect(sendButton).toBeDisabled();
   });
 
-  it('should show loading spinner when isLoading is true', () => {
+  it('should show a stop button while streaming and call onStopStreaming when clicked', async () => {
+    const user = userEvent.setup();
+    const mockOnStop = vi.fn();
+
     render(
-      <ChatInput 
-        onSendMessage={mockOnSendMessage} 
-        isLoading={true} 
+      <ChatInput
+        onSendMessage={mockOnSendMessage}
+        isLoading={true}
+        onStopStreaming={mockOnStop}
       />
     );
-    
-    const spinner = document.querySelector('.animate-spin');
-    expect(spinner).toBeInTheDocument();
+
+    const stopButton = screen.getByLabelText('応答を停止');
+    expect(stopButton).toBeInTheDocument();
+
+    await user.click(stopButton);
+    expect(mockOnStop).toHaveBeenCalledTimes(1);
   });
 
   it('should not submit empty messages', async () => {

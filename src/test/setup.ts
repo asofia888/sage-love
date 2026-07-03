@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { vi } from 'vitest';
+import { vi, beforeAll, afterAll } from 'vitest';
 
 // Mock window.location early
 Object.defineProperty(window, 'location', {
@@ -114,7 +114,7 @@ Element.prototype.scrollIntoView = vi.fn();
 const originalError = console.error;
 const originalWarn = console.warn;
 
-global.beforeAll(() => {
+beforeAll(() => {
   console.error = (...args) => {
     if (
       typeof args[0] === 'string' &&
@@ -138,7 +138,7 @@ global.beforeAll(() => {
   };
 });
 
-global.afterAll(() => {
+afterAll(() => {
   console.error = originalError;
   console.warn = originalWarn;
 });

@@ -36,22 +36,36 @@ export interface AIMessage extends BaseMessage {
 export type ChatMessage = UserMessage | AIMessage;
 
 // エラー型の強化
-export type ErrorCode =
-  | 'errorMessageDefault'
-  | 'errorAuth'
-  | 'errorQuota'
-  | 'errorNoApiKeyConfig'
-  | 'errorNetwork'
-  | 'errorTranslation'
-  | 'errorStreaming'
-  | 'MESSAGE_TOO_LONG'
-  | 'HISTORY_TOO_LONG';
+// 実行時にサーバー由来コードの検証（parseApiErrorFormat）でも使うため const 配列で一元管理する
+export const ERROR_CODES = [
+  'errorMessageDefault',
+  'errorAuth',
+  'errorQuota',
+  'errorNoApiKeyConfig',
+  'errorNetwork',
+  'errorTranslation',
+  'errorStreaming',
+  'errorRateLimit',
+  'errorBurstLimit',
+  'errorSessionLimit',
+  'errorContentSafety',
+  'errorTimeout',
+  'errorServiceUnavailable',
+  'errorDailyCostLimit',
+  'errorHourlyCostLimit',
+  'errorEmergencyCostLimit',
+  'MESSAGE_TOO_LONG',
+  'HISTORY_TOO_LONG',
+] as const;
+
+export type ErrorCode = (typeof ERROR_CODES)[number];
 
 export interface ApiError {
   code: ErrorCode;
   details?: string;
   severity?: 'low' | 'medium' | 'high' | 'critical';
   timestamp?: Date;
+  retryAfter?: number;
 }
 
 // サービス関連の型

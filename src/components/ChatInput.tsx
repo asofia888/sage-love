@@ -7,6 +7,7 @@ import VoiceInputButton from './VoiceInputButton';
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
   isLoading: boolean;
+  onStopStreaming?: () => void;
 }
 
 // 送信アイコン（紙飛行機）
@@ -21,31 +22,19 @@ const SendIcon: React.FC<{ className?: string }> = ({ className = "w-5 h-5" }) =
   </svg>
 );
 
-// 送信中のローディングスピナー
-const SendingSpinner: React.FC<{ className?: string }> = ({ className = "w-5 h-5" }) => (
+// 停止アイコン（四角）
+const StopIcon: React.FC<{ className?: string }> = ({ className = "w-5 h-5" }) => (
   <svg
-    className={`${className} animate-spin`}
-    fill="none"
+    className={className}
+    fill="currentColor"
     viewBox="0 0 24 24"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <circle
-      className="opacity-25"
-      cx="12"
-      cy="12"
-      r="10"
-      stroke="currentColor"
-      strokeWidth="4"
-    />
-    <path
-      className="opacity-75"
-      fill="currentColor"
-      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-    />
+    <rect x="6" y="6" width="12" height="12" rx="1.5" />
   </svg>
 );
 
-const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading }) => {
+const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading, onStopStreaming }) => {
   const { t } = useTranslation();
   const [inputValue, setInputValue] = useState('');
   const [isVoiceInput, setIsVoiceInput] = useState(false);
@@ -61,6 +50,8 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading }) => {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // IME変換確定のEnter（isComposing中）では送信しない
+    if (e.nativeEvent.isComposing) return;
     if (e.key === 'Enter' && !e.shiftKey && !isLoading) {
       e.preventDefault();
       handleSubmit(e as unknown as React.FormEvent);
@@ -133,23 +124,31 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading }) => {
               className="bg-slate-700/50 hover:bg-slate-600/50 backdrop-blur-sm"
             />
             
-            {/* 送信ボタン */}
-            <button
-              type="submit"
-              disabled={isLoading || !inputValue.trim()}
-              aria-label={isLoading ? t('sendingButton') : t('sendButton')}
-              className={`p-2 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-400 ${
-                isLoading || !inputValue.trim()
-                  ? 'bg-slate-600/50 text-slate-400 cursor-not-allowed'
-                  : 'bg-indigo-500 hover:bg-indigo-600 text-white shadow-md hover:shadow-lg'
-              }`}
-            >
-              {isLoading ? (
-                <SendingSpinner className="w-5 h-5" />
-              ) : (
+            {/* 送信/停止ボタン: ストリーミング中は停止ボタンに切り替わる */}
+            {isLoading && onStopStreaming ? (
+              <button
+                type="button"
+                onClick={onStopStreaming}
+                aria-label={t('stopGeneratingButton')}
+                title={t('stopGeneratingButton')}
+                className="p-2 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-400 bg-red-500/90 hover:bg-red-600 text-white shadow-md hover:shadow-lg animate-pulse"
+              >
+                <StopIcon className="w-5 h-5" />
+              </button>
+            ) : (
+              <button
+                type="submit"
+                disabled={isLoading || !inputValue.trim()}
+                aria-label={t('sendButton')}
+                className={`p-2 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-400 ${
+                  isLoading || !inputValue.trim()
+                    ? 'bg-slate-600/50 text-slate-400 cursor-not-allowed'
+                    : 'bg-indigo-500 hover:bg-indigo-600 text-white shadow-md hover:shadow-lg'
+                }`}
+              >
                 <SendIcon className="w-5 h-5" />
-              )}
-            </button>
+              </button>
+            )}
           </div>
         </div>
       </form>

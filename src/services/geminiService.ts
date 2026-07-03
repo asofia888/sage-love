@@ -32,7 +32,7 @@ export async function sendSecureChat(
       conversationHistory: history.map(msg => ({
         sender: msg.sender === 'user' ? 'user' : 'assistant',
         text: msg.text,
-        timestamp: msg.timestamp.toISOString()
+        timestamp: msg.timestamp
       })),
       language
     };
@@ -42,45 +42,10 @@ export async function sendSecureChat(
 
   } catch (error) {
     console.error('Secure chat error:', error);
-    throw translateApiError(error);
+    // API_ERROR:CODE:MESSAGE:RETRY_AFTER 形式のまま投げ、
+    // ErrorService.parseApiErrorFormat が表示用コードと retryAfter に解決する
+    throw error;
   }
-}
-
-/**
- * Map API_ERROR:* wire format into the ERR_* codes the UI already handles,
- * so streaming and non-streaming paths share error-handling downstream.
- */
-function translateApiError(error: unknown): Error {
-  if (error instanceof Error && error.message.startsWith('API_ERROR:')) {
-    const [, errorCode] = error.message.split(':');
-    switch (errorCode) {
-      // Content-limit errors carry actionable guidance (shorten the message /
-      // clear the conversation). Keep the original API_ERROR so the UI can show
-      // the specific MESSAGE_TOO_LONG / HISTORY_TOO_LONG text instead of the
-      // generic rate-limit message (ErrorService.parseApiErrorFormat reads the code).
-      case 'MESSAGE_TOO_LONG':
-      case 'HISTORY_TOO_LONG':
-        return error;
-      case 'RATE_LIMIT_EXCEEDED':
-      case 'IP_RATE_LIMIT':
-      case 'SESSION_HOURLY_LIMIT':
-      case 'SESSION_DAILY_LIMIT':
-      case 'BURST_LIMIT_EXCEEDED':
-        return new Error('ERR_RATE_LIMIT');
-      case 'SESSION_LIMIT_EXCEEDED':
-        return new Error('ERR_SESSION_LIMIT');
-      case 'QUOTA_EXCEEDED':
-      case 'errorQuota':
-        return new Error('ERR_QUOTA');
-      case 'CONTENT_SAFETY':
-        return new Error('ERR_CONTENT_SAFETY');
-      case 'NETWORK_ERROR':
-        return new Error('ERR_NETWORK');
-      default:
-        return new Error('ERR_GENERIC');
-    }
-  }
-  return new Error('ERR_GENERIC');
 }
 
 /**
@@ -95,27 +60,29 @@ export async function* streamChat(
 
 /**
  * Streaming chat with language selection. Yields chunks from the real
- * Gemini stream; errors are normalized to ERR_* codes.
+ * Gemini stream; errors keep the API_ERROR wire format for ErrorService.
+ * signal はユーザーによる停止（停止ボタン/アンマウント）用。
  */
 export async function* streamChatWithTranslation(
     message: string,
     history: ChatMessage[],
-    targetLanguage: string = 'ja'
+    targetLanguage: string = 'ja',
+    signal?: AbortSignal
 ): AsyncGenerator<string, void, unknown> {
   const request: ChatRequest = {
     message,
     conversationHistory: history.map(msg => ({
       sender: msg.sender === 'user' ? 'user' : 'assistant',
       text: msg.text,
-      timestamp: msg.timestamp.toISOString(),
+      timestamp: msg.timestamp,
     })),
     language: targetLanguage,
   };
 
   try {
-    yield* apiService.streamMessage(request);
+    yield* apiService.streamMessage(request, signal);
   } catch (error) {
     console.error('Stream chat error:', error);
-    throw translateApiError(error);
+    throw error;
   }
 }

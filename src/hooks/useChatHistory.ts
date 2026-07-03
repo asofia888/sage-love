@@ -62,7 +62,10 @@ export function useChatHistory(isI18nInitialized: boolean): [
             if (savedHistory.length > 0) {
                 const loadedMessages = savedHistory.map(msg => ({
                     ...msg,
-                    timestamp: new Date(msg.timestamp)
+                    // 旧形式データも含めISO文字列に正規化（型は string）
+                    timestamp: typeof msg.timestamp === 'string'
+                        ? msg.timestamp
+                        : new Date(msg.timestamp ?? Date.now()).toISOString()
                 }));
 
                 // メッセージ数制限チェック

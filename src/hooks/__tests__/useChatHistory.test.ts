@@ -126,19 +126,30 @@ describe('useChatHistory', () => {
     expect(messages[2].text).toBe('3番目のメッセージ');
   });
 
-  it('should parse string timestamps into Date objects when loading', () => {
+  it('should keep timestamps as ISO strings when loading (legacy values are normalized)', () => {
     const messageWithStringTimestamp = {
       id: 'test-1',
       text: 'タイムスタンプテスト',
       sender: MessageSender.USER,
       timestamp: '2023-01-01T00:00:00Z',
     };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify([messageWithStringTimestamp]));
+    // 旧形式（数値エポック）は ISO 文字列に正規化される
+    const legacyMessageWithNumericTimestamp = {
+      id: 'test-2',
+      text: 'レガシータイムスタンプ',
+      sender: MessageSender.AI,
+      timestamp: 1672531200000,
+    };
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify([messageWithStringTimestamp, legacyMessageWithNumericTimestamp])
+    );
 
     const { result } = renderHook(() => useChatHistory(true));
     const [messages] = result.current;
-    expect(messages).toHaveLength(1);
-    expect(messages[0].timestamp).toBeInstanceOf(Date);
+    expect(messages).toHaveLength(2);
+    expect(messages[0].timestamp).toBe('2023-01-01T00:00:00Z');
+    expect(messages[1].timestamp).toBe(new Date(1672531200000).toISOString());
   });
 
   it('should accumulate messages across multiple setMessages calls', () => {

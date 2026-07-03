@@ -24,6 +24,7 @@ export default {
   "termsLastUpdated": "最終更新: 2025年1月",
   "sendButton": "送信",
   "sendingButton": "送信中...",
+  "stopGeneratingButton": "応答を停止",
   "comprehensiveDisclaimer": `【重要な免責事項】
 
 **1. AI生成コンテンツについて**

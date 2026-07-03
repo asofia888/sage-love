@@ -134,10 +134,10 @@ describe('DuplicateAvoidanceService', () => {
     });
 
     it('should limit history to recent AI messages', () => {
-      const history = Array.from({ length: 15 }, (_, i) => ({
+      const history: any[] = Array.from({ length: 15 }, (_, i) => ({
         id: `${i + 1}`,
         text: `メッセージ ${i + 1}`,
-        sender: (i % 2 === 0 ? 'user' : 'ai') as const,
+        sender: i % 2 === 0 ? 'user' : 'ai',
         timestamp: new Date()
       }));
       

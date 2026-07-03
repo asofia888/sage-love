@@ -63,7 +63,7 @@ ${recentAIResponses.map((resp, i) => `応答${i + 1}: 「${resp.substring(0, 150
   private static extractKeyWords(text: string): Set<string> {
     // 重要そうな単語を抽出（簡易版）
     const words = text
-      .replace(/[。、！？\.\,\!\?]/g, ' ')
+      .replace(/[。、！？.,!?]/g, ' ')
       .split(/\s+/)
       .filter(word => word.length > 1)
       .filter(word => !this.isCommonWord(word));

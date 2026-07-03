@@ -32,7 +32,6 @@ export interface ApiError {
 
 export interface StreamMetadata {
   sessionId?: string;
-  cache?: { hit: boolean; tokensSaved: number };
   timestamp?: string;
 }
 
@@ -51,7 +50,6 @@ function handleStreamEvent(
     details?: string;
     retryAfter?: number;
     sessionId?: string;
-    cache?: { hit: boolean; tokensSaved: number };
     timestamp?: string;
   };
   try {
@@ -67,7 +65,6 @@ function handleStreamEvent(
   if (parsed.type === 'done') {
     onMeta({
       sessionId: parsed.sessionId,
-      cache: parsed.cache,
       timestamp: parsed.timestamp,
     });
     return null;
@@ -145,14 +142,17 @@ class ApiService {
 
   /**
    * Open an SSE chat stream. Yields chunk text as it arrives; the final return
-   * value carries the `done` event's metadata (sessionId, cache info).
+   * value carries the `done` event's metadata (sessionId, timestamp).
    *
    * We don't wrap the fetch in a global AbortController timeout the way
    * sendMessage does — streams are expected to stay open for many seconds
    * while the model thinks, and a single timeout would kill long answers.
+   * Instead the caller passes an AbortSignal for user-initiated cancellation
+   * (stop button / unmount). Abort is propagated as-is, not as an API error.
    */
   async *streamMessage(
-    request: ChatRequest
+    request: ChatRequest,
+    signal?: AbortSignal
   ): AsyncGenerator<string, StreamMetadata | undefined, unknown> {
     let response: Response;
     try {
@@ -169,8 +169,13 @@ class ApiService {
           language: request.language || 'ja',
           stream: true,
         }),
+        signal,
       });
     } catch (error) {
+      // fetch の中断は DOMException で、環境によっては Error を継承しないため name で判定する
+      if (error && typeof error === 'object' && (error as { name?: string }).name === 'AbortError') {
+        throw error;
+      }
       if (error instanceof Error && (error.message.includes('Failed to fetch') || error.name === 'NetworkError')) {
         throw new Error('API_ERROR:NETWORK_ERROR:Network connection failed. Please check your internet connection.:0');
       }

@@ -48,6 +48,7 @@ export default {
   },
   "sendButton": "Enviar",
   "sendingButton": "Enviando...",
+  "stopGeneratingButton": "Parar resposta",
   "comprehensiveDisclaimer": `【AVISO LEGAL IMPORTANTE】
 
 **1. Conteúdo gerado por IA**
@@ -348,6 +349,16 @@ Estes termos de serviço entram em vigor quando os usuários utilizam este servi
   "errorQuota": "Parece que muitos estão buscando sabedoria neste momento. Tente novamente em breve. (QUOTA_ERR)",
   "errorModel": "Pode haver um problema com as configurações internas do serviço. Ajudaria se você pudesse informar o administrador. (MODEL_ERR)",
   "errorGeneric": "Ocorreu um problema ao tecer palavras de sabedoria. Tente novamente mais tarde. (GEN_ERR)",
+  "errorRateLimit": "O acesso está temporariamente congestionado. Aguarde um momento e tente novamente.",
+  "errorBurstLimit": "Parece que você está com um pouco de pressa. Respire fundo e pergunte com calma.",
+  "errorSessionLimit": "Você atingiu o limite de uso de hoje. Tente novamente amanhã.",
+  "errorContentSafety": "Parece haver um problema com o conteúdo da sua mensagem. Tente expressá-lo com outras palavras.",
+  "errorNetwork": "Parece haver um problema com a conexão de rede. Verifique sua conexão com a internet.",
+  "errorTimeout": "A conexão demorou demais. Aguarde um momento e tente novamente.",
+  "errorServiceUnavailable": "O serviço está temporariamente indisponível. Tente novamente em breve.",
+  "errorDailyCostLimit": "O limite de uso de hoje foi atingido. Volte amanhã.",
+  "errorHourlyCostLimit": "O limite de uso por hora foi atingido. Tente novamente mais tarde.",
+  "errorEmergencyCostLimit": "O serviço está temporariamente restrito. Tente novamente mais tarde.",
   "MESSAGE_TOO_LONG": "Sua mensagem está um pouco longa. Por favor, mantenha-a com até 1000 caracteres e tente novamente.",
   "HISTORY_TOO_LONG": "Esta conversa ficou longa. Salve o que for importante, use “Limpar conversa” e depois continue.",
   "languageSelectorLabel": "Selecionar idioma",

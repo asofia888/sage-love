@@ -320,7 +320,7 @@ export class EmergencyResourceService {
    */
   static getResourcesByLanguageAndRegion(language: string, countryCode?: string): EmergencyResource[] {
     const lang = language.split('-')[0];
-    let resources: EmergencyResource[] = [];
+    const resources: EmergencyResource[] = [];
     
     // 指定された国のリソースを最優先
     if (countryCode) {

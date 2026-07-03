@@ -1,4 +1,4 @@
-import { ApiError, ErrorCode } from '../types';
+import { ApiError, ErrorCode, ERROR_CODES } from '../types';
 import { errorLogger, ErrorSeverity } from '../lib/error-logger';
 
 /**
@@ -66,22 +66,52 @@ export class ErrorService {
   }
 
   /**
+   * サーバー側ワイヤーコード → 表示用エラーコードの対応表。
+   * ERROR_CODES に含まれるコード（errorAuth / MESSAGE_TOO_LONG 等）はそのまま通す。
+   */
+  private static readonly WIRE_CODE_MAP: Record<string, ErrorCode> = {
+    RATE_LIMIT_EXCEEDED: 'errorRateLimit',
+    IP_RATE_LIMIT: 'errorRateLimit',
+    BURST_LIMIT_EXCEEDED: 'errorBurstLimit',
+    SESSION_HOURLY_LIMIT: 'errorSessionLimit',
+    SESSION_DAILY_LIMIT: 'errorSessionLimit',
+    SESSION_LIMIT_EXCEEDED: 'errorSessionLimit',
+    DAILY_COST_LIMIT: 'errorDailyCostLimit',
+    HOURLY_COST_LIMIT: 'errorHourlyCostLimit',
+    EMERGENCY_COST_LIMIT: 'errorEmergencyCostLimit',
+    PROJECTED_COST_LIMIT: 'errorEmergencyCostLimit',
+    QUOTA_EXCEEDED: 'errorQuota',
+    CONTENT_SAFETY: 'errorContentSafety',
+    NETWORK_ERROR: 'errorNetwork',
+    TIMEOUT: 'errorTimeout',
+    COST_CHECK_UNAVAILABLE: 'errorServiceUnavailable',
+    errorCircuitBreaker: 'errorServiceUnavailable',
+  };
+
+  /**
    * Parse API_ERROR format: API_ERROR:CODE:MESSAGE:RETRY_AFTER
    * Public method for external use
    */
   static parseApiErrorFormat(message: string): ApiError {
     const parts = message.split(':');
     if (parts.length >= 3) {
-      const code = parts[1] as ErrorCode;
-      const details = parts[2];
-      const retryAfter = parts[3] ? parseInt(parts[3], 10) : undefined;
+      const wireCode = parts[1];
+      const code: ErrorCode = (ERROR_CODES as readonly string[]).includes(wireCode)
+        ? (wireCode as ErrorCode)
+        : this.WIRE_CODE_MAP[wireCode] ?? 'errorMessageDefault';
+
+      // MESSAGE 自体に ':' が含まれ得るため、末尾が数値の場合のみ RETRY_AFTER として切り出す
+      const last = parts[parts.length - 1];
+      const hasRetry = parts.length >= 4 && /^\d+$/.test(last);
+      const retrySeconds = hasRetry ? parseInt(last, 10) : 0;
+      const details = parts.slice(2, hasRetry ? parts.length - 1 : undefined).join(':');
 
       return {
         code,
         details,
         timestamp: new Date(),
         severity: this.getErrorSeverity({ code } as ApiError),
-        retryAfter,
+        retryAfter: retrySeconds > 0 ? retrySeconds : undefined,
       };
     }
 
@@ -180,6 +210,8 @@ export class ErrorService {
       case 'errorQuota':
         return 'high';
       case 'errorNetwork':
+      case 'errorTimeout':
+      case 'errorServiceUnavailable':
         return 'medium';
       default:
         return 'low';

@@ -48,6 +48,7 @@ export default {
   },
   "sendButton": "Enviar",
   "sendingButton": "Enviando...",
+  "stopGeneratingButton": "Detener respuesta",
   "comprehensiveDisclaimer": `【AVISO LEGAL IMPORTANTE】
 
 **1. Contenido generado por IA**
@@ -349,6 +350,16 @@ Estos términos de servicio entran en vigor cuando los usuarios utilizan este se
   "errorQuota": "Parece que muchos buscan sabiduría en este momento. Por favor, inténtalo de nuevo en un momento. (QUOTA_ERR)",
   "errorModel": "Podría haber un problema con la configuración interna del servicio. Sería útil si pudieras informar al administrador. (MODEL_ERR)",
   "errorGeneric": "Surgió un problema al tejer palabras de sabiduría. Por favor, inténtalo de nuevo más tarde. (GEN_ERR)",
+  "errorRateLimit": "El acceso está temporalmente congestionado. Espera un momento e inténtalo de nuevo.",
+  "errorBurstLimit": "Parece que tienes un poco de prisa. Respira hondo y pregunta con calma.",
+  "errorSessionLimit": "Has alcanzado el límite de uso de hoy. Inténtalo de nuevo mañana.",
+  "errorContentSafety": "Parece haber un problema con el contenido de tu mensaje. Intenta expresarlo con otras palabras.",
+  "errorNetwork": "Parece haber un problema con la conexión de red. Comprueba tu conexión a internet.",
+  "errorTimeout": "La conexión tardó demasiado. Espera un momento e inténtalo de nuevo.",
+  "errorServiceUnavailable": "El servicio no está disponible temporalmente. Inténtalo de nuevo en un momento.",
+  "errorDailyCostLimit": "Se ha alcanzado el límite de uso de hoy. Vuelve mañana.",
+  "errorHourlyCostLimit": "Se ha alcanzado el límite de uso por hora. Inténtalo de nuevo más tarde.",
+  "errorEmergencyCostLimit": "El servicio está temporalmente restringido. Inténtalo de nuevo más tarde.",
   "MESSAGE_TOO_LONG": "Tu mensaje es un poco largo. Por favor, redúcelo a 1000 caracteres e inténtalo de nuevo.",
   "HISTORY_TOO_LONG": "Esta conversación se ha alargado. Guarda lo que sea importante, usa «Limpiar conversación» y luego continúa.",
   "languageSelectorLabel": "Seleccionar idioma",

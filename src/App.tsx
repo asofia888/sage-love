@@ -47,6 +47,7 @@ const App: React.FC = () => {
   // メッセージハンドリングロジックを分離
   const {
     handleSendMessage,
+    stopStreaming,
     isLoading,
     error,
     setError,
@@ -77,6 +78,8 @@ const App: React.FC = () => {
   };
 
   const confirmClearChat = () => {
+    // 進行中のストリーミングを中断してから履歴を消す
+    stopStreaming();
     clearChat();
     setError(null);
     closeModal();
@@ -139,7 +142,7 @@ const App: React.FC = () => {
                 />
               </div>
             )}
-            <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
+            <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} onStopStreaming={stopStreaming} />
             <div className="text-center mt-3 text-xs text-slate-200">
               {/* Mobile: Vertical layout */}
               <div className="sm:hidden">
