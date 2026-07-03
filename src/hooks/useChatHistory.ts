@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { ChatMessage } from '../types';
 import { STORAGE } from '../config/constants';
 import { storage } from '../lib/storage';
@@ -8,24 +8,13 @@ import { analytics } from '../lib/analytics';
 export function useChatHistory(isI18nInitialized: boolean): [
     ChatMessage[],
     React.Dispatch<React.SetStateAction<ChatMessage[]>>,
-    () => void,
-    { totalMessages: number; memoryUsage: number; isNearLimit: boolean }
+    () => void
 ] {
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [isLoaded, setIsLoaded] = useState(false);
-
-    // メモリ使用量とメタデータを計算
-    const memoryStats = useMemo(() => {
-        const jsonString = JSON.stringify(messages);
-        const memoryUsage = new Blob([jsonString]).size;
-        const isNearLimit = memoryUsage > STORAGE.SIZE_LIMIT * 0.8; // 80%に達したら警告
-
-        return {
-            totalMessages: messages.length,
-            memoryUsage,
-            isNearLimit
-        };
-    }, [messages]);
+    // 直前に保存したシリアライズ済みデータ。ストリーミング中は保存対象
+    // （isTyping除外後）が変わらないため、同一内容の再書き込みをスキップする
+    const lastSavedRef = useRef<string | null>(null);
 
     // メッセージ数制限チェックとトリム
     const trimMessagesIfNeeded = useCallback((messageList: ChatMessage[]): ChatMessage[] => {
@@ -109,6 +98,10 @@ export function useChatHistory(isI18nInitialized: boolean): [
 
             if (historyToSave.length > 0) {
                 const dataString = JSON.stringify(historyToSave);
+
+                // ストリーミング中のチャンク更新等で内容が変わっていなければ書き込まない
+                if (dataString === lastSavedRef.current) return;
+
                 const dataSize = new Blob([dataString]).size;
 
                 // ストレージサイズ制限チェック
@@ -118,6 +111,7 @@ export function useChatHistory(isI18nInitialized: boolean): [
                     // さらにトリムして保存
                     const furtherTrimmed = historyToSave.slice(-STORAGE.TRIM_TO_MESSAGES * 0.8);
                     storage.set(STORAGE.CHAT_HISTORY_KEY, furtherTrimmed);
+                    lastSavedRef.current = JSON.stringify(furtherTrimmed);
 
                     // Analytics tracking
                     analytics.trackEvent('storage_limit_exceeded', {
@@ -127,9 +121,11 @@ export function useChatHistory(isI18nInitialized: boolean): [
                     });
                 } else {
                     storage.setRaw(STORAGE.CHAT_HISTORY_KEY, dataString);
+                    lastSavedRef.current = dataString;
                 }
             } else {
                 storage.remove(STORAGE.CHAT_HISTORY_KEY);
+                lastSavedRef.current = null;
             }
 
             const saveTime = performance.now() - startTime;
@@ -157,5 +153,5 @@ export function useChatHistory(isI18nInitialized: boolean): [
         });
     }, [messages.length]);
 
-    return [messages, optimizedSetMessages, clearChat, memoryStats];
+    return [messages, optimizedSetMessages, clearChat];
 }

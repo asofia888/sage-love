@@ -129,12 +129,23 @@ export default async function handler(req: Request) {
                      'unknown';
     const sessionId = session.sessionId;
 
+    // 履歴1件あたりの本文長も検証対象にする（巨大履歴によるコスト膨張対策）
+    const longestHistoryMessageLength = Array.isArray(conversationHistory)
+      ? conversationHistory.reduce((max: number, msg: unknown) => {
+          const text = msg && typeof msg === 'object'
+            ? (msg as Record<string, unknown>).text
+            : undefined;
+          return typeof text === 'string' && text.length > max ? text.length : max;
+        }, 0)
+      : 0;
+
     // Check rate limits
     const rateLimitResult = await shouldBlockRequest(
       clientIP,
       sessionId,
       message?.length || 0,
-      conversationHistory?.length || 0
+      conversationHistory?.length || 0,
+      longestHistoryMessageLength
     );
 
     if (rateLimitResult.blocked) {

@@ -28,6 +28,9 @@ const RATE_LIMIT_CONFIG = {
   content: {
     maxMessageLength: 1000,    // Max 1000 characters
     maxHistoryMessages: 10,    // Limit conversation history (matches api/chat.ts slice(-10))
+    // 履歴1件あたりの本文長上限。正規のAI応答(最大4096トークン)より十分大きく、
+    // 巨大な履歴本文を送り込むコスト膨張攻撃だけを弾く
+    maxHistoryMessageLength: 8000,
     maxTokensPerRequest: 2000, // Approximate token limit
   }
 };
@@ -219,7 +222,11 @@ export interface RateLimitResult {
  * Content limit checks. These need no Redis, so they must run unconditionally —
  * even when Redis is unavailable and the rate-limit checks are bypassed.
  */
-function checkContentLimits(messageLength: number, historyLength: number): RateLimitResult | null {
+function checkContentLimits(
+  messageLength: number,
+  historyLength: number,
+  longestHistoryMessageLength: number = 0
+): RateLimitResult | null {
   if (messageLength > RATE_LIMIT_CONFIG.content.maxMessageLength) {
     return {
       blocked: true,
@@ -238,6 +245,15 @@ function checkContentLimits(messageLength: number, historyLength: number): RateL
     };
   }
 
+  if (longestHistoryMessageLength > RATE_LIMIT_CONFIG.content.maxHistoryMessageLength) {
+    return {
+      blocked: true,
+      reason: 'HISTORY_MESSAGE_TOO_LONG',
+      message: `A conversation history entry is too long. Maximum ${RATE_LIMIT_CONFIG.content.maxHistoryMessageLength} characters per message.`,
+      retryAfter: 0,
+    };
+  }
+
   return null;
 }
 
@@ -248,10 +264,11 @@ export async function shouldBlockRequest(
   clientIP: string,
   sessionId: string,
   messageLength: number,
-  historyLength: number = 0
+  historyLength: number = 0,
+  longestHistoryMessageLength: number = 0
 ): Promise<RateLimitResult> {
   // 1. Check content limits first (no Redis needed)
-  const contentViolation = checkContentLimits(messageLength, historyLength);
+  const contentViolation = checkContentLimits(messageLength, historyLength, longestHistoryMessageLength);
   if (contentViolation) {
     return contentViolation;
   }

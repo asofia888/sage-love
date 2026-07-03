@@ -153,7 +153,17 @@ describe('rate-limiter (Redis paths)', () => {
     expect(tooMany.blocked).toBe(true);
     expect(tooMany.reason).toBe('HISTORY_TOO_LONG');
 
+    // 履歴1件あたりの本文長上限（コスト膨張攻撃対策）
+    const historyEntryTooLong = await shouldBlockRequest('1.2.3.4', 's', 100, 5, 8001);
+    expect(historyEntryTooLong.blocked).toBe(true);
+    expect(historyEntryTooLong.reason).toBe('HISTORY_MESSAGE_TOO_LONG');
+
+    // ここまでのコンテンツ違反ブロックはRedisに一切触れていない
     expect(h.redisMock.get).not.toHaveBeenCalled();
+
+    // 上限ちょうどは通過する
+    const historyEntryOk = await shouldBlockRequest('1.2.3.4', 's', 100, 5, 8000);
+    expect(historyEntryOk.blocked).toBe(false);
   });
 
   it('records actual cost as a scaled integer with expiry', async () => {

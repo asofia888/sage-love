@@ -76,6 +76,8 @@ export class ErrorService {
     SESSION_HOURLY_LIMIT: 'errorSessionLimit',
     SESSION_DAILY_LIMIT: 'errorSessionLimit',
     SESSION_LIMIT_EXCEEDED: 'errorSessionLimit',
+    // 履歴1件の本文長超過も「会話をクリア」の案内が適切なので既存キーへ寄せる
+    HISTORY_MESSAGE_TOO_LONG: 'HISTORY_TOO_LONG',
     DAILY_COST_LIMIT: 'errorDailyCostLimit',
     HOURLY_COST_LIMIT: 'errorHourlyCostLimit',
     EMERGENCY_COST_LIMIT: 'errorEmergencyCostLimit',
