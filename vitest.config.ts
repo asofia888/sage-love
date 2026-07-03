@@ -13,6 +13,8 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
+      // api/ はセキュリティ中核（セッション署名・レート制限・サーキットブレーカー）
+      // なのでカバレッジ計測対象に含める
       exclude: [
         'node_modules/',
         'dist/',
@@ -20,7 +22,6 @@ export default defineConfig({
         '**/*.config.ts',
         'coverage/',
         'src/test/',
-        'api/',
         'assets/',
         'i18n/',
         'types.ts'

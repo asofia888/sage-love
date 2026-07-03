@@ -105,15 +105,16 @@ export class CircuitBreaker {
    * Handle failed request
    */
   private onFailure(): void {
-    this.failureCount++;
-    this.lastFailureTime = new Date();
-
-    // Remove old failures outside monitoring period
+    // 監視ウィンドウ外の古い失敗はカウントし直す。
+    // 判定は「前回の失敗」からの経過時間で行う（上書き前に比較しないと常に0になる）
     const now = Date.now();
     if (this.lastFailureTime &&
         now - this.lastFailureTime.getTime() > this.config.monitoringPeriod) {
-      this.failureCount = 1;
+      this.failureCount = 0;
     }
+
+    this.failureCount++;
+    this.lastFailureTime = new Date();
 
     if (this.state === CircuitState.HALF_OPEN) {
       this.open();
