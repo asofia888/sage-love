@@ -2,11 +2,15 @@ import path from 'path';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   plugins: [react()],
   esbuild: {
     // Disable strict TypeScript checking during build
-    logOverride: { 'this-is-undefined-in-esm': 'silent' }
+    logOverride: { 'this-is-undefined-in-esm': 'silent' },
+    // 本番ビルドでは console.log/info/debug を除去する（warn/error は残す）
+    ...(command === 'build'
+      ? { pure: ['console.log', 'console.info', 'console.debug'] }
+      : {}),
   },
   build: {
     outDir: 'dist',
@@ -35,4 +39,4 @@ export default defineConfig({
       '@': path.resolve(__dirname, '.'),
     }
   }
-});
+}));

@@ -12,7 +12,6 @@ vi.mock('../../services/geminiService', () => ({
     yield 'モックされたAI応答です';
   }),
   sendSecureChat: vi.fn().mockResolvedValue('モックされたAI応答です'),
-  initializeTranslationService: vi.fn(),
 }));
 
 // Mock crisis detection service

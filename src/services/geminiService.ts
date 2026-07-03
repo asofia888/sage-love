@@ -8,15 +8,6 @@ import { ChatMessage } from '../types';
  */
 
 /**
- * 翻訳サービスを初期化（レガシー互換性のため、現在は不要）
- * @deprecated API key is now handled server-side
- */
-export function initializeTranslationService(_apiKey: string) {
-  // No longer needed - API key is handled server-side
-  console.log('Translation service initialization is now handled server-side');
-}
-
-/**
  * Secure chat function using serverless backend.
  * The system prompt is built server-side from the language — the client no
  * longer sends any instruction text.
