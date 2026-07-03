@@ -150,9 +150,9 @@ describe('App Integration Tests', () => {
       await user.type(input, 'こんにちは');
       await user.click(sendButton);
 
-      // AI応答が表示される
+      // AI応答が表示される（チャット本文とSR用ライブリージョンの両方に現れるため getAllByText）
       await waitFor(() => {
-        expect(screen.getByText('モックされたAI応答です')).toBeInTheDocument();
+        expect(screen.getAllByText('モックされたAI応答です').length).toBeGreaterThan(0);
       }, { timeout: 3000 });
     });
 

@@ -40,6 +40,17 @@ const Modal: React.FC<ModalProps> = ({
     };
   }, [isOpen, onClose]);
 
+  // モーダルを閉じたとき、開く前にフォーカスがあった要素へ戻す (WCAG 2.4.3)
+  useEffect(() => {
+    if (!isOpen) return;
+    const previouslyFocused = document.activeElement;
+    return () => {
+      if (previouslyFocused instanceof HTMLElement) {
+        previouslyFocused.focus();
+      }
+    };
+  }, [isOpen]);
+
   useEffect(() => {
     if (isOpen) {
       const focusableElements = modalRef.current?.querySelectorAll<HTMLElement>(

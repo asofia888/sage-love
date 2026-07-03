@@ -29,6 +29,7 @@ const TermsOfServiceModal = React.lazy(() => import('./components/TermsOfService
 import { useChatHistory } from './hooks/useChatHistory';
 import { useTextSize } from './hooks/useTextSize';
 import { useMessageHandler } from './hooks/useMessageHandler';
+import { MessageSender } from './types';
 
 
 // --- Main App Component ---
@@ -85,6 +86,12 @@ const App: React.FC = () => {
     closeModal();
   };
 
+  // スクリーンリーダー読み上げ用: 直近の「完了した」AI応答。
+  // ストリーミング中(isTyping)は対象にせず、完了時に一度だけ全文を通知する
+  const latestCompletedAiText = [...messages]
+    .reverse()
+    .find(m => m.sender === MessageSender.AI && !m.isTyping && m.text)?.text ?? '';
+
 
   return (
     <>
@@ -125,6 +132,11 @@ const App: React.FC = () => {
             )}
           </div>
         </main>
+
+        {/* スクリーンリーダー向けライブリージョン（視覚的には非表示） */}
+        <div aria-live="polite" role="status" className="sr-only">
+          {latestCompletedAiText}
+        </div>
 
         {error && (
           <div className="p-4 bg-red-700/80 text-white text-center backdrop-blur-sm" role="alert" onClick={() => setError(null)}>
