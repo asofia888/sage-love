@@ -65,15 +65,14 @@ const VoiceInputButton: React.FC<VoiceInputButtonProps> = ({
 }) => {
   const { t, i18n } = useTranslation();
   const [isListening, setIsListening] = useState(false);
-  const [isSupported, setIsSupported] = useState(false);
   const [permissionGranted, setPermissionGranted] = useState<boolean | null>(null);
   const [speechService] = useState(() => new SpeechRecognitionService());
+  // ブラウザのサポート有無はマウント後に変化しないため一度だけ判定する
+  const [isSupported] = useState(() => speechService.isSupported());
   const [showTooltip, setShowTooltip] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
-    setIsSupported(speechService.isSupported());
-    
     // 言語が変更されたときに音声認識の言語も更新
     const currentLang = i18n.language.split('-')[0];
     speechService.setLanguage(currentLang);

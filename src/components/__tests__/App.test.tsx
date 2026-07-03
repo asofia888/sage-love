@@ -1,7 +1,15 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor } from '../../test/utils';
 import userEvent from '@testing-library/user-event';
+import type React from 'react';
 import App from '../../App';
+
+interface ModalMockProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm?: () => void;
+  children?: React.ReactNode;
+}
 
 // Mock geminiService — useMessageHandler imports it as a namespace (* as geminiService).
 vi.mock('../../services/geminiService', () => ({
@@ -29,12 +37,12 @@ vi.mock('../../services/crisisDetectionService', () => ({
 
 // Mock lazy-loaded components to avoid Suspense issues in tests
 vi.mock('../../components/DisclaimerModal', () => ({
-  default: ({ isOpen, onClose }: any) =>
+  default: ({ isOpen, onClose }: ModalMockProps) =>
     isOpen ? <div data-testid="disclaimer-modal" onClick={onClose}>Disclaimer Modal</div> : null
 }));
 
 vi.mock('../../components/ConfirmationModal', () => ({
-  default: ({ isOpen, onClose, onConfirm, children }: any) =>
+  default: ({ isOpen, onClose, onConfirm, children }: ModalMockProps) =>
     isOpen ? (
       <div data-testid="confirmation-modal">
         {children}
@@ -45,31 +53,31 @@ vi.mock('../../components/ConfirmationModal', () => ({
 }));
 
 vi.mock('../../components/HelpModal', () => ({
-  default: ({ isOpen, onClose }: any) =>
+  default: ({ isOpen, onClose }: ModalMockProps) =>
     isOpen ? <div data-testid="help-modal" onClick={onClose}>Help Modal</div> : null
 }));
 
 vi.mock('../../components/CrisisInterventionModal', () => ({
-  default: ({ isOpen, onClose }: any) =>
+  default: ({ isOpen, onClose }: ModalMockProps) =>
     isOpen ? <div data-testid="crisis-modal" onClick={onClose}>Crisis Modal</div> : null
 }));
 
 vi.mock('../../components/PrivacyPolicyModal', () => ({
-  default: ({ isOpen, onClose }: any) =>
+  default: ({ isOpen, onClose }: ModalMockProps) =>
     isOpen ? <div data-testid="privacy-modal" onClick={onClose}>Privacy Modal</div> : null
 }));
 
 vi.mock('../../components/TermsOfServiceModal', () => ({
-  default: ({ isOpen, onClose }: any) =>
+  default: ({ isOpen, onClose }: ModalMockProps) =>
     isOpen ? <div data-testid="terms-modal" onClick={onClose}>Terms Modal</div> : null
 }));
 
 // jsdom give Virtuoso a 0px viewport, so virtualized items don't render.
 // Replace with a simple list so tests can assert on message text directly.
 vi.mock('../../components/VirtualizedChat', () => ({
-  default: ({ messages }: any) => (
+  default: ({ messages }: { messages: Array<{ id: string; text: string }> }) => (
     <div data-testid="virtualized-chat">
-      {messages.map((msg: any) => (
+      {messages.map(msg => (
         <div key={msg.id} data-testid="chat-message">{msg.text}</div>
       ))}
     </div>
@@ -383,10 +391,8 @@ describe('App Integration Tests', () => {
     it('エラーメッセージが表示される', async () => {
       // エラーをシミュレート
       const geminiService = await import('../../services/geminiService');
-      vi.mocked(geminiService.streamChatWithTranslation).mockImplementationOnce(async function* () {
+      vi.mocked(geminiService.streamChatWithTranslation).mockImplementationOnce(() => {
         throw new Error('API_ERROR:errorGeneric');
-        // eslint-disable-next-line no-unreachable
-        yield '';
       });
 
       const user = userEvent.setup();
@@ -404,10 +410,8 @@ describe('App Integration Tests', () => {
 
     it('エラーメッセージをクリックして消去できる', async () => {
       const geminiService = await import('../../services/geminiService');
-      vi.mocked(geminiService.streamChatWithTranslation).mockImplementationOnce(async function* () {
+      vi.mocked(geminiService.streamChatWithTranslation).mockImplementationOnce(() => {
         throw new Error('API_ERROR:errorGeneric');
-        // eslint-disable-next-line no-unreachable
-        yield '';
       });
 
       const user = userEvent.setup();
@@ -446,7 +450,7 @@ describe('App Integration Tests', () => {
 
         if (chatHistory) {
           const parsed = JSON.parse(chatHistory);
-          expect(parsed.some((msg: any) => msg.text === '保存テスト')).toBe(true);
+          expect(parsed.some((msg: { text?: string }) => msg.text === '保存テスト')).toBe(true);
         }
       });
     });
@@ -478,10 +482,8 @@ describe('App Integration Tests', () => {
 
     it('エラーメッセージにrole="alert"が設定される', async () => {
       const geminiService = await import('../../services/geminiService');
-      vi.mocked(geminiService.streamChatWithTranslation).mockImplementationOnce(async function* () {
+      vi.mocked(geminiService.streamChatWithTranslation).mockImplementationOnce(() => {
         throw new Error('API_ERROR:errorGeneric');
-        // eslint-disable-next-line no-unreachable
-        yield '';
       });
 
       const user = userEvent.setup();

@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { ErrorService } from '@/services/errorService';
+import type { ApiError, ErrorCode } from '../../types';
 
 describe('ErrorService', () => {
   describe('normalizeError', () => {
@@ -65,7 +66,7 @@ describe('ErrorService', () => {
   describe('logError', () => {
     it('should log error without throwing', () => {
       const error = {
-        code: 'errorTest' as any,
+        code: 'errorTest' as ErrorCode,
         details: 'Test error',
         timestamp: new Date(),
         severity: 'medium' as const
@@ -79,7 +80,7 @@ describe('ErrorService', () => {
 
     it('should handle errors without context', () => {
       const error = {
-        code: 'errorTest' as any,
+        code: 'errorTest' as ErrorCode,
         details: 'Test error without context',
         timestamp: new Date(),
         severity: 'low' as const
@@ -93,14 +94,14 @@ describe('ErrorService', () => {
 
   describe('getErrorSeverity', () => {
     it('should assign appropriate severity levels', () => {
-      const authError = { code: 'errorAuth' } as any;
+      const authError: ApiError = { code: 'errorAuth' };
       const severity = ErrorService.getErrorSeverity(authError);
       
       expect(['low', 'medium', 'high', 'critical']).toContain(severity);
     });
 
     it('should handle unknown error codes', () => {
-      const unknownError = { code: 'errorUnknown' } as any;
+      const unknownError = { code: 'errorUnknown' as ErrorCode };
       const severity = ErrorService.getErrorSeverity(unknownError);
       
       expect(['low', 'medium', 'high', 'critical']).toContain(severity);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CrisisDetectionResult } from '../services/crisisDetectionService';
 import { EmergencyResource, EmergencyResourceService } from '../data/emergencyResources';
@@ -20,19 +20,20 @@ const CrisisInterventionModal: React.FC<CrisisInterventionModalProps> = ({
   userCountry
 }) => {
   const { t } = useTranslation();
-  const [resources, setResources] = useState<EmergencyResource[]>([]);
   const [showAllResources, setShowAllResources] = useState(false);
 
-  useEffect(() => {
-    if (isOpen && crisisResult.isCrisis) {
-      const recommendedResources = EmergencyResourceService.getRecommendedResources(
-        crisisResult.severity,
-        userLanguage,
-        userCountry
-      );
-      setResources(recommendedResources);
-    }
-  }, [isOpen, crisisResult, userLanguage, userCountry]);
+  // 入力（深刻度・言語・国）から導出できる値なので state ではなく useMemo で持つ
+  const resources = useMemo<EmergencyResource[]>(
+    () =>
+      isOpen && crisisResult.isCrisis
+        ? EmergencyResourceService.getRecommendedResources(
+            crisisResult.severity,
+            userLanguage,
+            userCountry
+          )
+        : [],
+    [isOpen, crisisResult, userLanguage, userCountry]
+  );
 
   if (!isOpen) return null;
 

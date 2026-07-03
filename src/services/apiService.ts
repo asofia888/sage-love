@@ -121,12 +121,12 @@ class ApiService {
       if (error instanceof Error) {
         // Handle timeout/abort errors
         if (error.name === 'AbortError') {
-          throw new Error('API_ERROR:TIMEOUT:Request timed out. The response was taking too long.:0');
+          throw new Error('API_ERROR:TIMEOUT:Request timed out. The response was taking too long.:0', { cause: error });
         }
 
         // Handle network errors
         if (error.message.includes('Failed to fetch') || error.name === 'NetworkError') {
-          throw new Error('API_ERROR:NETWORK_ERROR:Network connection failed. Please check your internet connection.:0');
+          throw new Error('API_ERROR:NETWORK_ERROR:Network connection failed. Please check your internet connection.:0', { cause: error });
         }
 
         // Re-throw API errors
@@ -136,7 +136,7 @@ class ApiService {
       }
 
       // Generic error
-      throw new Error('API_ERROR:UNKNOWN_ERROR:An unexpected error occurred. Please try again.:0');
+      throw new Error('API_ERROR:UNKNOWN_ERROR:An unexpected error occurred. Please try again.:0', { cause: error });
     }
   }
 
@@ -177,9 +177,9 @@ class ApiService {
         throw error;
       }
       if (error instanceof Error && (error.message.includes('Failed to fetch') || error.name === 'NetworkError')) {
-        throw new Error('API_ERROR:NETWORK_ERROR:Network connection failed. Please check your internet connection.:0');
+        throw new Error('API_ERROR:NETWORK_ERROR:Network connection failed. Please check your internet connection.:0', { cause: error });
       }
-      throw new Error('API_ERROR:UNKNOWN_ERROR:An unexpected error occurred. Please try again.:0');
+      throw new Error('API_ERROR:UNKNOWN_ERROR:An unexpected error occurred. Please try again.:0', { cause: error });
     }
 
     // Pre-stream failures (rate limit, validation, session init) still come

@@ -33,14 +33,19 @@ export default tseslint.config(
     rules: {
       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': 'warn',
-      // 既存コードベースへの段階導入: 以下は警告に留める（新規コードでは避ける）
-      '@typescript-eslint/no-explicit-any': 'warn',
-      'react-hooks/set-state-in-effect': 'warn',
-      'preserve-caught-error': 'warn',
+      // any禁止（全既存箇所を解消済み。unknown+絞り込みを使う）
+      '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/no-unused-vars': [
         'error',
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
+    },
+  },
+  {
+    // テスト関連ファイルはHMR対象外のため react-refresh ルールを適用しない
+    files: ['**/__tests__/**', '**/*.test.{ts,tsx}', 'src/test/**'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
     },
   }
 );

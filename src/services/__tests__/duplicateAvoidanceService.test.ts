@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { DuplicateAvoidanceService } from '@/services/duplicateAvoidanceService';
+import { DuplicateAvoidanceService, HistoryMessageLike } from '@/services/duplicateAvoidanceService';
 
 describe('DuplicateAvoidanceService', () => {
   describe('evaluateResponseDiversity', () => {
@@ -126,7 +126,7 @@ describe('DuplicateAvoidanceService', () => {
     });
 
     it('should handle empty history', () => {
-      const history: any[] = [];
+      const history: HistoryMessageLike[] = [];
       
       const prompt = DuplicateAvoidanceService.generateDuplicateAvoidancePrompt(history);
       
@@ -134,7 +134,7 @@ describe('DuplicateAvoidanceService', () => {
     });
 
     it('should limit history to recent AI messages', () => {
-      const history: any[] = Array.from({ length: 15 }, (_, i) => ({
+      const history: HistoryMessageLike[] = Array.from({ length: 15 }, (_, i) => ({
         id: `${i + 1}`,
         text: `メッセージ ${i + 1}`,
         sender: i % 2 === 0 ? 'user' : 'ai',

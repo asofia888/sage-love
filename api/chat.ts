@@ -200,7 +200,7 @@ export default async function handler(req: Request) {
       systemInstruction,
       generationConfig,
       safetySettings,
-    } as any);
+    });
 
     const prompt = buildPrompt(conversationHistory, message);
 

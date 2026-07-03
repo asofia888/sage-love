@@ -5,79 +5,65 @@ import { STORAGE } from '../config/constants';
 import { storage } from '../lib/storage';
 import { analytics } from '../lib/analytics';
 
-export function useChatHistory(isI18nInitialized: boolean): [
+// メッセージ数制限チェックとトリム（フックに依存しない純粋なロジック）
+function trimMessagesIfNeeded(messageList: ChatMessage[]): ChatMessage[] {
+    if (messageList.length <= STORAGE.MAX_MESSAGES) {
+        return messageList;
+    }
+
+    console.warn(`Message history exceeded ${STORAGE.MAX_MESSAGES} messages. Trimming to ${STORAGE.TRIM_TO_MESSAGES} most recent messages.`);
+
+    // 最新のメッセージを保持（ユーザーメッセージとアシスタントメッセージのペアを維持）
+    const trimmed = messageList.slice(-STORAGE.TRIM_TO_MESSAGES);
+
+    // Analytics tracking for performance monitoring
+    analytics.trackEvent('chat_history_trimmed', {
+        event_category: 'performance',
+        original_count: messageList.length,
+        trimmed_count: trimmed.length,
+        memory_usage: new Blob([JSON.stringify(messageList)]).size
+    });
+
+    return trimmed;
+}
+
+// localStorageから履歴を同期的に読み込む（useStateの遅延初期化用）
+function loadInitialMessages(): ChatMessage[] {
+    try {
+        const item = storage.getRaw(STORAGE.CHAT_HISTORY_KEY);
+        const savedHistory: unknown[] = item ? JSON.parse(item) : [];
+
+        if (savedHistory.length === 0) return [];
+
+        const loadedMessages = (savedHistory as Array<Record<string, unknown>>).map(msg => ({
+            ...msg,
+            // 旧形式データも含めISO文字列に正規化（型は string）
+            timestamp: typeof msg.timestamp === 'string'
+                ? msg.timestamp
+                : new Date((msg.timestamp as number | undefined) ?? Date.now()).toISOString()
+        })) as unknown as ChatMessage[];
+
+        return trimMessagesIfNeeded(loadedMessages);
+    } catch (e) {
+        console.error("Failed to load history:", e);
+        storage.remove(STORAGE.CHAT_HISTORY_KEY);
+
+        // Analytics tracking for errors
+        analytics.trackError(e instanceof Error ? e : 'Unknown error', 'chat_history_load');
+        return [];
+    }
+}
+
+export function useChatHistory(_isI18nInitialized: boolean): [
     ChatMessage[],
     React.Dispatch<React.SetStateAction<ChatMessage[]>>,
     () => void
 ] {
-    const [messages, setMessages] = useState<ChatMessage[]>([]);
-    const [isLoaded, setIsLoaded] = useState(false);
+    // 遅延初期化で同期的に読み込む（effect内setStateを避け、初期描画から履歴を表示）
+    const [messages, setMessages] = useState<ChatMessage[]>(loadInitialMessages);
     // 直前に保存したシリアライズ済みデータ。ストリーミング中は保存対象
     // （isTyping除外後）が変わらないため、同一内容の再書き込みをスキップする
     const lastSavedRef = useRef<string | null>(null);
-
-    // メッセージ数制限チェックとトリム
-    const trimMessagesIfNeeded = useCallback((messageList: ChatMessage[]): ChatMessage[] => {
-        if (messageList.length <= STORAGE.MAX_MESSAGES) {
-            return messageList;
-        }
-
-        console.warn(`Message history exceeded ${STORAGE.MAX_MESSAGES} messages. Trimming to ${STORAGE.TRIM_TO_MESSAGES} most recent messages.`);
-
-        // 最新のメッセージを保持（ユーザーメッセージとアシスタントメッセージのペアを維持）
-        const trimmed = messageList.slice(-STORAGE.TRIM_TO_MESSAGES);
-
-        // Analytics tracking for performance monitoring
-        analytics.trackEvent('chat_history_trimmed', {
-            event_category: 'performance',
-            original_count: messageList.length,
-            trimmed_count: trimmed.length,
-            memory_usage: new Blob([JSON.stringify(messageList)]).size
-        });
-
-        return trimmed;
-    }, []);
-
-    // Load from localStorage on initial mount
-    useEffect(() => {
-        if (!isI18nInitialized) return;
-
-        const startTime = performance.now();
-
-        try {
-            const item = storage.getRaw(STORAGE.CHAT_HISTORY_KEY);
-            const savedHistory: any[] = item ? JSON.parse(item) : [];
-
-            if (savedHistory.length > 0) {
-                const loadedMessages = savedHistory.map(msg => ({
-                    ...msg,
-                    // 旧形式データも含めISO文字列に正規化（型は string）
-                    timestamp: typeof msg.timestamp === 'string'
-                        ? msg.timestamp
-                        : new Date(msg.timestamp ?? Date.now()).toISOString()
-                }));
-
-                // メッセージ数制限チェック
-                const trimmedMessages = trimMessagesIfNeeded(loadedMessages);
-                setMessages(trimmedMessages);
-            }
-        } catch (e) {
-            console.error("Failed to load history:", e);
-            storage.remove(STORAGE.CHAT_HISTORY_KEY);
-            setMessages([]);
-
-            // Analytics tracking for errors
-            analytics.trackError(e instanceof Error ? e : 'Unknown error', 'chat_history_load');
-        } finally {
-            setIsLoaded(true);
-
-            const loadTime = performance.now() - startTime;
-            console.log(`Chat history loaded in ${loadTime.toFixed(2)}ms`);
-
-            // Analytics tracking for load performance
-            analytics.trackPerformance('chat_history_load_time', loadTime);
-        }
-    }, [isI18nInitialized, trimMessagesIfNeeded]);
 
     // メッセージ設定時の最適化版セッター
     const optimizedSetMessages = useCallback((newMessages: React.SetStateAction<ChatMessage[]>) => {
@@ -85,12 +71,10 @@ export function useChatHistory(isI18nInitialized: boolean): [
             const updated = typeof newMessages === 'function' ? newMessages(prevMessages) : newMessages;
             return trimMessagesIfNeeded(updated);
         });
-    }, [trimMessagesIfNeeded]);
+    }, []);
 
     // Save to localStorage with size checking
     useEffect(() => {
-        if (!isLoaded) return;
-
         const startTime = performance.now();
 
         try {
@@ -139,7 +123,7 @@ export function useChatHistory(isI18nInitialized: boolean): [
             // Analytics tracking for save errors
             analytics.trackError(e instanceof Error ? e : 'Unknown error', 'chat_history_save');
         }
-    }, [messages, isLoaded]);
+    }, [messages]);
 
     const clearChat = useCallback(() => {
         const previousCount = messages.length;

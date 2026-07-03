@@ -75,7 +75,7 @@ export const createMockCrisisResult = (overrides = {}) => ({
 });
 
 // Mock fetch helper
-export const mockFetch = (response: any, ok = true) => {
+export const mockFetch = (response: unknown, ok = true) => {
   return vi.fn().mockResolvedValue({
     ok,
     json: vi.fn().mockResolvedValue(response),

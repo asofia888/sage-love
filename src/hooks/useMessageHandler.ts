@@ -137,7 +137,7 @@ export const useMessageHandler = ({
             });
         }
 
-    } catch (e: any) {
+    } catch (e) {
         // ユーザーによる停止（またはアンマウント）はエラー扱いにしない。
         // 途中まで届いた応答は残し、1文字も無ければプレースホルダーを消す。
         if (abortController.signal.aborted) {
@@ -164,7 +164,7 @@ export const useMessageHandler = ({
             abortControllerRef.current = null;
         }
     }
-  }, [messages, isLoading, i18n.language, setMessages]);
+  }, [messages, isLoading, i18n.language, setMessages, checkForCrisis]);
 
   return {
     handleSendMessage,

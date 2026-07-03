@@ -91,7 +91,9 @@ describe('useChatHistory', () => {
     expect(messages[1].text).toBe('既存メッセージ2');
   });
 
-  it('should not load from localStorage when i18n is not initialized', () => {
+  it('should load history immediately regardless of i18n initialization state', () => {
+    // 履歴データは言語非依存なので、i18n初期化を待たず遅延初期化で同期読み込みする
+    // （初期描画でウェルカム画面が一瞬表示されるちらつきを防ぐ）
     const existingMessages = [
       { id: '1', text: '既存メッセージ', sender: MessageSender.USER, timestamp: '2023-01-01T00:00:00Z' },
     ];
@@ -99,7 +101,8 @@ describe('useChatHistory', () => {
 
     const { result } = renderHook(() => useChatHistory(false));
     const [messages] = result.current;
-    expect(messages).toEqual([]);
+    expect(messages).toHaveLength(1);
+    expect(messages[0].text).toBe('既存メッセージ');
   });
 
   it('should handle corrupted localStorage data gracefully', () => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface CookiePreferences {
@@ -6,31 +6,25 @@ interface CookiePreferences {
   functional: boolean;
 }
 
+// 保存済みの同意設定を読む。未保存・破損時は null（=バナー表示）
+function readStoredPreferences(): CookiePreferences | null {
+  const cookieConsent = localStorage.getItem('cookieConsent');
+  if (!cookieConsent) return null;
+  try {
+    return JSON.parse(cookieConsent);
+  } catch (error) {
+    console.error('Error parsing cookie consent:', error);
+    return null;
+  }
+}
+
 const CookieBanner: React.FC = () => {
   const { t } = useTranslation();
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(() => readStoredPreferences() === null);
   const [showDetails, setShowDetails] = useState(false);
-  const [preferences, setPreferences] = useState<CookiePreferences>({
-    necessary: true, // Always required
-    functional: false
-  });
-
-  useEffect(() => {
-    // Check if user has already made a cookie choice
-    const cookieConsent = localStorage.getItem('cookieConsent');
-    if (!cookieConsent) {
-      setIsVisible(true);
-    } else {
-      // Load saved preferences
-      try {
-        const savedPreferences = JSON.parse(cookieConsent);
-        setPreferences(savedPreferences);
-      } catch (error) {
-        console.error('Error parsing cookie consent:', error);
-        setIsVisible(true);
-      }
-    }
-  }, []);
+  const [preferences, setPreferences] = useState<CookiePreferences>(
+    () => readStoredPreferences() ?? { necessary: true, functional: false }
+  );
 
 
   const handleAcceptAll = () => {
