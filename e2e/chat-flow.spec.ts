@@ -215,7 +215,8 @@ test.describe('Chat Flow E2E', () => {
     // Messages should persist via localStorage (addInitScript is guarded so
     // reload doesn't wipe storage; fetch mock is re-installed before scripts
     // load, but no new API calls fire from persisted history).
-    await expect(page.getByText('永続化テスト')).toBeVisible({ timeout: 5000 });
+    // exact: true — 部分一致だと「永続化テスト応答」にもマッチして strict mode violation になる
+    await expect(page.getByText('永続化テスト', { exact: true })).toBeVisible({ timeout: 5000 });
     await expect(page.getByText('永続化テスト応答')).toBeVisible({ timeout: 5000 });
   });
 

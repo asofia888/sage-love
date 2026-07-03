@@ -208,7 +208,7 @@ curl -X POST https://your-domain.vercel.app/api/chat \
 
 ---
 
-### GET /api/stats
+### GET /api/admin/stats
 
 システムの健全性とレート制限統計を取得します。
 
@@ -289,7 +289,7 @@ curl -X POST https://your-domain.vercel.app/api/chat \
 #### Example
 
 ```bash
-curl -X GET https://your-domain.vercel.app/api/stats \
+curl -X GET https://your-domain.vercel.app/api/admin/stats \
   -H "Authorization: Bearer your-stats-api-key"
 ```
 

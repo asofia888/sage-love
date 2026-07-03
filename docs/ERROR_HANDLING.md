@@ -214,13 +214,13 @@ async function sendMessage(message: string) {
 
 ## 監視とデバッグ
 
-### 統計エンドポイント (`/api/stats`)
+### 統計エンドポイント (`/api/admin/stats`)
 
 システムの健全性とエラー統計を取得:
 
 ```bash
 curl -H "Authorization: Bearer YOUR_STATS_API_KEY" \
-  https://your-app.vercel.app/api/stats
+  https://your-app.vercel.app/api/admin/stats
 ```
 
 **レスポンス例:**

@@ -31,7 +31,7 @@ Sage's Love AIは、React + Vite フロントエンドと Vercel Edge Functions 
 │  └──────────────────────────────────────┼──────────────────────┘│
 │                                         │                        │
 │  ┌─────────────────────────────────────┐│                        │
-│  │              /api/stats             ││                        │
+│  │              /api/admin/stats             ││                        │
 │  │  Health Check & Monitoring          ││                        │
 │  └─────────────────────────────────────┘│                        │
 └─────────────────────────────────────────┼────────────────────────┘
@@ -429,7 +429,7 @@ Savings: 75% on system prompt tokens
 
 ```bash
 # Check cache status
-curl -H "Authorization: Bearer $ADMIN_TOKEN" /api/stats
+curl -H "Authorization: Bearer $ADMIN_TOKEN" /api/admin/stats
 
 # Response includes:
 {

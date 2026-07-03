@@ -93,7 +93,7 @@ if (process.env.NODE_ENV === 'development') {
 1. Check current usage:
 ```bash
 curl -H "Authorization: Bearer YOUR_ADMIN_TOKEN" \
-  https://your-domain.vercel.app/api/stats
+  https://your-domain.vercel.app/api/admin/stats
 ```
 
 2. Increase limits (if needed):
@@ -125,7 +125,7 @@ EMERGENCY_STOP_LIMIT=150.0
 1. Check circuit breaker status:
 ```bash
 curl -H "Authorization: Bearer YOUR_ADMIN_TOKEN" \
-  https://your-domain.vercel.app/api/stats
+  https://your-domain.vercel.app/api/admin/stats
 ```
 
 2. Wait for automatic recovery:
@@ -322,7 +322,7 @@ console.log(result);
 
 ```bash
 curl -H "Authorization: Bearer YOUR_ADMIN_TOKEN" \
-  https://your-domain.vercel.app/api/stats | jq
+  https://your-domain.vercel.app/api/admin/stats | jq
 ```
 
 ### Check Health
