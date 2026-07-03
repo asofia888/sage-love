@@ -208,7 +208,9 @@ test.describe('Chat Flow E2E', () => {
     const textarea = page.getByRole('textbox');
     await textarea.fill('永続化テスト');
     await page.getByRole('button', { name: /送信/ }).click();
-    await expect(page.getByText('永続化テスト応答')).toBeVisible({ timeout: 10000 });
+    // AI応答テキストは <main> 外の aria-live リージョンにも複製されるため、
+    // チャット本文（main内）にスコープして一意にマッチさせる
+    await expect(page.locator('main').getByText('永続化テスト応答')).toBeVisible({ timeout: 10000 });
 
     await page.reload();
 
@@ -217,7 +219,7 @@ test.describe('Chat Flow E2E', () => {
     // load, but no new API calls fire from persisted history).
     // exact: true — 部分一致だと「永続化テスト応答」にもマッチして strict mode violation になる
     await expect(page.getByText('永続化テスト', { exact: true })).toBeVisible({ timeout: 5000 });
-    await expect(page.getByText('永続化テスト応答')).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('main').getByText('永続化テスト応答')).toBeVisible({ timeout: 5000 });
   });
 
   test('rate limit response shows appropriate error', async ({ page }) => {
