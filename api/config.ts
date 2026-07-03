@@ -5,6 +5,7 @@
 export const API_CONFIG = {
   REQUEST_TIMEOUT: 25000, // 25 seconds (within Vercel's 30s Edge Function limit)
   MAX_OUTPUT_TOKENS: 4096,
+  MODEL_NAME: 'gemini-flash-latest', // Always use latest Flash model
 } as const;
 
 /**

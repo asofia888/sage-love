@@ -37,7 +37,8 @@ async function hmac(secret: string, data: string): Promise<string> {
 }
 
 // Constant-time string comparison to avoid timing side-channels on the HMAC check.
-function timingSafeEqual(a: string, b: string): boolean {
+// Exported so token checks elsewhere (e.g. admin stats) use the same primitive.
+export function timingSafeEqual(a: string, b: string): boolean {
   if (a.length !== b.length) return false;
   let result = 0;
   for (let i = 0; i < a.length; i++) {

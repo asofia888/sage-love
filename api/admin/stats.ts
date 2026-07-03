@@ -4,6 +4,8 @@
 
 import { getUsageStats, config as rateLimitConfig } from '../rate-limiter';
 import { validateEnv } from '../config';
+import { timingSafeEqual } from '../session';
+import { geminiCircuitBreaker } from '../circuit-breaker';
 
 export const config = {
   runtime: 'edge',
@@ -18,8 +20,8 @@ export default async function handler(req: Request) {
   }
 
   try {
-    // Simple authentication check
-    const authHeader = req.headers.get('Authorization');
+    // Simple authentication check (constant-time comparison)
+    const authHeader = req.headers.get('Authorization') || '';
     const adminToken = process.env.ADMIN_TOKEN;
 
     if (!adminToken) {
@@ -32,7 +34,7 @@ export default async function handler(req: Request) {
       });
     }
 
-    if (authHeader !== `Bearer ${adminToken}`) {
+    if (!timingSafeEqual(authHeader, `Bearer ${adminToken}`)) {
       return new Response(JSON.stringify({
         error: 'UNAUTHORIZED',
         message: 'Valid authorization required',
@@ -45,6 +47,8 @@ export default async function handler(req: Request) {
     // Get usage statistics
     const usageStats = await getUsageStats();
     const envValidation = validateEnv();
+    // Edge のアイソレート単位の値である点に注意（リージョン/インスタンスごとに独立）
+    const cbStats = geminiCircuitBreaker.getStats();
 
     // Get current timestamp and calculate time until resets
     const now = new Date();
@@ -73,6 +77,17 @@ export default async function handler(req: Request) {
       resetTimes: {
         dailyResetIn: Math.ceil((endOfDay.getTime() - now.getTime()) / 1000),
         hourlyResetIn: Math.ceil((endOfHour.getTime() - now.getTime()) / 1000),
+      },
+
+      // Circuit breaker (per-isolate values)
+      circuitBreaker: {
+        state: cbStats.state,
+        failureCount: cbStats.failureCount,
+        successCount: cbStats.successCount,
+        totalRequests: cbStats.totalRequests,
+        rejectedRequests: cbStats.rejectedRequests,
+        lastFailureTime: cbStats.lastFailureTime?.toISOString(),
+        lastStateChange: cbStats.lastStateChange.toISOString(),
       },
 
       // Environment validation

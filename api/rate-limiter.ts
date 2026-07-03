@@ -117,37 +117,30 @@ function estimateRequestCost(messageLength: number, historyLength: number = 0): 
 const COST_SCALE = 10000; // preserves 4 decimal places
 
 /**
- * Get current daily cost from Redis (in dollars)
+ * Get current daily cost from Redis (in dollars).
+ * Redis 障害時は例外を投げる — 呼び出し側（コスト上限チェック）が
+ * fail-closed で扱えるよう、ここで 0 に潰さない。
  */
 async function getDailyCost(): Promise<number> {
   if (!redis) return 0;
 
-  try {
-    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-    const costKey = `cost:daily:${today}`;
-    const cost = await redis.get<number>(costKey);
-    return (cost || 0) / COST_SCALE;
-  } catch (error) {
-    console.error('Error getting daily cost:', error);
-    return 0;
-  }
+  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+  const costKey = `cost:daily:${today}`;
+  const cost = await redis.get<number>(costKey);
+  return (cost || 0) / COST_SCALE;
 }
 
 /**
- * Get current hourly cost from Redis (in dollars)
+ * Get current hourly cost from Redis (in dollars).
+ * Redis 障害時は例外を投げる（getDailyCost と同じ方針）。
  */
 async function getHourlyCost(): Promise<number> {
   if (!redis) return 0;
 
-  try {
-    const currentHour = new Date().toISOString().substring(0, 13); // YYYY-MM-DDTHH
-    const costKey = `cost:hourly:${currentHour}`;
-    const cost = await redis.get<number>(costKey);
-    return (cost || 0) / COST_SCALE;
-  } catch (error) {
-    console.error('Error getting hourly cost:', error);
-    return 0;
-  }
+  const currentHour = new Date().toISOString().substring(0, 13); // YYYY-MM-DDTHH
+  const costKey = `cost:hourly:${currentHour}`;
+  const cost = await redis.get<number>(costKey);
+  return (cost || 0) / COST_SCALE;
 }
 
 /**
@@ -156,7 +149,7 @@ async function getHourlyCost(): Promise<number> {
 export async function recordActualCost(cost: number): Promise<void> {
   if (!redis || cost <= 0) return;
 
-  // Store as integer (multiply by COST_SCALE) — same scheme as cache savings
+  // Store as integer (multiply by COST_SCALE)
   const scaledCost = Math.round(cost * COST_SCALE);
   if (scaledCost <= 0) return;
 
@@ -181,67 +174,6 @@ export async function recordActualCost(cost: number): Promise<void> {
     }
   } catch (error) {
     console.error('Error recording cost:', error);
-  }
-}
-
-/**
- * Record cache savings for monitoring
- */
-export async function recordCacheSavings(savings: number): Promise<void> {
-  if (!redis || savings <= 0) return;
-
-  try {
-    const today = new Date().toISOString().split('T')[0];
-
-    // Increment daily savings (expires after 2 days)
-    const savingsKey = `cache:savings:${today}`;
-    // Store as integer (multiply by 10000 to preserve 4 decimal places)
-    await redis.incrby(savingsKey, Math.round(savings * 10000));
-    await redis.expire(savingsKey, 172800); // 2 days in seconds
-
-    // Increment cache hit count
-    const hitCountKey = `cache:hits:${today}`;
-    await redis.incr(hitCountKey);
-    await redis.expire(hitCountKey, 172800);
-
-    console.log(`💰 Cache savings recorded: $${savings.toFixed(4)}`);
-  } catch (error) {
-    console.error('Error recording cache savings:', error);
-  }
-}
-
-/**
- * Get daily cache savings
- */
-async function getDailyCacheSavings(): Promise<number> {
-  if (!redis) return 0;
-
-  try {
-    const today = new Date().toISOString().split('T')[0];
-    const savingsKey = `cache:savings:${today}`;
-    const savings = await redis.get<number>(savingsKey);
-    // Convert back from integer (divide by 10000)
-    return (savings || 0) / 10000;
-  } catch (error) {
-    console.error('Error getting cache savings:', error);
-    return 0;
-  }
-}
-
-/**
- * Get daily cache hit count
- */
-async function getDailyCacheHits(): Promise<number> {
-  if (!redis) return 0;
-
-  try {
-    const today = new Date().toISOString().split('T')[0];
-    const hitCountKey = `cache:hits:${today}`;
-    const hits = await redis.get<number>(hitCountKey);
-    return hits || 0;
-  } catch (error) {
-    console.error('Error getting cache hits:', error);
-    return 0;
   }
 }
 
@@ -333,8 +265,12 @@ export async function shouldBlockRequest(
     };
   }
 
+  const estimatedCost = estimateRequestCost(messageLength, historyLength);
+
+  // 2-3. Global cost limits — Redis 障害でコストが読めない場合は fail-closed。
+  // 「使用額 0」と誤認して日次上限($10)を素通りさせないため、読み取り失敗は拒否する。
+  // （IP/セッション制限の障害は下の catch で従来どおり fail-open。）
   try {
-    // 2. Check global cost limits
     const dailyCost = await getDailyCost();
     const hourlyCost = await getHourlyCost();
 
@@ -365,8 +301,6 @@ export async function shouldBlockRequest(
       };
     }
 
-    // 3. Check estimated cost
-    const estimatedCost = estimateRequestCost(messageLength, historyLength);
     if (dailyCost + estimatedCost > RATE_LIMIT_CONFIG.global.maxCostPerDay) {
       return {
         blocked: true,
@@ -375,7 +309,17 @@ export async function shouldBlockRequest(
         retryAfter: getTimeUntilReset('daily'),
       };
     }
+  } catch (error) {
+    console.error('Cost check unavailable — failing closed:', error);
+    return {
+      blocked: true,
+      reason: 'COST_CHECK_UNAVAILABLE',
+      message: 'Service temporarily unavailable. Please try again shortly.',
+      retryAfter: 60,
+    };
+  }
 
+  try {
     // 4. Check burst rate limit (prevent rapid-fire requests)
     const burstResult = await burstRateLimiter.limit(clientIP);
     if (!burstResult.success) {
@@ -432,10 +376,11 @@ export async function shouldBlockRequest(
     };
   } catch (error) {
     console.error('Error in rate limiting check:', error);
-    // On error, fail open (allow the request) but log the error
+    // IP/セッション制限のRedis障害はfail-open（正当なユーザーを止めない）。
+    // コスト上限は上のブロックで別途fail-closed済み。
     return {
       blocked: false,
-      estimatedCost: estimateRequestCost(messageLength, historyLength),
+      estimatedCost,
     };
   }
 }
@@ -454,11 +399,6 @@ export async function getUsageStats() {
   try {
     const dailyCost = await getDailyCost();
     const hourlyCost = await getHourlyCost();
-    const cacheSavings = await getDailyCacheSavings();
-    const cacheHits = await getDailyCacheHits();
-
-    // Calculate effective cost (actual cost minus cache savings)
-    const effectiveDailyCost = Math.max(0, dailyCost - cacheSavings);
 
     return {
       redisConfigured: true,
@@ -467,13 +407,6 @@ export async function getUsageStats() {
       limits: RATE_LIMIT_CONFIG.global,
       remainingBudget: Math.max(0, RATE_LIMIT_CONFIG.global.maxCostPerDay - dailyCost),
       utilizationPercentage: (dailyCost / RATE_LIMIT_CONFIG.global.maxCostPerDay) * 100,
-      // Context cache statistics
-      contextCache: {
-        dailySavings: cacheSavings,
-        dailyHits: cacheHits,
-        effectiveCost: effectiveDailyCost,
-        savingsPercentage: dailyCost > 0 ? (cacheSavings / dailyCost) * 100 : 0,
-      },
     };
   } catch (error) {
     console.error('Error getting usage stats:', error);

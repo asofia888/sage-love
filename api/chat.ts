@@ -1,9 +1,8 @@
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold, GenerateContentResult } from '@google/generative-ai';
-import { shouldBlockRequest, recordActualCost, recordCacheSavings } from './rate-limiter';
+import { shouldBlockRequest, recordActualCost } from './rate-limiter';
 import { parseGeminiError, buildErrorResponse, ValidationError, APIError } from './errors';
 import { retryWithBackoff, withTimeout, RetryStatsTracker } from './retry-utils';
 import { geminiCircuitBreaker } from './circuit-breaker';
-import { getModelWithCache, calculateCacheSavings, getCacheStats } from './context-cache';
 import { API_CONFIG, validateEnv, isOriginAllowed } from './config';
 import { getOrCreateSession, attachSessionCookie, SessionResult } from './session';
 import { buildSystemInstruction } from './system-instruction';
@@ -185,16 +184,12 @@ export default async function handler(req: Request) {
 
     const systemInstruction = buildSystemInstruction(language, message, conversationHistory);
 
-    const { model, cached, tokensSaved } = await getModelWithCache(
-      genAI,
+    const model = genAI.getGenerativeModel({
+      model: API_CONFIG.MODEL_NAME,
       systemInstruction,
       generationConfig,
-      safetySettings
-    );
-
-    if (cached) {
-      console.log(`📦 Context cache hit: ~${tokensSaved} tokens saved`);
-    }
+      safetySettings,
+    } as any);
 
     const prompt = buildPrompt(conversationHistory, message);
 
@@ -204,8 +199,6 @@ export default async function handler(req: Request) {
         prompt,
         session,
         sessionId,
-        cached,
-        tokensSaved,
         rateLimitResult,
       });
     }
@@ -215,8 +208,6 @@ export default async function handler(req: Request) {
       prompt,
       session,
       sessionId,
-      cached,
-      tokensSaved,
       rateLimitResult,
     });
 
@@ -227,12 +218,10 @@ export default async function handler(req: Request) {
 }
 
 interface ResponseContext {
-  model: Awaited<ReturnType<typeof getModelWithCache>>['model'];
+  model: ReturnType<GoogleGenerativeAI['getGenerativeModel']>;
   prompt: string;
   session: SessionResult;
   sessionId: string;
-  cached: boolean;
-  tokensSaved: number;
   rateLimitResult: RateLimitResult;
 }
 
@@ -241,7 +230,7 @@ interface ResponseContext {
  * a single response, matching the pre-streaming contract.
  */
 async function handleJsonResponse(ctx: ResponseContext): Promise<Response> {
-  const { model, prompt, session, sessionId, cached, tokensSaved, rateLimitResult } = ctx;
+  const { model, prompt, session, sessionId, rateLimitResult } = ctx;
 
   let retryAttempts = 0;
   const result = await geminiCircuitBreaker.execute<GenerateContentResult>(async () => {
@@ -273,17 +262,11 @@ async function handleJsonResponse(ctx: ResponseContext): Promise<Response> {
   if (rateLimitResult.estimatedCost) {
     await recordActualCost(rateLimitResult.estimatedCost);
   }
-  if (cached && tokensSaved > 0) {
-    await recordCacheSavings(calculateCacheSavings(tokensSaved));
-  }
-
-  const cacheStats = getCacheStats();
 
   return attachSessionCookie(new Response(JSON.stringify({
     message: text.trim(),
     timestamp: new Date().toISOString(),
     sessionId,
-    cache: { hit: cached, tokensSaved },
   }), {
     status: 200,
     headers: {
@@ -291,9 +274,6 @@ async function handleJsonResponse(ctx: ResponseContext): Promise<Response> {
       'Cache-Control': 'no-cache',
       'X-RateLimit-Remaining-IP': String(rateLimitResult.remainingRequests?.ip || 0),
       'X-RateLimit-Remaining-Session': String(rateLimitResult.remainingRequests?.session || 0),
-      'X-Context-Cache-Hit': String(cached),
-      'X-Context-Cache-Tokens-Saved': String(tokensSaved),
-      'X-Context-Cache-TTL': String(cacheStats.remainingTTL),
     },
   }), session);
 }
@@ -310,9 +290,8 @@ async function handleJsonResponse(ctx: ResponseContext): Promise<Response> {
  * so upstream outages trip the breaker just like the JSON path.
  */
 function handleStreamingResponse(ctx: ResponseContext): Response {
-  const { model, prompt, session, sessionId, cached, tokensSaved, rateLimitResult } = ctx;
+  const { model, prompt, session, sessionId, rateLimitResult } = ctx;
   const encoder = new TextEncoder();
-  const cacheStats = getCacheStats();
 
   const body = new ReadableStream<Uint8Array>({
     async start(controller) {
@@ -363,14 +342,10 @@ function handleStreamingResponse(ctx: ResponseContext): Response {
         if (rateLimitResult.estimatedCost) {
           await recordActualCost(rateLimitResult.estimatedCost);
         }
-        if (cached && tokensSaved > 0) {
-          await recordCacheSavings(calculateCacheSavings(tokensSaved));
-        }
 
         enqueue({
           type: 'done',
           sessionId,
-          cache: { hit: cached, tokensSaved },
           timestamp: new Date().toISOString(),
         });
         controller.close();
@@ -399,9 +374,6 @@ function handleStreamingResponse(ctx: ResponseContext): Response {
       'X-Accel-Buffering': 'no',
       'X-RateLimit-Remaining-IP': String(rateLimitResult.remainingRequests?.ip || 0),
       'X-RateLimit-Remaining-Session': String(rateLimitResult.remainingRequests?.session || 0),
-      'X-Context-Cache-Hit': String(cached),
-      'X-Context-Cache-Tokens-Saved': String(tokensSaved),
-      'X-Context-Cache-TTL': String(cacheStats.remainingTTL),
     },
   }), session);
 }
