@@ -323,6 +323,8 @@ export default {
   "textSizeLarge": "كبير",
   "textSizeNormalAria": "تعيين حجم النص إلى عادي",
   "textSizeLargeAria": "تعيين حجم النص إلى كبير",
+  "textSizeXLarge": "كبير جدًا",
+  "textSizeXLargeAria": "ضبط حجم النص على كبير جدًا",
   "copyMessageButtonLabel": "نسخ الرسالة",
   "messageCopiedTooltip": "تم النسخ!",
   "clearConversationButtonLabel": "مسح المحادثة",

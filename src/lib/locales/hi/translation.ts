@@ -322,6 +322,8 @@ export default {
   "textSizeLarge": "बड़ा",
   "textSizeNormalAria": "पाठ आकार सामान्य पर सेट करें",
   "textSizeLargeAria": "पाठ आकार बड़ा सेट करें",
+  "textSizeXLarge": "अति बड़ा",
+  "textSizeXLargeAria": "टेक्स्ट का आकार अति बड़ा पर सेट करें",
   "copyMessageButtonLabel": "संदेश कॉपी करें",
   "messageCopiedTooltip": "कॉपी किया गया!",
   "clearConversationButtonLabel": "वार्तालाप साफ़ करें",

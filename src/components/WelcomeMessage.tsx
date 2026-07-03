@@ -2,14 +2,15 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { SageAvatarIcon } from './icons/SageAvatarIcon';
+import { textSizeBodyClass } from '../lib/textSize';
 
 interface WelcomeMessageProps {
     textSize: string;
 }
-  
+
 const WelcomeMessage: React.FC<WelcomeMessageProps> = ({ textSize }) => {
     const { t, i18n } = useTranslation();
-    const textClass = textSize === 'large' ? 'text-base' : 'text-sm';
+    const textClass = textSizeBodyClass(textSize);
     const formattedTimestamp = new Date().toLocaleTimeString(i18n.language.split('-')[0], {
         hour: '2-digit', minute: '2-digit'
     });

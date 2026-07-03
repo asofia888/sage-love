@@ -73,8 +73,9 @@ describe('useChatHistory', () => {
     });
 
     const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY)!);
-    expect(parsed).toHaveLength(1);
-    expect(parsed[0].text).toBe('永続化テスト');
+    expect(parsed.v).toBe(1);
+    expect(parsed.messages).toHaveLength(1);
+    expect(parsed.messages[0].text).toBe('永続化テスト');
   });
 
   it('should load messages from localStorage on initialization', () => {
@@ -110,6 +111,38 @@ describe('useChatHistory', () => {
     const { result } = renderHook(() => useChatHistory(true));
     const [messages] = result.current;
     expect(messages).toEqual([]);
+  });
+
+  it('should load the versioned { v, messages } schema', () => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      v: 1,
+      messages: [
+        { id: 'v1', text: 'バージョン付き', sender: MessageSender.USER, timestamp: '2023-01-01T00:00:00Z' },
+      ],
+    }));
+
+    const { result } = renderHook(() => useChatHistory(true));
+    const [messages] = result.current;
+    expect(messages).toHaveLength(1);
+    expect(messages[0].text).toBe('バージョン付き');
+  });
+
+  it('should persist using the versioned schema and migrate legacy arrays on save', () => {
+    // 旧形式（素の配列）を置いた状態から
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([
+      { id: 'old', text: '旧データ', sender: MessageSender.USER, timestamp: '2023-01-01T00:00:00Z' },
+    ]));
+
+    const { result } = renderHook(() => useChatHistory(true));
+    act(() => {
+      const [, setMessages] = result.current;
+      setMessages(prev => [...prev, createMockMessage({ id: 'new', text: '新データ' })]);
+    });
+
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) as string);
+    expect(stored.v).toBe(1);
+    expect(Array.isArray(stored.messages)).toBe(true);
+    expect(stored.messages.map((m: { text: string }) => m.text)).toEqual(['旧データ', '新データ']);
   });
 
   it('should maintain message order', () => {

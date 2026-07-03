@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { textSizeBodyClass } from '../lib/textSize';
 
 interface PromptSuggestionsProps {
   onSelectPrompt: (promptText: string) => void;
@@ -16,7 +17,7 @@ const PromptSuggestions: React.FC<PromptSuggestionsProps> = ({ onSelectPrompt, t
     { id: 's3', key: 'promptSuggestion3', ariaKey: 'promptSuggestion3' },
   ];
 
-  const buttonTextClass = textSize === 'large' ? 'text-base' : 'text-sm';
+  const buttonTextClass = textSizeBodyClass(textSize);
 
   return (
     <div className="flex flex-wrap justify-center gap-2 mb-3 px-2 sm:px-0">

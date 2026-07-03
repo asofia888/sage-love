@@ -71,6 +71,19 @@ describe('CrisisDetectionService', () => {
       expect(result.recommendedAction).toBe('emergency_resources');
     });
 
+    it('should NOT flag negated phrases as a crisis', () => {
+      // 否定形の偽陽性対策: 「死にたくない」を危機として誤検出しない
+      for (const phrase of [
+        "I don't want to die",
+        'I do not want to die',
+        'I would never kill myself',
+        "I won't kill myself",
+      ]) {
+        const result = CrisisDetectionService.detectCrisis(phrase, 'en');
+        expect(result.isCrisis, `"${phrase}" should not be a crisis`).toBe(false);
+      }
+    });
+
     it('should handle case insensitive matching', () => {
       const result = CrisisDetectionService.detectCrisis('死にたい気持ち');
 

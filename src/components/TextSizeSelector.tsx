@@ -14,6 +14,7 @@ const TextSizeSelector: React.FC<TextSizeSelectorProps> = ({ currentTextSize, on
   const sizes = [
     { value: 'normal', labelKey: 'textSizeNormal', ariaKey: 'textSizeNormalAria' },
     { value: 'large', labelKey: 'textSizeLarge', ariaKey: 'textSizeLargeAria' },
+    { value: 'x-large', labelKey: 'textSizeXLarge', ariaKey: 'textSizeXLargeAria' },
   ];
 
   return (

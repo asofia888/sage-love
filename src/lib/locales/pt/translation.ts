@@ -381,6 +381,8 @@ Estes termos de serviço entram em vigor quando os usuários utilizam este servi
   "textSizeLarge": "Grande",
   "textSizeNormalAria": "Definir tamanho do texto como normal",
   "textSizeLargeAria": "Definir tamanho do texto como grande",
+  "textSizeXLarge": "Muito grande",
+  "textSizeXLargeAria": "Definir tamanho do texto para muito grande",
   "copyMessageButtonLabel": "Copiar mensagem",
   "messageCopiedTooltip": "Copiado!",
   "clearConversationButtonLabel": "Limpar conversa",

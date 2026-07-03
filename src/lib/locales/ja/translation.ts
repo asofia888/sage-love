@@ -334,6 +334,8 @@ export default {
   "textSizeLarge": "大",
   "textSizeNormalAria": "文字サイズを標準に設定",
   "textSizeLargeAria": "文字サイズを大に設定",
+  "textSizeXLarge": "特大",
+  "textSizeXLargeAria": "文字サイズを特大に設定",
   "copyMessageButtonLabel": "メッセージをコピー",
   "messageCopiedTooltip": "コピーしました！",
   "clearConversationButtonLabel": "会話をクリア",

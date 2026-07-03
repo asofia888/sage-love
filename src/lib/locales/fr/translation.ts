@@ -324,6 +324,8 @@ Ces conditions de service entrent en vigueur lorsque les utilisateurs utilisent 
   "textSizeLarge": "Grand",
   "textSizeNormalAria": "Définir la taille du texte à normal",
   "textSizeLargeAria": "Définir la taille du texte à grand",
+  "textSizeXLarge": "Très grand",
+  "textSizeXLargeAria": "Définir la taille du texte sur très grand",
   "copyMessageButtonLabel": "Copier le message",
   "messageCopiedTooltip": "Copié !",
   "clearConversationButtonLabel": "Effacer la conversation",

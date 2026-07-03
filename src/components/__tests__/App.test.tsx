@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, waitFor } from '../../test/utils';
+import { render, screen, waitFor, within } from '../../test/utils';
 import userEvent from '@testing-library/user-event';
 import type React from 'react';
 import App from '../../App';
@@ -421,13 +421,11 @@ describe('App Integration Tests', () => {
       await user.type(input, 'エラーテスト');
       await user.click(screen.getByLabelText('送信'));
 
-      await waitFor(() => {
-        expect(screen.getByRole('alert')).toBeInTheDocument();
-      }, { timeout: 3000 });
+      const alert = await screen.findByRole('alert', {}, { timeout: 3000 });
 
-      // エラーをクリックして消去
-      const errorAlert = screen.getByRole('alert');
-      await user.click(errorAlert);
+      // 専用の閉じるボタン（キーボード操作可能）で消去する
+      const closeButton = within(alert).getByRole('button', { name: '閉じる' });
+      await user.click(closeButton);
 
       await waitFor(() => {
         expect(screen.queryByRole('alert')).not.toBeInTheDocument();
@@ -449,8 +447,10 @@ describe('App Integration Tests', () => {
         expect(chatHistory).toBeTruthy();
 
         if (chatHistory) {
+          // 保存フォーマットは { v, messages } のバージョン付きスキーマ
           const parsed = JSON.parse(chatHistory);
-          expect(parsed.some((msg: { text?: string }) => msg.text === '保存テスト')).toBe(true);
+          expect(parsed.v).toBe(1);
+          expect(parsed.messages.some((msg: { text?: string }) => msg.text === '保存テスト')).toBe(true);
         }
       });
     });

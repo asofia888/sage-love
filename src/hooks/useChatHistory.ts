@@ -27,15 +27,42 @@ function trimMessagesIfNeeded(messageList: ChatMessage[]): ChatMessage[] {
     return trimmed;
 }
 
+// 保存フォーマットのスキーマバージョン。将来メッセージ構造を変えたら
+// この値を上げ、loadInitialMessages のマイグレーション分岐を追加する。
+const SCHEMA_VERSION = 1;
+
+interface StoredHistory {
+    v: number;
+    messages: unknown[];
+}
+
+// 保存済みデータから生メッセージ配列を取り出す。
+// v0（バージョン無しの素の配列）も後方互換で受け入れ、次回保存時に現行版へ移行する。
+function extractRawMessages(parsed: unknown): unknown[] {
+    if (Array.isArray(parsed)) {
+        return parsed; // legacy v0
+    }
+    if (parsed && typeof parsed === 'object' && Array.isArray((parsed as StoredHistory).messages)) {
+        return (parsed as StoredHistory).messages;
+    }
+    return [];
+}
+
+// 現行スキーマのシリアライズ文字列を作る（保存とdedup比較で共用）
+function serializeHistory(messages: ChatMessage[]): string {
+    return JSON.stringify({ v: SCHEMA_VERSION, messages });
+}
+
 // localStorageから履歴を同期的に読み込む（useStateの遅延初期化用）
 function loadInitialMessages(): ChatMessage[] {
     try {
         const item = storage.getRaw(STORAGE.CHAT_HISTORY_KEY);
-        const savedHistory: unknown[] = item ? JSON.parse(item) : [];
+        if (!item) return [];
 
-        if (savedHistory.length === 0) return [];
+        const rawMessages = extractRawMessages(JSON.parse(item));
+        if (rawMessages.length === 0) return [];
 
-        const loadedMessages = (savedHistory as Array<Record<string, unknown>>).map(msg => ({
+        const loadedMessages = (rawMessages as Array<Record<string, unknown>>).map(msg => ({
             ...msg,
             // 旧形式データも含めISO文字列に正規化（型は string）
             timestamp: typeof msg.timestamp === 'string'
@@ -81,7 +108,7 @@ export function useChatHistory(_isI18nInitialized: boolean): [
             const historyToSave = messages.filter(msg => !msg.isTyping);
 
             if (historyToSave.length > 0) {
-                const dataString = JSON.stringify(historyToSave);
+                const dataString = serializeHistory(historyToSave);
 
                 // ストリーミング中のチャンク更新等で内容が変わっていなければ書き込まない
                 if (dataString === lastSavedRef.current) return;
@@ -94,8 +121,9 @@ export function useChatHistory(_isI18nInitialized: boolean): [
 
                     // さらにトリムして保存
                     const furtherTrimmed = historyToSave.slice(-STORAGE.TRIM_TO_MESSAGES * 0.8);
-                    storage.set(STORAGE.CHAT_HISTORY_KEY, furtherTrimmed);
-                    lastSavedRef.current = JSON.stringify(furtherTrimmed);
+                    const trimmedString = serializeHistory(furtherTrimmed);
+                    storage.setRaw(STORAGE.CHAT_HISTORY_KEY, trimmedString);
+                    lastSavedRef.current = trimmedString;
 
                     // Analytics tracking
                     analytics.trackEvent('storage_limit_exceeded', {

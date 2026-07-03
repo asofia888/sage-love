@@ -4,6 +4,7 @@ import { ChatMessage, MessageSender } from '../types';
 import { useTranslation } from 'react-i18next';
 import SageLoadingIndicator from './SageLoadingIndicator'; // Import the new component
 import { SageAvatarIcon } from './icons/SageAvatarIcon';
+import { textSizeBodyClass } from '../lib/textSize';
 import { UserAvatarIcon } from './icons/UserAvatarIcon';
 
 
@@ -53,7 +54,7 @@ const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({ message, curren
     minute: '2-digit',
   });
 
-  const textClass = textSize === 'large' ? 'text-base' : 'text-sm';
+  const textClass = textSizeBodyClass(textSize);
 
   const handleCopy = async () => {
     if (!message.text) return;
