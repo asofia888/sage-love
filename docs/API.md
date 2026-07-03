@@ -341,15 +341,18 @@ curl -X GET https://your-domain.vercel.app/api/admin/stats \
 | Type | Limit |
 |------|-------|
 | Message length | 1000 characters |
-| History messages | 5 messages |
+| History messages | 10 messages |
+| History message length | 8000 characters/message |
 | Tokens per request | ~2000 tokens |
 
 ### Cost Calculation
 
-Gemini 2.5 Flash 料金に基づく推定:
-- Input: $0.0003 / 1K tokens
-- Output: $0.0025 / 1K tokens
-- Average request: ~$0.0016
+Gemini 3 Flash Preview (`gemini-3-flash-preview`) 料金に基づく推定:
+- Input: $0.0005 / 1K tokens
+- Output: $0.0030 / 1K tokens
+- Average request: ~$0.0020
+
+詳細は [COST_ANALYSIS.md](../COST_ANALYSIS.md) を参照。
 
 ---
 

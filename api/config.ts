@@ -5,7 +5,11 @@
 export const API_CONFIG = {
   REQUEST_TIMEOUT: 25000, // 25 seconds (within Vercel's 30s Edge Function limit)
   MAX_OUTPUT_TOKENS: 4096,
-  MODEL_NAME: 'gemini-flash-latest', // Always use latest Flash model
+  // バージョン固定: エイリアス(gemini-flash-latest)は指す先が勝手に変わり、
+  // 単価も変わってコスト見積りとズレるため使わない。
+  // 注意: Preview版のため、GA時にIDが 'gemini-3-flash' へ変わる可能性あり。
+  // 変更時は api/rate-limiter.ts の単価と COST_ANALYSIS.md も併せて更新すること。
+  MODEL_NAME: 'gemini-3-flash-preview',
 } as const;
 
 /**
