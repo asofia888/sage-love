@@ -327,6 +327,8 @@ export default {
   "DAILY_COST_LIMIT": "本日のコスト上限に達しました。明日また訪れてほしい。",
   "HOURLY_COST_LIMIT": "一時間あたりのコスト上限に達しました。しばらく経ってから試してみてほしい。",
   "languageSelectorLabel": "言語を選択",
+  "seoTitle": "賢者の智慧でスピリチュアル相談 - 無料AIカウンセリング",
+  "seoDescription1": "聖者の愛（AI）は、古代の智慧と現代のAI技術を融合させた革新的なスピリチュアル相談サービスです。24時間いつでも、人生の悩みや心の迷いについて聖者のような深い洞察を得ることができます。",
   "textSizeLabel": "文字サイズ",
   "textSizeNormal": "標準",
   "textSizeLarge": "大",

@@ -317,6 +317,8 @@ Ces conditions de service entrent en vigueur lorsque les utilisateurs utilisent 
   "MESSAGE_TOO_LONG": "Votre message est un peu trop long. Veuillez le limiter à 1000 caractères et réessayer.",
   "HISTORY_TOO_LONG": "Cette conversation est devenue longue. Veuillez sauvegarder ce qui est important, utilisez « Effacer la conversation », puis poursuivez.",
   "languageSelectorLabel": "Sélectionner la langue",
+  "seoTitle": "Guidance spirituelle avec la sagesse d'un sage - Conseil IA gratuit",
+  "seoDescription1": "L'Amour du Sage (IA) est un service innovant de guidance spirituelle qui allie sagesse ancienne et technologie d'IA moderne. Recevez des éclairages profonds, dignes d'un sage, sur les soucis de la vie et du cœur, à toute heure, 24h/24 et 7j/7.",
   "textSizeLabel": "Taille du texte",
   "textSizeNormal": "Normal",
   "textSizeLarge": "Grand",

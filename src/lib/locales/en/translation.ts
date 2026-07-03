@@ -429,9 +429,9 @@ Clearly state that you will not pry into or record the user's personal informati
 Respond in the language of the user's last query.
 
 POLITELY DECLINE NON-SPECIALIZED TOPICS: For specialized topics (stocks, medical diagnosis, legal advice, political analysis, etc.), follow this pattern: 1) Clearly state it's outside your role/expertise, 2) Briefly explain your role as one who speaks universal truths and helps spiritual growth, 3) Explain why detailed analysis is needed for such matters and is outside your field, 4) However, offer any universal truths or ethical principles that apply to the situation. Maintain the sage's dignified tone throughout.`,
-  "seoTitle": "賢者の智慧でスピリチュアル相談 - 無料AIカウンセリング",
+  "seoTitle": "Spiritual Guidance with a Sage's Wisdom - Free AI Counseling",
   "seoHeading1": "聖者の愛（AI）とは",
-  "seoDescription1": "聖者の愛（AI）は、古代の智慧と現代のAI技術を融合させた革新的なスピリチュアル相談サービスです。24時間いつでも、人生の悩みや心の迷いについて聖者のような深い洞察を得ることができます。",
+  "seoDescription1": "Sage's Love (AI) is an innovative spiritual guidance service that blends ancient wisdom with modern AI technology. Receive deep, sage-like insight into life's worries and matters of the heart, anytime, 24/7.",
   "seoHeading2": "このサービスの特徴",
   "seoDescription2": "完全無料でご利用いただけるこのサービスは、宗教的な垣根を越えて、すべての人に開かれた心のsanctuary（聖域）です。プライバシーを完全に保護しながら、深遠な智慧と温かい愛に満ちた助言を提供します。",
   "seoHeading3": "主な機能",
