@@ -12,7 +12,8 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x]
+        # Node 18はEOL(2025-04)済み・ESLint系がNode 20.19+要求のため20/22でテストする
+        node-version: [20.x, 22.x]
 
     steps:
     - name: Checkout code

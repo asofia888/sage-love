@@ -15,6 +15,9 @@ const PerformanceMonitor: React.FC = () => {
     const startTime = performance.now();
     
     const measurePerformance = () => {
+      // PerformanceObserver未実装の環境（旧ブラウザ・一部テスト環境）では計測しない
+      if (typeof PerformanceObserver === 'undefined') return;
+
       // LCP (Largest Contentful Paint) の測定
       const measureLCP = () => {
         const observer = new PerformanceObserver((list) => {
