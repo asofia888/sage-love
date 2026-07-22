@@ -46,10 +46,11 @@ const SESSION_DAILY = 4;
 
 const COST_SCALE = 10000;
 
-function setCosts(daily: number, hourly: number) {
+function setCosts(daily: number, hourly: number, monthly: number = 0) {
   h.redisMock.get.mockImplementation(async (key: string) => {
     if (key.startsWith('cost:daily:')) return Math.round(daily * COST_SCALE);
     if (key.startsWith('cost:hourly:')) return Math.round(hourly * COST_SCALE);
+    if (key.startsWith('cost:monthly:')) return Math.round(monthly * COST_SCALE);
     return null;
   });
 }
@@ -104,6 +105,17 @@ describe('rate-limiter (Redis paths)', () => {
 
     expect(result.blocked).toBe(true);
     expect(result.reason).toBe(reason);
+    expect(result.retryAfter).toBeGreaterThan(0);
+  });
+
+  it('blocks when the month-to-date cost limit is reached → MONTHLY_COST_LIMIT', async () => {
+    // 月次予算(¥5,000 ≈ $30)を使い切った状態。日次/時次は未達でも月次で止める。
+    setCosts(0, 0, 30.0);
+    const { shouldBlockRequest } = await loadModule();
+    const result = await shouldBlockRequest('1.2.3.4', 's', 100, 0);
+
+    expect(result.blocked).toBe(true);
+    expect(result.reason).toBe('MONTHLY_COST_LIMIT');
     expect(result.retryAfter).toBeGreaterThan(0);
   });
 
@@ -173,12 +185,12 @@ describe('rate-limiter (Redis paths)', () => {
     const { recordActualCost } = await loadModule();
     await recordActualCost(0.05);
 
-    // 日次・時間の両キーに INCRBY(500) + EXPIRE
-    expect(h.redisMock.incrby).toHaveBeenCalledTimes(2);
+    // 日次・時間・月次の3キーに INCRBY(500) + EXPIRE
+    expect(h.redisMock.incrby).toHaveBeenCalledTimes(3);
     for (const call of h.redisMock.incrby.mock.calls) {
       expect(call[1]).toBe(Math.round(0.05 * COST_SCALE));
     }
-    expect(h.redisMock.expire).toHaveBeenCalledTimes(2);
+    expect(h.redisMock.expire).toHaveBeenCalledTimes(3);
   });
 
   it('skips recording non-positive costs', async () => {

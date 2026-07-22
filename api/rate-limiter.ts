@@ -25,6 +25,9 @@ const RATE_LIMIT_CONFIG = {
   global: {
     maxCostPerHour: 5.0,    // $5 per hour limit
     maxCostPerDay: 10.0,    // $10 per day limit
+    // 月次予算の上限。¥5,000/月 相当（¥5,000 ÷ 163.19 ≈ $30.64 @2026-07-22）。
+    // USD建てのため為替変動で¥換算は前後する。日次/時次と併用し、最も厳しい上限が効く。
+    maxCostPerMonth: 30.0,  // ≈ ¥5,000/月
     emergencyStopCost: 15.0, // Emergency stop at $15 (must stay above maxCostPerDay)
   },
 
@@ -112,17 +115,17 @@ if (isRedisConfigured()) {
  * Estimate the cost of a request based on message and history length
  */
 function estimateRequestCost(messageLength: number, historyLength: number = 0): number {
-  // Cost estimation for gemini-3.5-flash-lite (api/config.ts MODEL_NAME):
-  // Input: $0.30 per 1M tokens = $0.0003 per 1K tokens (text)
-  // Output: $2.50 per 1M tokens = $0.0025 per 1K tokens
+  // Cost estimation for gemini-3.6-flash (api/config.ts MODEL_NAME):
+  // Input: $1.50 per 1M tokens = $0.0015 per 1K tokens (text)
+  // Output: $7.50 per 1M tokens = $0.0075 per 1K tokens
   // Average character ≈ 1.5 tokens
   // モデルを変える場合はこの単価も必ず更新すること（日次$10上限はこの見積りで判定している）
 
   const inputTokens = (messageLength + historyLength * 100) * 1.5;
   const estimatedOutputTokens = Math.min(inputTokens * 2, 2000); // Max 2K output
 
-  const inputCost = (inputTokens / 1000) * 0.0003;
-  const outputCost = (estimatedOutputTokens / 1000) * 0.0025;
+  const inputCost = (inputTokens / 1000) * 0.0015;
+  const outputCost = (estimatedOutputTokens / 1000) * 0.0075;
 
   return Math.round((inputCost + outputCost) * 10000) / 10000; // Round to 4 decimal places
 }
@@ -160,6 +163,19 @@ async function getHourlyCost(): Promise<number> {
 }
 
 /**
+ * Get current month-to-date cost from Redis (in dollars).
+ * Redis 障害時は例外を投げる（getDailyCost と同じ方針）。
+ */
+async function getMonthlyCost(): Promise<number> {
+  if (!redis) return 0;
+
+  const currentMonth = new Date().toISOString().substring(0, 7); // YYYY-MM
+  const costKey = `cost:monthly:${currentMonth}`;
+  const cost = await redis.get<number>(costKey);
+  return (cost || 0) / COST_SCALE;
+}
+
+/**
  * Record actual cost (in dollars) after request completion
  */
 export async function recordActualCost(cost: number): Promise<void> {
@@ -183,6 +199,12 @@ export async function recordActualCost(cost: number): Promise<void> {
     await redis.incrby(hourlyKey, scaledCost);
     await redis.expire(hourlyKey, 7200); // 2 hours in seconds
 
+    // Increment month-to-date cost (expires after ~2 months so it survives its own month)
+    const currentMonth = new Date().toISOString().substring(0, 7); // YYYY-MM
+    const monthlyKey = `cost:monthly:${currentMonth}`;
+    await redis.incrby(monthlyKey, scaledCost);
+    await redis.expire(monthlyKey, 5356800); // 62 days in seconds
+
     // Log high-cost requests
     if (cost > 0.10) {
       const totalCost = await getDailyCost();
@@ -196,7 +218,7 @@ export async function recordActualCost(cost: number): Promise<void> {
 /**
  * Get time until next reset (in seconds)
  */
-function getTimeUntilReset(type: 'hourly' | 'daily'): number {
+function getTimeUntilReset(type: 'hourly' | 'daily' | 'monthly'): number {
   const now = new Date();
 
   if (type === 'daily') {
@@ -210,6 +232,13 @@ function getTimeUntilReset(type: 'hourly' | 'daily'): number {
     const nextHour = new Date(now);
     nextHour.setHours(nextHour.getHours() + 1, 0, 0, 0);
     return Math.ceil((nextHour.getTime() - now.getTime()) / 1000);
+  }
+
+  if (type === 'monthly') {
+    const nextMonth = new Date(now);
+    nextMonth.setMonth(nextMonth.getMonth() + 1, 1); // 翌月1日（12月→翌年1月も自動繰り上げ）
+    nextMonth.setHours(0, 0, 0, 0);
+    return Math.ceil((nextMonth.getTime() - now.getTime()) / 1000);
   }
 
   return 3600; // Default 1 hour
@@ -303,6 +332,7 @@ export async function shouldBlockRequest(
   try {
     const dailyCost = await getDailyCost();
     const hourlyCost = await getHourlyCost();
+    const monthlyCost = await getMonthlyCost();
 
     if (dailyCost >= RATE_LIMIT_CONFIG.global.emergencyStopCost) {
       return {
@@ -310,6 +340,16 @@ export async function shouldBlockRequest(
         reason: 'EMERGENCY_COST_LIMIT',
         message: 'Service temporarily unavailable due to high usage.',
         retryAfter: getTimeUntilReset('daily'),
+      };
+    }
+
+    // 月次予算(¥5,000相当)を使い切ったら翌月まで停止。日次/時次より上位の予算天井。
+    if (monthlyCost >= RATE_LIMIT_CONFIG.global.maxCostPerMonth) {
+      return {
+        blocked: true,
+        reason: 'MONTHLY_COST_LIMIT',
+        message: 'Monthly cost limit reached. Service will resume next month.',
+        retryAfter: getTimeUntilReset('monthly'),
       };
     }
 
@@ -440,14 +480,18 @@ export async function getUsageStats() {
   try {
     const dailyCost = await getDailyCost();
     const hourlyCost = await getHourlyCost();
+    const monthlyCost = await getMonthlyCost();
 
     return {
       redisConfigured: true,
       dailyCost,
       hourlyCost,
+      monthlyCost,
       limits: RATE_LIMIT_CONFIG.global,
       remainingBudget: Math.max(0, RATE_LIMIT_CONFIG.global.maxCostPerDay - dailyCost),
+      monthlyRemainingBudget: Math.max(0, RATE_LIMIT_CONFIG.global.maxCostPerMonth - monthlyCost),
       utilizationPercentage: (dailyCost / RATE_LIMIT_CONFIG.global.maxCostPerDay) * 100,
+      monthlyUtilizationPercentage: (monthlyCost / RATE_LIMIT_CONFIG.global.maxCostPerMonth) * 100,
     };
   } catch (error) {
     console.error('Error getting usage stats:', error);

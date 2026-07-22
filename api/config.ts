@@ -7,9 +7,9 @@ export const API_CONFIG = {
   MAX_OUTPUT_TOKENS: 4096,
   // バージョン固定: エイリアス(gemini-flash-latest)は指す先が勝手に変わり、
   // 単価も変わってコスト見積りとズレるため使わない。
-  // gemini-3.5-flash-lite は GA 版のため ID は安定（-preview サフィックスなし）。
+  // gemini-3.6-flash は GA 版のため ID は安定（-preview サフィックスなし）。
   // 変更時は api/rate-limiter.ts の単価と COST_ANALYSIS.md も併せて更新すること。
-  MODEL_NAME: 'gemini-3.5-flash-lite',
+  MODEL_NAME: 'gemini-3.6-flash',
 } as const;
 
 /**

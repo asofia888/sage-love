@@ -347,10 +347,10 @@ curl -X GET https://your-domain.vercel.app/api/admin/stats \
 
 ### Cost Calculation
 
-Gemini 3.5 Flash-Lite (`gemini-3.5-flash-lite`) 料金に基づく推定:
-- Input: $0.0003 / 1K tokens
-- Output: $0.0025 / 1K tokens
-- Average request: ~$0.0016
+Gemini 3.6 Flash (`gemini-3.6-flash`) 料金に基づく推定:
+- Input: $0.0015 / 1K tokens
+- Output: $0.0075 / 1K tokens
+- Average request: ~$0.0053
 
 詳細は [COST_ANALYSIS.md](../COST_ANALYSIS.md) を参照。
 

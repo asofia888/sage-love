@@ -67,6 +67,7 @@ export default async function handler(req: Request) {
       limits: {
         dailyCostLimit: rateLimitConfig.global.maxCostPerDay,
         hourlyCostLimit: rateLimitConfig.global.maxCostPerHour,
+        monthlyCostLimit: rateLimitConfig.global.maxCostPerMonth,
         emergencyStopLimit: rateLimitConfig.global.emergencyStopCost,
         ipRequestLimit: rateLimitConfig.ip.requests,
         sessionDailyLimit: rateLimitConfig.session.daily,
