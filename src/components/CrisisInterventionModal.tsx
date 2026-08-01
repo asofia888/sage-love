@@ -22,18 +22,20 @@ const CrisisInterventionModal: React.FC<CrisisInterventionModalProps> = ({
   const { t } = useTranslation();
   const [showAllResources, setShowAllResources] = useState(false);
 
-  // 入力（深刻度・言語・国）から導出できる値なので state ではなく useMemo で持つ
-  const resources = useMemo<EmergencyResource[]>(
-    () =>
-      isOpen && crisisResult.isCrisis
-        ? EmergencyResourceService.getRecommendedResources(
-            crisisResult.severity,
-            userLanguage,
-            userCountry
-          )
-        : [],
-    [isOpen, crisisResult, userLanguage, userCountry]
-  );
+  // 入力（深刻度・言語・国）から導出できる値なので state ではなく useMemo で持つ。
+  // getRecommendedResources は常に1件以上返す契約だが、万一空で返ってきても
+  // 「窓口の見出しだけあって中身が無いモーダル」を出さないようここでも受け止める。
+  const resources = useMemo<EmergencyResource[]>(() => {
+    if (!isOpen || !crisisResult.isCrisis) return [];
+    const recommended = EmergencyResourceService.getRecommendedResources(
+      crisisResult.severity,
+      userLanguage,
+      userCountry
+    );
+    return recommended.length > 0
+      ? recommended
+      : EmergencyResourceService.getGlobalFallbackResources();
+  }, [isOpen, crisisResult, userLanguage, userCountry]);
 
   if (!isOpen) return null;
 

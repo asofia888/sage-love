@@ -266,7 +266,10 @@ const App: React.FC = () => {
             onClose={closeCrisisModal}
             crisisResult={lastCrisisResult}
             userLanguage={i18n.language}
-            userCountry={navigator.language.split('-')[1] || 'JP'}
+            // 地域サブタグが無いロケール（"ar" 等）で 'JP' を既定にすると、
+            // 日本にいない利用者を日本在住として扱い国内専用番号で絞り込んでしまう。
+            // 判らないときは undefined を渡し、言語一致だけで窓口を選ばせる。
+            userCountry={navigator.language.split('-')[1]?.toUpperCase()}
           />
         )}
       </React.Suspense>
