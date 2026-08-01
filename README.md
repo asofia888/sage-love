@@ -4,7 +4,7 @@ Gemini APIを活用した、多言語対応の瞑想・スピリチュアルガ�
 
 ## Features
 
-- **AIチャット**: Gemini API（Gemini 3 Flash Preview）とのリアルタイム対話
+- **AIチャット**: Gemini API（Gemini 3.6 Flash）とのリアルタイム対話
 - **多言語対応**: 7言語（日本語、英語、スペイン語、ポルトガル語、フランス語、ヒンディー語、アラビア語）
 - **危機検出**: 自傷・自殺関連キーワードの多言語検出と緊急リソース提供
 - **レート制限**: IP/セッション/コストベースの多層防御
@@ -16,7 +16,7 @@ Gemini APIを活用した、多言語対応の瞑想・スピリチュアルガ�
 |---------|------|
 | Frontend | React 18, TypeScript, Vite |
 | Backend | Vercel Edge Functions |
-| AI | Google Gemini API (gemini-3-flash-preview) |
+| AI | Google Gemini API (gemini-3.6-flash) |
 | i18n | i18next |
 | Rate Limiting | Upstash Redis |
 | Testing | Vitest, Testing Library |

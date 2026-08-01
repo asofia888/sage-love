@@ -193,6 +193,8 @@ export default async function handler(req: Request) {
     }
     const genAI = new GoogleGenerativeAI(apiKey);
 
+    // 注意: temperature/topP/topK は Gemini 3.6 時点で非推奨。将来のモデル世代
+    // (Gemini 4+) では指定すると HTTP 400 になるため、その際は削除すること。
     const generationConfig = {
       temperature: 0.7,
       topP: 0.8,
