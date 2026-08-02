@@ -37,6 +37,36 @@ function usesSubstringMatch(lang: string): boolean {
   return ['ja', 'zh', 'ko', 'hi', 'ar'].includes(lang);
 }
 
+/** Devanagari: チャンドラビンドゥ(ँ) とアヌスヴァーラ(ं) は実運用で混用される */
+const DEVANAGARI_CHANDRABINDU = /ँ/g;
+
+/** Arabic: タシュキール(発音記号)とタトウィール(伸ばし記号)は表記揺れでしかない */
+const ARABIC_DIACRITICS = /[ً-ٰٟـ]/g;
+
+/**
+ * 表記揺れを吸収してからマッチさせる。
+ * 辞書側とテキスト側の双方に同じ正規化をかけるので、辞書に異体字を
+ * 並べなくても「मरना चाहता हूँ / हूं」「أريد / اريد」の両方を拾える。
+ */
+function normalizeForMatching(text: string, lang: string): string {
+  const normalized = text.normalize('NFC').toLowerCase();
+
+  if (lang === 'hi') {
+    return normalized.replace(DEVANAGARI_CHANDRABINDU, 'ं');
+  }
+
+  if (lang === 'ar') {
+    return normalized
+      .replace(ARABIC_DIACRITICS, '')
+      .replace(/[آأإٱ]/g, 'ا') // آ أ إ ٱ → ا
+      .replace(/ؤ/g, 'و')                     // ؤ → و
+      .replace(/[ئى]/g, 'ي')             // ئ ى → ي
+      .replace(/ة/g, 'ه');                    // ة → ه
+  }
+
+  return normalized;
+}
+
 /**
  * テキストにキーワードが文脈的に含まれるかチェック。
  * - 除外語が含まれる場合は取り除いた残りで再判定
@@ -48,25 +78,29 @@ function matchesKeyword(
   exclusions: string[],
   lang: string
 ): boolean {
-  const lowerText = text.toLowerCase();
-  const lowerKeyword = keyword.toLowerCase();
+  const normalizedText = normalizeForMatching(text, lang);
+  const normalizedKeyword = normalizeForMatching(keyword, lang);
 
   for (const exclusion of exclusions) {
-    if (lowerText.includes(exclusion.toLowerCase())) {
-      const cleaned = lowerText.replaceAll(exclusion.toLowerCase(), '  ');
-      if (!cleaned.includes(lowerKeyword)) {
+    const normalizedExclusion = normalizeForMatching(exclusion, lang);
+    if (normalizedText.includes(normalizedExclusion)) {
+      const cleaned = normalizedText.replaceAll(normalizedExclusion, '  ');
+      if (!cleaned.includes(normalizedKeyword)) {
         return false;
       }
     }
   }
 
   if (usesSubstringMatch(lang)) {
-    return lowerText.includes(lowerKeyword);
+    return normalizedText.includes(normalizedKeyword);
   }
 
-  const escaped = lowerKeyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const pattern = new RegExp(`\\b${escaped}\\b`, 'i');
-  return pattern.test(text);
+  // ASCII の \b はアクセント付き文字を語の一部と見なさないため、"sin mí" や
+  // "désespoir" のように非ASCII文字で終わる/始まるキーワードが一致しなくなる。
+  // Unicode の文字・数字クラスで前後の境界を自前に作る。
+  const escaped = normalizedKeyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const pattern = new RegExp(`(?<![\\p{L}\\p{N}])${escaped}(?![\\p{L}\\p{N}])`, 'iu');
+  return pattern.test(normalizedText);
 }
 
 interface MatchContext {
@@ -80,7 +114,10 @@ function collectMatches(text: string, lang: string): MatchContext[] {
 
   const matches: MatchContext[] = [];
   for (const category of CATEGORY_ORDER) {
-    const { keywords, exclusions } = data[category];
+    // カテゴリを持たない辞書があっても検出全体を落とさない
+    const categoryData = data[category];
+    if (!categoryData) continue;
+    const { keywords, exclusions } = categoryData;
     for (const entry of keywords) {
       if (matchesKeyword(text, entry.word, exclusions, lang)) {
         matches.push({ category, entry });

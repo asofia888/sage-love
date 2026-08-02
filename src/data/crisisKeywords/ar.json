@@ -1,33 +1,61 @@
 {
+  "preparation": {
+    "keywords": [
+      { "word": "رسالة انتحار", "confidence": "high" },
+      { "word": "رسالة وداع", "confidence": "contextual" },
+      { "word": "كيف أنتحر", "confidence": "high" },
+      { "word": "كيف أقتل نفسي", "confidence": "high" },
+      { "word": "طريقة للموت", "confidence": "high" },
+      { "word": "طريقة أموت بها", "confidence": "high" },
+      { "word": "أشنق نفسي", "confidence": "high" },
+      { "word": "جرعة زائدة", "confidence": "contextual" },
+      { "word": "أجمع الحبوب", "confidence": "high" },
+      { "word": "خبأت الحبوب", "confidence": "high" },
+      { "word": "أوزع أغراضي", "confidence": "contextual" },
+      { "word": "حددت التاريخ", "confidence": "contextual" }
+    ],
+    "exclusions": ["رسالة وداع للعمل", "جرعة زائدة من السكر", "حددت التاريخ للزفاف"]
+  },
   "suicide": {
     "keywords": [
       { "word": "انتحار", "confidence": "high" },
       { "word": "أقتل نفسي", "confidence": "high" },
-      { "word": "اقتل نفسي", "confidence": "high" },
       { "word": "أريد أن أموت", "confidence": "high" },
-      { "word": "اريد ان اموت", "confidence": "high" },
       { "word": "أنهي حياتي", "confidence": "high" },
-      { "word": "انهي حياتي", "confidence": "high" },
       { "word": "لا أريد العيش", "confidence": "high" },
-      { "word": "لا اريد الحياة", "confidence": "high" },
+      { "word": "لا أريد الحياة", "confidence": "high" },
       { "word": "أفضل ميتا", "confidence": "high" },
+      { "word": "أفضل بدوني", "confidence": "high" },
+      { "word": "سيكونون أفضل بدوني", "confidence": "high" },
+      { "word": "ليتني لم أولد", "confidence": "high" },
+      { "word": "لا أريد أن أستيقظ", "confidence": "high" },
+      { "word": "أنا عبء", "confidence": "contextual" },
+      { "word": "أريد أن أختفي", "confidence": "contextual" },
       { "word": "لا فائدة من الحياة", "confidence": "contextual" },
       { "word": "أموت", "confidence": "contextual" }
     ],
-    "exclusions": ["يموت من الضحك", "أموت فيك", "اموت فيك", "أموت من الضحك", "اموت من الضحك", "أموت من الجوع", "اموت من الجوع"]
+    "exclusions": [
+      "يموت من الضحك",
+      "أموت فيك",
+      "أموت من الضحك",
+      "أموت من الجوع",
+      "لا أريد أن أموت",
+      "لن أقتل نفسي",
+      "لن أنتحر",
+      "لا أفكر في الانتحار",
+      "لست عبئا",
+      "أنت لست عبئا"
+    ]
   },
   "selfHarm": {
     "keywords": [
       { "word": "إيذاء النفس", "confidence": "high" },
-      { "word": "ايذاء النفس", "confidence": "high" },
       { "word": "أؤذي نفسي", "confidence": "high" },
-      { "word": "اؤذي نفسي", "confidence": "high" },
       { "word": "أجرح نفسي", "confidence": "high" },
-      { "word": "اجرح نفسي", "confidence": "high" },
       { "word": "أقطع نفسي", "confidence": "high" },
-      { "word": "اقطع نفسي", "confidence": "high" }
+      { "word": "أحرق نفسي", "confidence": "contextual" }
     ],
-    "exclusions": ["قص الشعر", "قص الأظافر", "اقطع الاتصال", "قطع المكالمة"]
+    "exclusions": ["قص الشعر", "قص الأظافر", "أقطع الاتصال", "قطع المكالمة", "لا أريد أن أؤذي نفسي"]
   },
   "despair": {
     "keywords": [
@@ -43,9 +71,7 @@
   "isolation": {
     "keywords": [
       { "word": "وحيد", "confidence": "contextual" },
-      { "word": "وحيدة", "confidence": "contextual" },
       { "word": "لا أحد يفهمني", "confidence": "contextual" },
-      { "word": "لا احد يفهمني", "confidence": "contextual" },
       { "word": "ساعدني", "confidence": "contextual" },
       { "word": "النجدة", "confidence": "contextual" }
     ],

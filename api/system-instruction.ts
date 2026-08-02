@@ -18,6 +18,7 @@ import hi from '../src/lib/locales/hi/translation';
 import ar from '../src/lib/locales/ar/translation';
 import { CrisisDetectionService } from '../src/services/crisisDetectionService';
 import { DuplicateAvoidanceService } from '../src/services/duplicateAvoidanceService';
+import { buildCrisisDirective } from './crisis-directives';
 
 const INSTRUCTIONS: Record<string, string> = {
   ja: ja.systemInstructionForSage,
@@ -61,11 +62,13 @@ export function buildSystemInstruction(
   const lang = resolveLanguage(language);
   let instruction = INSTRUCTIONS[lang];
 
-  // 危機が検出された場合はシステムプロンプトを調整（旧クライアント実装と同文）
+  // 危機が検出された場合は、利用者の言語で危機対応指示を追記する。
+  // この指示はペルソナ側の口調制約（断定調・共感の禁止）を意図的に上書きする
+  // ので、必ずベースのシステムプロンプトより後ろに置くこと。
   const crisisResult = CrisisDetectionService.detectCrisis(message, lang);
   if (crisisResult.isCrisis) {
     const guidance = CrisisDetectionService.generateCrisisResponse(crisisResult, lang);
-    instruction += `\n\n【重要な注意】ユーザーは現在困難な状況にある可能性があります。以下のガイダンスを参考に、共感的で支援的な応答を心がけてください：\n${guidance}\n\nまた、専門的な支援を受けることの重要性を優しく伝えてください。`;
+    instruction += `\n\n${buildCrisisDirective(lang, guidance)}`;
   }
 
   instruction += DuplicateAvoidanceService.generateDuplicateAvoidancePrompt(

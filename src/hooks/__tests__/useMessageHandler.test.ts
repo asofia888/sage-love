@@ -4,6 +4,7 @@ import '../../test/utils'; // i18n をテスト用に初期化する（副作用
 import { useMessageHandler } from '@/hooks/useMessageHandler';
 import { ChatMessage, MessageSender } from '../../types';
 import * as geminiService from '../../services/geminiService';
+import { CrisisDetectionService } from '../../services/crisisDetectionService';
 
 vi.mock('../../services/geminiService', () => ({
   streamChatWithTranslation: vi.fn(),
@@ -189,5 +190,60 @@ describe('useMessageHandler', () => {
     expect(mockedStream).toHaveBeenCalledTimes(1);
     const signal = mockedStream.mock.calls[0][3];
     expect(signal).toBeInstanceOf(AbortSignal);
+  });
+
+  describe('危機検出の配線', () => {
+    const userMessage = (text: string): ChatMessage => ({
+      id: `u-${text}`,
+      text,
+      sender: MessageSender.USER,
+      timestamp: new Date().toISOString(),
+    });
+
+    beforeEach(() => {
+      mockedStream.mockImplementation(async function* () {
+        yield 'ok';
+      });
+    });
+
+    it('単発では危機でない発言でも、直近の流れから危機を検出してモーダルを開く', async () => {
+      // 「もう限界」「生きる意味」はいずれも単独では閾値に届かない文脈依存語
+      const { hook } = setup([userMessage('もう限界かもしれない')]);
+
+      expect(
+        CrisisDetectionService.detectCrisis('生きる意味がわからない', 'ja').isCrisis
+      ).toBe(false);
+
+      await act(async () => {
+        await hook.result.current.handleSendMessage('生きる意味がわからない');
+      });
+
+      expect(hook.result.current.lastCrisisResult?.isCrisis).toBe(true);
+      expect(hook.result.current.isCrisisModalOpen).toBe(true);
+    });
+
+    it('単発で危機を検出したときは複数ターン評価を重ねて呼ばない', async () => {
+      const patternSpy = vi.spyOn(CrisisDetectionService, 'detectCrisisPattern');
+      const { hook } = setup();
+
+      await act(async () => {
+        await hook.result.current.handleSendMessage('死にたい');
+      });
+
+      expect(hook.result.current.lastCrisisResult?.isCrisis).toBe(true);
+      // セッション内のモーダル表示回数を二重に消費しないこと
+      expect(patternSpy).not.toHaveBeenCalled();
+      patternSpy.mockRestore();
+    });
+
+    it('危機でない通常のやりとりではモーダルを開かない', async () => {
+      const { hook } = setup([userMessage('おはようございます')]);
+
+      await act(async () => {
+        await hook.result.current.handleSendMessage('今日はよい天気ですね');
+      });
+
+      expect(hook.result.current.isCrisisModalOpen).toBe(false);
+    });
   });
 });

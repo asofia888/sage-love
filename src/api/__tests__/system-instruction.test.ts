@@ -55,11 +55,52 @@ describe('buildSystemInstruction', () => {
     }
   );
 
-  it('危機を検出した場合はガイダンスを追記する', () => {
+  it('危機を検出した場合は危機対応指示を追記する', () => {
     const normal = buildSystemInstruction('ja', '今日はいい天気だ', []);
     const crisis = buildSystemInstruction('ja', '死にたい', []);
     expect(crisis.length).toBeGreaterThan(normal.length);
-    expect(crisis).toContain('【重要な注意】');
+    expect(crisis).toContain('【最優先の指示 — 危機対応】');
+  });
+
+  /**
+   * 危機対応指示が日本語ハードコードだと、他言語の利用者に対して
+   * プロンプトの言語が混ざり、応答の言語が揺れる原因になる。
+   */
+  it.each([
+    ['en', 'I want to die', /HIGHEST PRIORITY/],
+    ['es', 'quiero morir', /MÁXIMA PRIORIDAD/],
+    ['pt', 'quero morrer', /PRIORIDADE MÁXIMA/],
+    ['fr', 'je veux mourir', /PRIORITAIRE/],
+    ['hi', 'मैं मरना चाहता हूँ', /सर्वोच्च प्राथमिकता/],
+    ['ar', 'أريد أن أموت', /أولوية قصوى/],
+  ])('%s: 危機対応指示は利用者の言語で追記される', (lang, message, pattern) => {
+    const crisis = buildSystemInstruction(lang, message, []);
+    expect(pattern.test(crisis)).toBe(true);
+    // 日本語版のヘッダーが混入していないこと
+    expect(crisis).not.toContain('【最優先の指示 — 危機対応】');
+  });
+
+  /**
+   * ペルソナ側は「断定調を保て」「安易な共感は不要」と指示している。
+   * 危機時にそれを上書きしないと、いちばん苦しい場面で冷たい応答になる。
+   */
+  it.each([
+    ['ja', '死にたい', /断定調を保つ必要はない/],
+    ['en', 'I want to die', /need not maintain the dignified, assertive register/],
+  ])('%s: 危機時は口調制約を明示的に解除する', (lang, message, pattern) => {
+    const crisis = buildSystemInstruction(lang, message, []);
+    expect(pattern.test(crisis)).toBe(true);
+  });
+
+  it('深刻度別のガイダンス文が指示に埋め込まれる', () => {
+    const crisis = buildSystemInstruction('ja', '死にたい', []);
+    expect(crisis).not.toContain('{guidance}');
+    expect(crisis).toContain('専門家');
+  });
+
+  it('危機でない通常のメッセージには危機対応指示を足さない', () => {
+    const normal = buildSystemInstruction('en', 'what is the meaning of kindness?', []);
+    expect(normal).not.toContain('HIGHEST PRIORITY');
   });
 
   it('壊れた履歴を渡してもクラッシュしない', () => {

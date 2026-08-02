@@ -1,20 +1,58 @@
 {
+  "preparation": {
+    "keywords": [
+      { "word": "遺書", "confidence": "high" },
+      { "word": "遺言を書", "confidence": "contextual" },
+      { "word": "死ぬ方法", "confidence": "high" },
+      { "word": "死に方を調べ", "confidence": "high" },
+      { "word": "楽に死ねる", "confidence": "high" },
+      { "word": "首を吊", "confidence": "high" },
+      { "word": "首吊り", "confidence": "high" },
+      { "word": "オーバードーズ", "confidence": "high" },
+      { "word": "薬をたくさん飲", "confidence": "high" },
+      { "word": "薬を大量に飲", "confidence": "high" },
+      { "word": "薬をため", "confidence": "contextual" },
+      { "word": "練炭", "confidence": "contextual" },
+      { "word": "飛び降り", "confidence": "contextual" },
+      { "word": "身辺整理", "confidence": "contextual" },
+      { "word": "決行", "confidence": "contextual" }
+    ],
+    "exclusions": ["練炭バーベキュー", "練炭コンロ", "飛び降りるように", "バンジー", "遺書のような手紙を小説"]
+  },
   "suicide": {
     "keywords": [
       { "word": "自殺", "confidence": "high" },
       { "word": "死にたい", "confidence": "high" },
       { "word": "消えたい", "confidence": "high" },
+      { "word": "いなくなりたい", "confidence": "high" },
       { "word": "終わりにしたい", "confidence": "high" },
       { "word": "自分を殺", "confidence": "high" },
       { "word": "死んでしまいたい", "confidence": "high" },
       { "word": "生きていたくない", "confidence": "high" },
       { "word": "死のう", "confidence": "high" },
       { "word": "死ぬしかない", "confidence": "high" },
+      { "word": "目が覚めなければ", "confidence": "high" },
+      { "word": "生まれてこなければ", "confidence": "high" },
+      { "word": "生まれてこなきゃ", "confidence": "high" },
+      { "word": "楽になりたい", "confidence": "contextual" },
+      { "word": "いない方がみんな", "confidence": "high" },
+      { "word": "いない方が幸せ", "confidence": "high" },
+      { "word": "いなくなればみんな", "confidence": "high" },
+      { "word": "いない方が", "confidence": "contextual" },
+      { "word": "いなければよかった", "confidence": "contextual" },
       { "word": "生きる意味", "confidence": "contextual" },
       { "word": "もう限界", "confidence": "contextual" },
       { "word": "死ぬ", "confidence": "contextual" }
     ],
-    "exclusions": ["必死", "死角", "死語", "死蔵", "死守", "死闘", "死球", "死後", "死因", "死者", "死亡事故", "死活問題", "生死", "死神", "死刑", "瀕死"]
+    "exclusions": [
+      "必死", "死角", "死語", "死蔵", "死守", "死闘", "死球", "死後", "死因", "死者",
+      "死亡事故", "死活問題", "生死", "死神", "死刑", "瀕死",
+      "死にたいわけじゃない", "死にたいわけではない", "死にたいとは思わない",
+      "死にたいなんて思わない", "死にたいと思ったことはない", "死にたくない",
+      "消えたいわけじゃない", "消えたいとは思わない",
+      "自殺したいわけじゃない", "自殺する気はない", "自殺なんて考えて",
+      "いなくなりたいわけじゃない"
+    ]
   },
   "selfHarm": {
     "keywords": [
@@ -24,7 +62,10 @@
       { "word": "切りたい", "confidence": "contextual" },
       { "word": "痛みで忘れたい", "confidence": "high" }
     ],
-    "exclusions": ["爪を切りたい", "髪を切りたい", "縁を切りたい", "電話を切りたい"]
+    "exclusions": [
+      "爪を切りたい", "髪を切りたい", "縁を切りたい", "電話を切りたい",
+      "自分を傷つけたくない", "自傷したいわけじゃない"
+    ]
   },
   "despair": {
     "keywords": [
@@ -34,7 +75,7 @@
       { "word": "生きていても", "confidence": "high" },
       { "word": "意味がない", "confidence": "contextual" }
     ],
-    "exclusions": ["絶望的に美味", "絶望先生"]
+    "exclusions": ["絶望的に美味", "絶望先生", "絶望する必要はない"]
   },
   "isolation": {
     "keywords": [
@@ -43,7 +84,7 @@
       { "word": "孤独", "confidence": "contextual" },
       { "word": "助けて", "confidence": "contextual" }
     ],
-    "exclusions": ["孤独のグルメ", "孤独な戦い", "孤独死"]
+    "exclusions": ["孤独のグルメ", "孤独な戦い", "孤独死", "助けて頂き", "助けていただき"]
   },
   "responses": {
     "emergency_resources": "深刻な心の痛みを感じておられることが伝わります。あなたの命は尊く、助けを求めることは勇気ある行動です。すぐに専門家にご相談ください。",

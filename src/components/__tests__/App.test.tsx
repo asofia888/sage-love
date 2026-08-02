@@ -23,17 +23,25 @@ vi.mock('../../services/geminiService', () => ({
 }));
 
 // Mock crisis detection service
-vi.mock('../../services/crisisDetectionService', () => ({
-  CrisisDetectionService: {
-    detectCrisis: vi.fn().mockReturnValue({
-      isCrisis: false,
-      severity: 'low',
-      detectedKeywords: [],
-      triggerPatterns: [],
-      recommendedAction: 'monitor',
-    }),
-  },
-}));
+vi.mock('../../services/crisisDetectionService', () => {
+  // vi.mock は巻き上げられるので、共有オブジェクトはファクトリ内で作る
+  const noCrisis = {
+    isCrisis: false,
+    severity: 'low',
+    detectedKeywords: [],
+    triggerPatterns: [],
+    recommendedAction: 'monitor',
+  };
+  return {
+    CrisisDetectionService: {
+      detectCrisis: vi.fn().mockReturnValue(noCrisis),
+      // 単発で危機と判定されなかったとき useMessageHandler が複数ターン評価に進むため、
+      // こちらもモックしておかないと送信処理そのものが落ちる
+      detectCrisisPattern: vi.fn().mockReturnValue(noCrisis),
+      generateCrisisResponse: vi.fn().mockReturnValue(''),
+    },
+  };
+});
 
 // Mock lazy-loaded components to avoid Suspense issues in tests
 vi.mock('../../components/DisclaimerModal', () => ({

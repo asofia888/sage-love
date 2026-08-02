@@ -1,34 +1,48 @@
 {
+  "preparation": {
+    "keywords": [
+      { "word": "suicide note", "confidence": "high" },
+      { "word": "goodbye letter", "confidence": "contextual" },
+      { "word": "how to kill myself", "confidence": "high" },
+      { "word": "ways to kill myself", "confidence": "high" },
+      { "word": "how to die", "confidence": "high" },
+      { "word": "painless way to die", "confidence": "high" },
+      { "word": "hang myself", "confidence": "high" },
+      { "word": "saving up my pills", "confidence": "high" },
+      { "word": "saving my pills", "confidence": "high" },
+      { "word": "stockpiling pills", "confidence": "high" },
+      { "word": "been saving pills", "confidence": "high" },
+      { "word": "planned my death", "confidence": "high" },
+      { "word": "picked a date", "confidence": "contextual" },
+      { "word": "giving away my things", "confidence": "contextual" },
+      { "word": "overdose", "confidence": "contextual" },
+      { "word": "got a rope", "confidence": "contextual" }
+    ],
+    "exclusions": [
+      "overdose of information",
+      "caffeine overdose",
+      "goodbye letter to my old job",
+      "picked a date for the wedding",
+      "picked a date for our"
+    ]
+  },
   "suicide": {
     "keywords": [
-      {
-        "word": "suicide",
-        "confidence": "high"
-      },
-      {
-        "word": "kill myself",
-        "confidence": "high"
-      },
-      {
-        "word": "want to die",
-        "confidence": "high"
-      },
-      {
-        "word": "end it all",
-        "confidence": "high"
-      },
-      {
-        "word": "no point living",
-        "confidence": "high"
-      },
-      {
-        "word": "better off dead",
-        "confidence": "high"
-      },
-      {
-        "word": "can't go on",
-        "confidence": "contextual"
-      }
+      { "word": "suicide", "confidence": "high" },
+      { "word": "kill myself", "confidence": "high" },
+      { "word": "want to die", "confidence": "high" },
+      { "word": "end it all", "confidence": "high" },
+      { "word": "no point living", "confidence": "high" },
+      { "word": "better off dead", "confidence": "high" },
+      { "word": "better off without me", "confidence": "high" },
+      { "word": "wish i wasn't here", "confidence": "high" },
+      { "word": "wish i was never born", "confidence": "high" },
+      { "word": "don't want to wake up", "confidence": "high" },
+      { "word": "never wake up", "confidence": "contextual" },
+      { "word": "burden to everyone", "confidence": "contextual" },
+      { "word": "burden on everyone", "confidence": "contextual" },
+      { "word": "want to disappear", "confidence": "contextual" },
+      { "word": "can't go on", "confidence": "contextual" }
     ],
     "exclusions": [
       "deadline",
@@ -44,80 +58,52 @@
       "would never kill myself",
       "won't kill myself",
       "wouldn't kill myself",
-      "not going to kill myself"
+      "not going to kill myself",
+      "not better off dead",
+      "you are not a burden",
+      "you're not a burden"
     ]
   },
   "selfHarm": {
     "keywords": [
-      {
-        "word": "self harm",
-        "confidence": "high"
-      },
-      {
-        "word": "self-harm",
-        "confidence": "high"
-      },
-      {
-        "word": "hurt myself",
-        "confidence": "high"
-      },
-      {
-        "word": "cut myself",
-        "confidence": "high"
-      },
-      {
-        "word": "self injury",
-        "confidence": "high"
-      },
-      {
-        "word": "want to cut",
-        "confidence": "contextual"
-      }
+      { "word": "self harm", "confidence": "high" },
+      { "word": "self-harm", "confidence": "high" },
+      { "word": "hurt myself", "confidence": "high" },
+      { "word": "cut myself", "confidence": "high" },
+      { "word": "self injury", "confidence": "high" },
+      { "word": "burn myself", "confidence": "high" },
+      { "word": "want to cut", "confidence": "contextual" }
     ],
     "exclusions": [
       "shortcut",
       "cut the",
       "cut down on",
       "cut back",
-      "paper cut"
+      "paper cut",
+      "don't want to hurt myself",
+      "would never hurt myself",
+      "not going to hurt myself"
     ]
   },
   "despair": {
     "keywords": [
-      {
-        "word": "hopeless",
-        "confidence": "contextual"
-      },
-      {
-        "word": "no hope",
-        "confidence": "contextual"
-      },
-      {
-        "word": "can't take it",
-        "confidence": "contextual"
-      },
-      {
-        "word": "give up",
-        "confidence": "contextual"
-      }
+      { "word": "hopeless", "confidence": "contextual" },
+      { "word": "no hope", "confidence": "contextual" },
+      { "word": "can't take it", "confidence": "contextual" },
+      { "word": "give up", "confidence": "contextual" }
     ],
     "exclusions": [
       "give up sugar",
       "give up smoking",
       "give up caffeine",
-      "never give up"
+      "never give up",
+      "not hopeless"
     ]
   },
   "isolation": {
     "keywords": [
-      {
-        "word": "nobody understands",
-        "confidence": "contextual"
-      },
-      {
-        "word": "help me",
-        "confidence": "contextual"
-      }
+      { "word": "nobody understands", "confidence": "contextual" },
+      { "word": "help me", "confidence": "contextual" }
     ],
     "exclusions": [
       "alone time",

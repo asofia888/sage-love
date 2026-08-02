@@ -11,7 +11,16 @@ import fr from './fr.json';
 import hi from './hi.json';
 import ar from './ar.json';
 
-export type CrisisCategoryName = 'suicide' | 'selfHarm' | 'despair' | 'isolation';
+export type CrisisCategoryName =
+  /**
+   * 準備・計画行動（遺書、手段の入手、方法の調べ物など）。
+   * 臨床上もっとも切迫した危険信号であり、語彙的な希死念慮より優先度が高い。
+   */
+  | 'preparation'
+  | 'suicide'
+  | 'selfHarm'
+  | 'despair'
+  | 'isolation';
 export type CrisisSeverity = 'low' | 'medium' | 'high' | 'critical';
 export type CrisisAction =
   | 'monitor'
@@ -32,6 +41,7 @@ export interface CategoryData {
 }
 
 export interface CrisisLanguageData {
+  preparation: CategoryData;
   suicide: CategoryData;
   selfHarm: CategoryData;
   despair: CategoryData;
@@ -44,6 +54,7 @@ export interface CrisisLanguageData {
  * JSON ではなくコード側に置いている。
  */
 export const CATEGORY_SEVERITY: Record<CrisisCategoryName, CrisisSeverity> = {
+  preparation: 'critical',
   suicide: 'critical',
   selfHarm: 'high',
   despair: 'medium',
@@ -51,6 +62,7 @@ export const CATEGORY_SEVERITY: Record<CrisisCategoryName, CrisisSeverity> = {
 };
 
 export const CATEGORY_ORDER: CrisisCategoryName[] = [
+  'preparation',
   'suicide',
   'selfHarm',
   'despair',

@@ -1,4 +1,23 @@
 {
+  "preparation": {
+    "keywords": [
+      { "word": "सुसाइड नोट", "confidence": "high" },
+      { "word": "आत्महत्या का नोट", "confidence": "high" },
+      { "word": "अंतिम पत्र", "confidence": "contextual" },
+      { "word": "आत्महत्या कैसे", "confidence": "high" },
+      { "word": "मरने का तरीका", "confidence": "high" },
+      { "word": "कैसे मरूं", "confidence": "high" },
+      { "word": "फांसी लगा", "confidence": "high" },
+      { "word": "फाँसी लगा", "confidence": "high" },
+      { "word": "गोलियां जमा", "confidence": "high" },
+      { "word": "गोलियाँ जमा", "confidence": "high" },
+      { "word": "बहुत सारी गोलियां", "confidence": "high" },
+      { "word": "ओवरडोज", "confidence": "contextual" },
+      { "word": "अपना सामान बांट", "confidence": "contextual" },
+      { "word": "तारीख तय कर", "confidence": "contextual" }
+    ],
+    "exclusions": ["शादी की तारीख तय कर", "काम का ओवरडोज"]
+  },
   "suicide": {
     "keywords": [
       { "word": "आत्महत्या", "confidence": "high" },
@@ -10,10 +29,23 @@
       { "word": "जीना नहीं चाहती", "confidence": "high" },
       { "word": "सब खत्म कर", "confidence": "high" },
       { "word": "जीने का कोई मतलब नहीं", "confidence": "high" },
+      { "word": "मेरे बिना बेहतर", "confidence": "high" },
+      { "word": "मेरे बिना सब बेहतर", "confidence": "high" },
+      { "word": "मेरे बिना सब खुश", "confidence": "high" },
+      { "word": "काश मैं पैदा न होता", "confidence": "high" },
+      { "word": "काश मैं पैदा न होती", "confidence": "high" },
+      { "word": "कभी न जागूं", "confidence": "high" },
+      { "word": "गायब हो जाना चाहता", "confidence": "contextual" },
+      { "word": "मैं एक बोझ हूं", "confidence": "contextual" },
       { "word": "मर जाऊं", "confidence": "contextual" },
       { "word": "मरना", "confidence": "contextual" }
     ],
-    "exclusions": ["डर से मर", "भूख से मर", "हंसी से मर", "थक कर मर"]
+    "exclusions": [
+      "डर से मर", "भूख से मर", "हंसी से मर", "थक कर मर",
+      "मरना नहीं चाहता", "मरना नहीं चाहती",
+      "आत्महत्या नहीं करूंगा", "आत्महत्या नहीं करूंगी",
+      "तुम बोझ नहीं हो", "आप बोझ नहीं हैं"
+    ]
   },
   "selfHarm": {
     "keywords": [
@@ -21,9 +53,10 @@
       { "word": "खुद को नुकसान", "confidence": "high" },
       { "word": "खुद को काटना", "confidence": "high" },
       { "word": "खुद को जख्मी", "confidence": "high" },
+      { "word": "खुद को जलाना", "confidence": "contextual" },
       { "word": "खुद को तकलीफ", "confidence": "contextual" }
     ],
-    "exclusions": ["बाल काटना", "नाखून काटना", "फोन काट"]
+    "exclusions": ["बाल काटना", "नाखून काटना", "फोन काट", "खुद को चोट नहीं"]
   },
   "despair": {
     "keywords": [

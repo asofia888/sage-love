@@ -50,6 +50,7 @@ export const useMessageHandler = ({
   // 危機検出フックを統合
   const {
     checkForCrisis,
+    checkMessageHistory,
     lastCrisisResult,
     isCrisisModalOpen,
     closeCrisisModal
@@ -63,9 +64,6 @@ export const useMessageHandler = ({
     if (isLoading) return;
     setError(null);
 
-    // 危機検出チェック（モーダル表示用。プロンプトへの反映はサーバー側で行う）
-    checkForCrisis(userInput);
-
     // ユーザーメッセージを作成
     const newUserMessage: ChatMessage = {
       id: `user-${Date.now()}`,
@@ -73,7 +71,18 @@ export const useMessageHandler = ({
       sender: MessageSender.USER,
       timestamp: new Date().toISOString(),
     };
-    
+
+    // 危機検出チェック（モーダル表示用。プロンプトへの反映はサーバー側で行う）
+    const immediateCrisis = checkForCrisis(userInput);
+
+    // 単発では危機と判定されなかった場合のみ、直近の複数ターンをまとめて評価する。
+    // 「疲れた」→「誰も分かってくれない」→「もういいや」のように、1通ずつでは
+    // 拾えず流れとして現れる悪化を捉えるため。単発で既に検出済みのときに
+    // 重ねて呼ぶと、セッションあたりのモーダル表示回数を二重に消費してしまう。
+    if (!immediateCrisis.isCrisis) {
+      checkMessageHistory([...messages, newUserMessage]);
+    }
+
     // API呼び出し用の履歴をキャプチャ（新しいメッセージ追加前）
     const historyForApi = [...messages];
 
@@ -164,7 +173,7 @@ export const useMessageHandler = ({
             abortControllerRef.current = null;
         }
     }
-  }, [messages, isLoading, i18n.language, setMessages, checkForCrisis]);
+  }, [messages, isLoading, i18n.language, setMessages, checkForCrisis, checkMessageHistory]);
 
   return {
     handleSendMessage,

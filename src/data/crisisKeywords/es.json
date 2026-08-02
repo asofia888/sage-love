@@ -1,38 +1,86 @@
 {
+  "preparation": {
+    "keywords": [
+      { "word": "nota de suicidio", "confidence": "high" },
+      { "word": "carta de despedida", "confidence": "contextual" },
+      { "word": "como suicidarme", "confidence": "high" },
+      { "word": "cómo suicidarme", "confidence": "high" },
+      { "word": "como matarme", "confidence": "high" },
+      { "word": "cómo matarme", "confidence": "high" },
+      { "word": "forma de morir", "confidence": "high" },
+      { "word": "manera de morir", "confidence": "high" },
+      { "word": "ahorcarme", "confidence": "high" },
+      { "word": "colgarme", "confidence": "contextual" },
+      { "word": "guardando pastillas", "confidence": "high" },
+      { "word": "juntando pastillas", "confidence": "high" },
+      { "word": "sobredosis", "confidence": "contextual" },
+      { "word": "regalando mis cosas", "confidence": "contextual" },
+      { "word": "ya tengo fecha", "confidence": "contextual" }
+    ],
+    "exclusions": ["carta de despedida del trabajo", "sobredosis de trabajo", "sobredosis de azúcar"]
+  },
   "suicide": {
     "keywords": [
       { "word": "suicidio", "confidence": "high" },
+      { "word": "suicidarme", "confidence": "high" },
       { "word": "matarme", "confidence": "high" },
       { "word": "quiero morir", "confidence": "high" },
       { "word": "acabar con todo", "confidence": "high" },
       { "word": "no vale la pena vivir", "confidence": "high" },
-      { "word": "mejor muerto", "confidence": "high" }
+      { "word": "mejor muerto", "confidence": "high" },
+      { "word": "estarían mejor sin mí", "confidence": "high" },
+      { "word": "estarian mejor sin mi", "confidence": "high" },
+      { "word": "no quiero despertar", "confidence": "high" },
+      { "word": "ojalá no hubiera nacido", "confidence": "high" },
+      { "word": "no haber nacido", "confidence": "high" },
+      { "word": "quiero desaparecer", "confidence": "contextual" },
+      { "word": "soy una carga", "confidence": "contextual" }
     ],
-    "exclusions": []
+    "exclusions": [
+      "no quiero morir",
+      "no quiero matarme",
+      "no quiero suicidarme",
+      "nunca me mataría",
+      "nunca me mataria",
+      "no me voy a matar",
+      "no pienso morir",
+      "no voy a suicidarme",
+      "no eres una carga"
+    ]
   },
   "selfHarm": {
     "keywords": [
       { "word": "autolesión", "confidence": "high" },
+      { "word": "autolesionarme", "confidence": "high" },
       { "word": "hacerme daño", "confidence": "high" },
       { "word": "cortarme", "confidence": "high" },
+      { "word": "quemarme", "confidence": "contextual" },
       { "word": "lastimarse", "confidence": "contextual" }
     ],
-    "exclusions": []
+    "exclusions": [
+      "no quiero hacerme daño",
+      "no me voy a cortar",
+      "cortarme el pelo",
+      "cortarme las uñas"
+    ]
   },
   "despair": {
     "keywords": [
       { "word": "sin esperanza", "confidence": "contextual" },
       { "word": "no puedo más", "confidence": "contextual" },
+      { "word": "no aguanto más", "confidence": "contextual" },
       { "word": "rendirse", "confidence": "contextual" }
     ],
-    "exclusions": []
+    "exclusions": ["nunca me rindo", "no hay que rendirse", "jamás rendirse"]
   },
   "isolation": {
     "keywords": [
       { "word": "nadie me entiende", "confidence": "contextual" },
+      { "word": "estoy solo", "confidence": "contextual" },
+      { "word": "estoy sola", "confidence": "contextual" },
       { "word": "ayúdame", "confidence": "contextual" }
     ],
-    "exclusions": []
+    "exclusions": ["déjame solo", "ayúdame a entender", "ayúdame a encontrar"]
   },
   "responses": {
     "emergency_resources": "Puedo sentir que estás experimentando un dolor emocional profundo. Tu vida es preciosa, y buscar ayuda es un paso valiente. Por favor, contacta a un profesional inmediatamente.",

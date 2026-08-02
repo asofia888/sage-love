@@ -1,4 +1,23 @@
 {
+  "preparation": {
+    "keywords": [
+      { "word": "lettre d'adieu", "confidence": "contextual" },
+      { "word": "mot d'adieu", "confidence": "contextual" },
+      { "word": "comment me suicider", "confidence": "high" },
+      { "word": "comment me tuer", "confidence": "high" },
+      { "word": "comment mourir", "confidence": "high" },
+      { "word": "façon de mourir", "confidence": "high" },
+      { "word": "moyen de mourir", "confidence": "high" },
+      { "word": "me pendre", "confidence": "high" },
+      { "word": "surdose", "confidence": "contextual" },
+      { "word": "overdose", "confidence": "contextual" },
+      { "word": "garde mes médicaments", "confidence": "high" },
+      { "word": "accumule des médicaments", "confidence": "high" },
+      { "word": "donne mes affaires", "confidence": "contextual" },
+      { "word": "choisi la date", "confidence": "contextual" }
+    ],
+    "exclusions": ["lettre d'adieu à mon employeur", "overdose de travail", "surdose de sucre"]
+  },
   "suicide": {
     "keywords": [
       { "word": "suicide", "confidence": "high" },
@@ -9,10 +28,29 @@
       { "word": "en finir avec la vie", "confidence": "high" },
       { "word": "plus envie de vivre", "confidence": "high" },
       { "word": "mieux mort", "confidence": "high" },
+      { "word": "mieux sans moi", "confidence": "high" },
+      { "word": "ne pas me réveiller", "confidence": "high" },
+      { "word": "jamais être né", "confidence": "high" },
+      { "word": "jamais venu au monde", "confidence": "high" },
+      { "word": "je suis un fardeau", "confidence": "contextual" },
+      { "word": "envie de disparaître", "confidence": "contextual" },
       { "word": "en finir", "confidence": "contextual" },
       { "word": "mourir", "confidence": "contextual" }
     ],
-    "exclusions": ["mourir de rire", "mourir d'envie", "mourir de faim", "mourir d'ennui", "à mourir de rire"]
+    "exclusions": [
+      "mourir de rire",
+      "mourir d'envie",
+      "mourir de faim",
+      "mourir d'ennui",
+      "à mourir de rire",
+      "je ne veux pas mourir",
+      "je ne veux pas me suicider",
+      "je ne veux pas me tuer",
+      "je ne vais pas me tuer",
+      "jamais je ne me suiciderais",
+      "tu n'es pas un fardeau",
+      "vous n'êtes pas un fardeau"
+    ]
   },
   "selfHarm": {
     "keywords": [
@@ -22,9 +60,17 @@
       { "word": "me blesser", "confidence": "high" },
       { "word": "me scarifier", "confidence": "high" },
       { "word": "me mutiler", "confidence": "high" },
+      { "word": "me brûler", "confidence": "contextual" },
       { "word": "envie de me couper", "confidence": "contextual" }
     ],
-    "exclusions": ["couper les cheveux", "couper les ongles", "couper court", "couper la parole"]
+    "exclusions": [
+      "couper les cheveux",
+      "couper les ongles",
+      "couper court",
+      "couper la parole",
+      "je ne veux pas me faire du mal",
+      "je ne vais pas me couper"
+    ]
   },
   "despair": {
     "keywords": [
