@@ -115,10 +115,12 @@ if (isRedisConfigured()) {
  * Estimate the cost of a request based on message and history length
  */
 function estimateRequestCost(messageLength: number, historyLength: number = 0): number {
-  // Cost estimation for gemini-3.6-flash (api/config.ts MODEL_NAME):
+  // Cost estimation for gemini-3.7-flash (api/config.ts MODEL_NAME):
   // Input: $1.50 per 1M tokens = $0.0015 per 1K tokens (text)
   // Output: $7.50 per 1M tokens = $0.0075 per 1K tokens
   // Average character ≈ 1.5 tokens
+  // 上記は標準単価（2027-01-01以降）。2026-12-31までは導入価格 $0.75/$3.75 で
+  // 実費は約半分だが、安全側に倒すため標準単価のまま見積もる（上限が早めに効く）。
   // モデルを変える場合はこの単価も必ず更新すること（日次$10上限はこの見積りで判定している）
 
   const inputTokens = (messageLength + historyLength * 100) * 1.5;
