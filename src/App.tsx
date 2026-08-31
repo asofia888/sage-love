@@ -14,6 +14,7 @@ import HelpButton from './components/HelpButton';
 import PerformanceMonitor from './components/PerformanceMonitor';
 import { MultilingualSEO } from './components/SEO';
 import CookieBanner from './components/CookieBanner';
+import { Analytics } from '@vercel/analytics/react';
 
 // 初回の WelcomeMessage 表示時は仮想化不要なので、Virtuoso を含む
 // VirtualizedChat は最初のメッセージ送信まで読み込まない。
@@ -98,6 +99,7 @@ const App: React.FC = () => {
       <CookieBanner />
       <PerformanceMonitor />
       <MultilingualSEO />
+      <Analytics />
       <div className="flex flex-col h-screen bg-transparent text-slate-100">
         <header className="p-4 bg-slate-800/50 backdrop-blur-md shadow-lg sticky top-0 z-10">
           <div className="container mx-auto flex flex-col sm:flex-row items-center">
