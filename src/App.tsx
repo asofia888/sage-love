@@ -103,6 +103,7 @@ const App: React.FC = () => {
       {cookieConsent?.functional && <Analytics />}
       <PerformanceMonitor />
       <MultilingualSEO />
+      <Analytics />
       <div className="flex flex-col h-screen bg-transparent text-slate-100">
         <header className="p-4 bg-slate-800/50 backdrop-blur-md shadow-lg sticky top-0 z-10">
           <div className="container mx-auto flex flex-col sm:flex-row items-center">
