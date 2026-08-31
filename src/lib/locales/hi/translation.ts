@@ -60,7 +60,7 @@ export default {
   "privacyPolicyKeyPointsTitle": "मुख्य बिंदु",
   "privacyPolicyKeyPoint1": "वार्तालाप इतिहास केवल आपके ब्राउज़र में संग्रहीत होता है",
   "privacyPolicyKeyPoint2": "IP पते और सत्र कुकीज़ का उपयोग केवल दर सीमा के लिए अस्थायी रूप से किया जाता है",
-  "privacyPolicyKeyPoint3": "गुमनाम उपयोग और त्रुटि डेटा Google Analytics और Sentry को भेजा जा सकता है (आपकी कुकी सहमति के आधार पर)",
+  "privacyPolicyKeyPoint3": "गुमनाम उपयोग और त्रुटि डेटा Google Analytics, Vercel Analytics और Sentry को भेजा जा सकता है (आपकी कुकी सहमति के आधार पर)",
   "privacyPolicyKeyPoint4": "आप किसी भी समय अपना डेटा हटा सकते हैं और सेवा का उपयोग बंद कर सकते हैं",
   "privacyPolicyManagementTitle": "डेटा प्रबंधन",
   "privacyPolicyManagementBody": "वार्तालाप इतिहास हटाने के लिए, ऐप के अंदर \"वार्तालाप साफ़ करें\" बटन का उपयोग करें, या ब्राउज़र सेटिंग्स से स्थानीय संग्रहण और कुकीज़ साफ़ करें।",
@@ -127,6 +127,7 @@ export default {
 
 **4.2 विश्लेषण और निगरानी**
 • Google Analytics: गुमनाम उपयोग मेट्रिक्स (पेज व्यू, फीचर उपयोग) एकत्र करता है। केवल आपकी कुकी सहमति के साथ सक्षम किया जाता है
+• Vercel Analytics: गुमनाम ट्रैफ़िक मेट्रिक्स (पेज व्यू, रेफ़रर) एकत्र करता है। कुकीज़ का उपयोग नहीं करता और व्यक्तियों की पहचान नहीं करता। केवल आपकी कुकी सहमति के साथ सक्षम किया जाता है
 • Sentry: त्रुटि लॉग और प्रदर्शन डेटा एकत्र करता है, केवल गुणवत्ता सुधार के लिए उपयोग किया जाता है
 • अवसंरचना: Vercel (होस्टिंग) और Upstash Redis (दर सीमा के लिए अस्थायी काउंटर)
 
@@ -340,9 +341,6 @@ export default {
   "promptSuggestion2": "जीवन का अर्थ क्या है?",
   "promptSuggestion3": "कठिन भावनाओं से कैसे निपटें?",
   "promptSuggestion4": "मेरा सच्चा स्व क्या है?",
-  "buyMeACoffeeText": "यदि सहायक हो, तो कृपया डेवलपर का समर्थन करें:",
-  "buyMeACoffeeButton": "मुझे एक कॉफी खरीदें ☕",
-  "buyMeACoffeeButtonAria": "Buy Me a Coffee पर डेवलपर का समर्थन करें",
   "cookieBannerTitle": "कुकी उपयोग",
   "cookieBannerDescription": "यह साइट हमारी सेवाओं को बेहतर बनाने और विश्लेषण उद्देश्यों के लिए कुकीज़ का उपयोग करती है। GDPR नियमों के अनुसार, हम आपकी सहमति से उनका उपयोग करते हैं।",
   "cookieBannerCustomize": "सेटिंग्स कस्टमाइज़ करें",
@@ -352,7 +350,7 @@ export default {
   "cookieNecessaryTitle": "आवश्यक कुकीज़",
   "cookieNecessaryDescription": "ये कुकीज़ साइट की बुनियादी कार्यक्षमता के लिए आवश्यक हैं। इन्हें अक्षम नहीं किया जा सकता।",
   "cookieFunctionalTitle": "कार्यात्मक कुकीज़",
-  "cookieFunctionalDescription": "ऐप कार्यक्षमता में सुधार के लिए उपयोग किया जाता है (भाषा सेटिंग्स, थीम सेटिंग्स, आदि)।",
+  "cookieFunctionalDescription": "ऐप कार्यक्षमता में सुधार के लिए उपयोग किया जाता है (भाषा सेटिंग्स, थीम सेटिंग्स, गुमनाम उपयोग विश्लेषण, आदि)।",
   "cookieAlwaysActive": "हमेशा सक्रिय",
   "cookieSavePreferences": "प्राथमिकताएँ सहेजें",
   "closeButton": "बंद करें",

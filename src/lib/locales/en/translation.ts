@@ -83,7 +83,7 @@ Please use this app responsibly and understand these limitations.`,
   "privacyPolicyKeyPointsTitle": "Key Points",
   "privacyPolicyKeyPoint1": "Conversation history is stored only in your browser",
   "privacyPolicyKeyPoint2": "IP addresses and session cookies are used only temporarily for rate limiting",
-  "privacyPolicyKeyPoint3": "Anonymous usage and error data may be sent to Google Analytics and Sentry (based on your cookie consent)",
+  "privacyPolicyKeyPoint3": "Anonymous usage and error data may be sent to Google Analytics, Vercel Analytics, and Sentry (based on your cookie consent)",
   "privacyPolicyKeyPoint4": "You can delete your data and stop using the service at any time",
   "privacyPolicyManagementTitle": "Data Management",
   "privacyPolicyManagementBody": "To delete conversation history, use the in-app \"Clear Conversation\" button, or clear local storage and cookies from your browser settings.",
@@ -152,6 +152,7 @@ Last Updated: April 2026
 
 **4.2 Analytics and Monitoring**
 • Google Analytics: Collects anonymized usage metrics (page views, feature usage). Enabled only with your cookie consent
+• Vercel Analytics: Collects anonymized traffic metrics (page views, referrers). Uses no cookies and does not identify individuals. Enabled only with your cookie consent
 • Sentry: Collects error logs and performance data, used solely for quality improvement
 • Infrastructure: Vercel (hosting) and Upstash Redis (temporary counters for rate limiting)
 
@@ -365,9 +366,6 @@ These terms of service take effect when users use this service.`,
   "promptSuggestion2": "What is the meaning of life?",
   "promptSuggestion3": "How to deal with difficult emotions?",
   "promptSuggestion4": "What is my true self?",
-  "buyMeACoffeeText": "If helpful, please support the developer:",
-  "buyMeACoffeeButton": "Buy Me a Coffee ☕",
-  "buyMeACoffeeButtonAria": "Support the developer on Buy Me a Coffee",
   "cookieBannerTitle": "Cookie Usage",
   "cookieBannerDescription": "This site uses cookies to improve our services and for analysis purposes. In accordance with GDPR regulations, we use them with your consent.",
   "cookieBannerCustomize": "Customize settings",
@@ -377,7 +375,7 @@ These terms of service take effect when users use this service.`,
   "cookieNecessaryTitle": "Necessary Cookies",
   "cookieNecessaryDescription": "These cookies are required for the basic functionality of the site. They cannot be disabled.",
   "cookieFunctionalTitle": "Functional Cookies",
-  "cookieFunctionalDescription": "Used to improve app functionality (language settings, theme settings, etc.).",
+  "cookieFunctionalDescription": "Used to improve app functionality (language settings, theme settings, anonymous usage analytics, etc.).",
   "cookieAlwaysActive": "Always active",
   "cookieSavePreferences": "Save preferences",
   "closeButton": "Close",

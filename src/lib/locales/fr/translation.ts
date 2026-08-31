@@ -62,7 +62,7 @@ Veuillez utiliser cette application de manière responsable et comprendre ces li
   "privacyPolicyKeyPointsTitle": "Points clés",
   "privacyPolicyKeyPoint1": "L'historique des conversations est stocké uniquement dans votre navigateur",
   "privacyPolicyKeyPoint2": "Les adresses IP et les cookies de session sont utilisés temporairement uniquement pour la limitation de débit",
-  "privacyPolicyKeyPoint3": "Des données anonymes d'utilisation et d'erreurs peuvent être envoyées à Google Analytics et Sentry (selon votre consentement aux cookies)",
+  "privacyPolicyKeyPoint3": "Des données anonymes d'utilisation et d'erreurs peuvent être envoyées à Google Analytics, Vercel Analytics et Sentry (selon votre consentement aux cookies)",
   "privacyPolicyKeyPoint4": "Vous pouvez supprimer vos données et cesser d'utiliser le service à tout moment",
   "privacyPolicyManagementTitle": "Gestion des données",
   "privacyPolicyManagementBody": "Pour supprimer l'historique des conversations, utilisez le bouton « Effacer la conversation » dans l'application ou effacez le stockage local et les cookies depuis les paramètres de votre navigateur.",
@@ -129,6 +129,7 @@ Dernière mise à jour : Avril 2026
 
 **4.2 Analyse et surveillance**
 • Google Analytics : collecte des statistiques d'utilisation anonymisées (pages vues, utilisation des fonctionnalités). Activé uniquement avec votre consentement aux cookies
+• Vercel Analytics : collecte des statistiques de fréquentation anonymisées (pages vues, sources de trafic). N'utilise pas de cookies et n'identifie pas les personnes. Activé uniquement avec votre consentement aux cookies
 • Sentry : collecte les journaux d'erreurs et les données de performance, utilisés uniquement pour l'amélioration de la qualité
 • Infrastructure : Vercel (hébergement) et Upstash Redis (compteurs temporaires pour la limitation de débit)
 
@@ -342,9 +343,6 @@ Ces conditions de service entrent en vigueur lorsque les utilisateurs utilisent 
   "promptSuggestion2": "Quel est le sens de la vie ?",
   "promptSuggestion3": "Comment gérer les émotions difficiles ?",
   "promptSuggestion4": "Quel est mon vrai moi ?",
-  "buyMeACoffeeText": "Si cela vous a été utile, veuillez soutenir le développeur :",
-  "buyMeACoffeeButton": "Offrez-moi un café ☕",
-  "buyMeACoffeeButtonAria": "Soutenir le développeur sur Buy Me a Coffee",
   "cookieBannerTitle": "Utilisation des cookies",
   "cookieBannerDescription": "Ce site utilise des cookies pour améliorer nos services et à des fins d'analyse. Conformément aux réglementations RGPD, nous les utilisons avec votre consentement.",
   "cookieBannerCustomize": "Personnaliser les paramètres",
@@ -354,7 +352,7 @@ Ces conditions de service entrent en vigueur lorsque les utilisateurs utilisent 
   "cookieNecessaryTitle": "Cookies nécessaires",
   "cookieNecessaryDescription": "Ces cookies sont requis pour la fonctionnalité de base du site. Ils ne peuvent pas être désactivés.",
   "cookieFunctionalTitle": "Cookies fonctionnels",
-  "cookieFunctionalDescription": "Utilisés pour améliorer la fonctionnalité de l'application (paramètres de langue, paramètres de thème, etc.).",
+  "cookieFunctionalDescription": "Utilisés pour améliorer la fonctionnalité de l'application (paramètres de langue, paramètres de thème, mesure d'audience anonyme, etc.).",
   "cookieAlwaysActive": "Toujours actif",
   "cookieSavePreferences": "Enregistrer les préférences",
   "closeButton": "Fermer",

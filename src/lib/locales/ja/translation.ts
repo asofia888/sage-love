@@ -62,7 +62,7 @@ export default {
   "privacyPolicyKeyPointsTitle": "重要なポイント",
   "privacyPolicyKeyPoint1": "会話履歴はお使いのブラウザ内にのみ保存されます",
   "privacyPolicyKeyPoint2": "IPアドレスとセッションCookieはレート制限のためだけに一時的に利用します",
-  "privacyPolicyKeyPoint3": "匿名の利用状況・エラー情報をGoogle AnalyticsとSentryに送信することがあります（Cookie同意に基づく）",
+  "privacyPolicyKeyPoint3": "匿名の利用状況・エラー情報をGoogle Analytics、Vercel Analytics、Sentryに送信することがあります（Cookie同意に基づく）",
   "privacyPolicyKeyPoint4": "いつでもデータを削除し、利用を停止できます",
   "privacyPolicyManagementTitle": "データの管理",
   "privacyPolicyManagementBody": "会話履歴を削除するには、アプリ内の「会話をクリア」ボタンを使用するか、ブラウザの設定からローカルストレージとCookieをクリアしてください。",
@@ -131,6 +131,7 @@ export default {
 
 **4.2 解析・監視サービス**
 • Google Analytics: 匿名の利用状況（ページビュー、機能利用頻度など）の集計。クッキー同意に基づき有効化されます
+• Vercel Analytics: 匿名のアクセス解析（ページビュー、参照元など）の集計。クッキーを使用せず、個人を特定しません。クッキー同意に基づき有効化されます
 • Sentry: エラーログおよびパフォーマンス情報の収集。サービス品質改善のみに利用します
 • インフラ: Vercel（ホスティング）およびUpstash Redis（レート制限用の一時カウンタ保存）
 
@@ -375,9 +376,6 @@ export default {
   "showMore": "さらに表示",
   "showLess": "少なく表示",
   "understood": "理解しました",
-  "buyMeACoffeeText": "お役に立てましたら、支援をお願いします：",
-  "buyMeACoffeeButton": "コーヒーを奢る ☕",
-  "buyMeACoffeeButtonAria": "Buy Me a Coffeeで開発者を支援する",
   "cookieBannerTitle": "Cookieの使用について",
   "cookieBannerDescription": "このサイトでは、サービスの改善と分析のためにCookieを使用しています。GDPR規則に従い、お客様の同意を得た上で使用いたします。",
   "cookieBannerCustomize": "設定をカスタマイズ",
@@ -387,7 +385,7 @@ export default {
   "cookieNecessaryTitle": "必要なCookie",
   "cookieNecessaryDescription": "サイトの基本機能のために必要なCookieです。これらは無効にできません。",
   "cookieFunctionalTitle": "機能Cookie",
-  "cookieFunctionalDescription": "アプリの機能改善のために使用されます（言語設定、テーマ設定など）。",
+  "cookieFunctionalDescription": "アプリの機能改善のために使用されます（言語設定、テーマ設定、匿名のアクセス解析など）。",
   "cookieAlwaysActive": "常に有効",
   "cookieSavePreferences": "設定を保存",
   "closeButton": "閉じる",

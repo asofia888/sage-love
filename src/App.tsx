@@ -14,6 +14,7 @@ import HelpButton from './components/HelpButton';
 import PerformanceMonitor from './components/PerformanceMonitor';
 import { MultilingualSEO } from './components/SEO';
 import CookieBanner from './components/CookieBanner';
+import { Analytics } from '@vercel/analytics/react';
 
 // 初回の WelcomeMessage 表示時は仮想化不要なので、Virtuoso を含む
 // VirtualizedChat は最初のメッセージ送信まで読み込まない。
@@ -28,6 +29,7 @@ const PrivacyPolicyModal = React.lazy(() => import('./components/PrivacyPolicyMo
 const TermsOfServiceModal = React.lazy(() => import('./components/TermsOfServiceModal'));
 import { useChatHistory } from './hooks/useChatHistory';
 import { useTextSize } from './hooks/useTextSize';
+import { useCookieConsent } from './hooks/useCookieConsent';
 import { useMessageHandler } from './hooks/useMessageHandler';
 import { MessageSender } from './types';
 
@@ -43,6 +45,7 @@ const App: React.FC = () => {
   const closeModal = () => setActiveModal(null);
 
   const [textSize, setTextSize] = useTextSize();
+  const cookieConsent = useCookieConsent();
   const [messages, setMessages, clearChat] = useChatHistory(i18n.isInitialized);
 
   // メッセージハンドリングロジックを分離
@@ -96,6 +99,8 @@ const App: React.FC = () => {
   return (
     <>
       <CookieBanner />
+      {/* 計測は functional Cookie に同意した利用者のみ。バナーでの変更に即座に追従する。 */}
+      {cookieConsent?.functional && <Analytics />}
       <PerformanceMonitor />
       <MultilingualSEO />
       <div className="flex flex-col h-screen bg-transparent text-slate-100">
@@ -169,20 +174,6 @@ const App: React.FC = () => {
             <div className="text-center mt-3 text-xs text-slate-200">
               {/* Mobile: Vertical layout */}
               <div className="sm:hidden">
-                <div className="mb-2">
-                  <p>
-                    {t('buyMeACoffeeText')}{' '}
-                    <a
-                      href="https://buymeacoffee.com/asofia"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-semibold text-sky-400 hover:text-sky-300 underline transition-colors"
-                      aria-label={t('buyMeACoffeeButtonAria')}
-                    >
-                      {t('buyMeACoffeeButton')}
-                    </a>
-                  </p>
-                </div>
                 <div className="text-slate-300 flex flex-row justify-center items-center gap-4">
                   <button
                     onClick={() => setActiveModal('disclaimer')}
@@ -206,20 +197,6 @@ const App: React.FC = () => {
               </div>
               {/* PC: Horizontal layout */}
               <div className="hidden sm:flex sm:justify-center sm:items-center sm:gap-6 text-slate-300">
-                <div className="bg-gradient-to-r from-sky-500/10 to-indigo-500/10 border border-sky-500/20 rounded-lg px-3 py-2 hover:from-sky-500/15 hover:to-indigo-500/15 hover:border-sky-400/30 transition-all duration-200 hover:scale-105">
-                  <p className="text-sm">
-                    {t('buyMeACoffeeText')}{' '}
-                    <a
-                      href="https://buymeacoffee.com/asofia"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-semibold text-sky-400 hover:text-sky-300 underline decoration-2 underline-offset-2 transition-colors"
-                      aria-label={t('buyMeACoffeeButtonAria')}
-                    >
-                      {t('buyMeACoffeeButton')}
-                    </a>
-                  </p>
-                </div>
                 <button
                   onClick={() => setActiveModal('disclaimer')}
                   className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1"

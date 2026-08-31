@@ -61,7 +61,7 @@ export default {
   "privacyPolicyKeyPointsTitle": "النقاط الرئيسية",
   "privacyPolicyKeyPoint1": "يتم تخزين سجل المحادثات فقط في متصفحك",
   "privacyPolicyKeyPoint2": "تُستخدم عناوين IP وملفات تعريف ارتباط الجلسة مؤقتاً لتحديد معدل الطلبات فقط",
-  "privacyPolicyKeyPoint3": "قد يتم إرسال بيانات استخدام وأخطاء مجهولة إلى Google Analytics وSentry (وفقاً لموافقتك على ملفات تعريف الارتباط)",
+  "privacyPolicyKeyPoint3": "قد يتم إرسال بيانات استخدام وأخطاء مجهولة إلى Google Analytics وVercel Analytics وSentry (وفقاً لموافقتك على ملفات تعريف الارتباط)",
   "privacyPolicyKeyPoint4": "يمكنك حذف بياناتك والتوقف عن استخدام الخدمة في أي وقت",
   "privacyPolicyManagementTitle": "إدارة البيانات",
   "privacyPolicyManagementBody": "لحذف سجل المحادثات، استخدم زر \"مسح المحادثة\" داخل التطبيق، أو امسح التخزين المحلي وملفات تعريف الارتباط من إعدادات المتصفح.",
@@ -128,6 +128,7 @@ export default {
 
 **4.2 التحليلات والمراقبة**
 • Google Analytics: يجمع مقاييس استخدام مجهولة (مشاهدات الصفحة، استخدام الميزات). يتم تفعيله فقط بموافقتك على ملفات تعريف الارتباط
+• Vercel Analytics: يجمع مقاييس زيارات مجهولة (مشاهدات الصفحة، مصادر الإحالة). لا يستخدم ملفات تعريف الارتباط ولا يحدد هوية الأفراد. يتم تفعيله فقط بموافقتك على ملفات تعريف الارتباط
 • Sentry: يجمع سجلات الأخطاء وبيانات الأداء، ويُستخدم فقط لتحسين الجودة
 • البنية التحتية: Vercel (الاستضافة) وUpstash Redis (عدّادات مؤقتة لتحديد معدل الطلبات)
 
@@ -341,9 +342,6 @@ export default {
   "promptSuggestion2": "ما هو معنى الحياة؟",
   "promptSuggestion3": "كيف أتعامل مع المشاعر الصعبة؟",
   "promptSuggestion4": "ما هو ذاتي الحقيقية؟",
-  "buyMeACoffeeText": "إذا كان مفيداً، يرجى دعم المطور:",
-  "buyMeACoffeeButton": "اشترِ لي قهوة ☕",
-  "buyMeACoffeeButtonAria": "دعم المطور على Buy Me a Coffee",
   "cookieBannerTitle": "استخدام ملفات تعريف الارتباط",
   "cookieBannerDescription": "يستخدم هذا الموقع ملفات تعريف الارتباط لتحسين خدماتنا ولأغراض التحليل. وفقاً للوائح GDPR، نستخدمها بموافقتك.",
   "cookieBannerCustomize": "تخصيص الإعدادات",
@@ -353,7 +351,7 @@ export default {
   "cookieNecessaryTitle": "ملفات تعريف الارتباط الضرورية",
   "cookieNecessaryDescription": "هذه ملفات تعريف الارتباط مطلوبة للوظائف الأساسية للموقع. لا يمكن تعطيلها.",
   "cookieFunctionalTitle": "ملفات تعريف الارتباط الوظيفية",
-  "cookieFunctionalDescription": "تُستخدم لتحسين وظائف التطبيق (إعدادات اللغة، إعدادات السمة، إلخ).",
+  "cookieFunctionalDescription": "تُستخدم لتحسين وظائف التطبيق (إعدادات اللغة، إعدادات السمة، تحليلات الاستخدام المجهولة، إلخ).",
   "cookieAlwaysActive": "نشط دائماً",
   "cookieSavePreferences": "حفظ التفضيلات",
   "closeButton": "إغلاق",

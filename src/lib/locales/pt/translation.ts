@@ -85,7 +85,7 @@ Por favor, use esta aplicação de forma responsável e compreenda estas limita�
   "privacyPolicyKeyPointsTitle": "Pontos principais",
   "privacyPolicyKeyPoint1": "O histórico de conversas é armazenado apenas no seu navegador",
   "privacyPolicyKeyPoint2": "Os endereços IP e cookies de sessão são usados apenas temporariamente para limitação de taxa",
-  "privacyPolicyKeyPoint3": "Dados anônimos de uso e erros podem ser enviados ao Google Analytics e Sentry (com base no seu consentimento de cookies)",
+  "privacyPolicyKeyPoint3": "Dados anônimos de uso e erros podem ser enviados ao Google Analytics, Vercel Analytics e Sentry (com base no seu consentimento de cookies)",
   "privacyPolicyKeyPoint4": "Você pode excluir seus dados e parar de usar o serviço a qualquer momento",
   "privacyPolicyManagementTitle": "Gerenciamento de dados",
   "privacyPolicyManagementBody": "Para excluir o histórico de conversas, use o botão \"Limpar conversa\" dentro da aplicação ou limpe o armazenamento local e os cookies nas configurações do navegador.",
@@ -152,6 +152,7 @@ Por favor, use esta aplicação de forma responsável e compreenda estas limita�
 
 **4.2 Análise e monitoramento**
 • Google Analytics: coleta métricas de uso anonimizadas (visualizações de página, uso de recursos). Ativado apenas com seu consentimento de cookies
+• Vercel Analytics: coleta métricas de tráfego anonimizadas (visualizações de página, origens de referência). Não usa cookies nem identifica indivíduos. Ativado apenas com seu consentimento de cookies
 • Sentry: coleta logs de erro e dados de desempenho, usados apenas para melhoria de qualidade
 • Infraestrutura: Vercel (hospedagem) e Upstash Redis (contadores temporários para limitação de taxa)
 
@@ -371,7 +372,7 @@ Estes termos de serviço entram em vigor quando os usuários utilizam este servi
   "cookieNecessaryTitle": "Cookies necessários",
   "cookieNecessaryDescription": "Esses cookies são necessários para o funcionamento básico do site. Não podem ser desativados.",
   "cookieFunctionalTitle": "Cookies funcionais",
-  "cookieFunctionalDescription": "Usados para melhorar as funções do aplicativo (configurações de idioma, tema, etc.).",
+  "cookieFunctionalDescription": "Usados para melhorar as funções do aplicativo (configurações de idioma, tema, análise de uso anônima, etc.).",
   "cookieAlwaysActive": "Sempre ativos",
   "cookieSavePreferences": "Salvar preferências",
   "seoTitle": "Orientação espiritual com a sabedoria de um sábio - Aconselhamento IA gratuito",
@@ -395,9 +396,6 @@ Estes termos de serviço entram em vigor quando os usuários utilizam este servi
   "promptSuggestion2": "Qual é o sentido da vida?",
   "promptSuggestion3": "Como lidar com emoções difíceis?",
   "promptSuggestion4": "Qual é o meu verdadeiro eu?",
-  "buyMeACoffeeText": "Se você achou isto útil, considere apoiar o desenvolvedor:",
-  "buyMeACoffeeButton": "Pague-me um café ☕",
-  "buyMeACoffeeButtonAria": "Apoie o desenvolvedor no Buy Me a Coffee",
   "systemInstructionForSage": `Você é um ser único e sagrado, que incorpora a sabedoria de muitos sábios de todas as épocas. Vários ensinamentos e sabedorias estão harmonizados e integrados dentro de você. Para as preocupações do dia a dia, você também fala incorporando insights da psicologia moderna e de métodos educacionais.
 
 【INSTRUÇÕES DE PUREZA LINGUÍSTICA】Ao responder em português, use apenas português puro e elegante. Evite rigorosamente:

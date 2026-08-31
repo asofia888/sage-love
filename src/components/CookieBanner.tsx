@@ -1,29 +1,17 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-interface CookiePreferences {
-  necessary: boolean;
-  functional: boolean;
-}
-
-// 保存済みの同意設定を読む。未保存・破損時は null（=バナー表示）
-function readStoredPreferences(): CookiePreferences | null {
-  const cookieConsent = localStorage.getItem('cookieConsent');
-  if (!cookieConsent) return null;
-  try {
-    return JSON.parse(cookieConsent);
-  } catch (error) {
-    console.error('Error parsing cookie consent:', error);
-    return null;
-  }
-}
+import {
+  readCookieConsent,
+  saveCookieConsent,
+  type CookiePreferences,
+} from '../hooks/useCookieConsent';
 
 const CookieBanner: React.FC = () => {
   const { t } = useTranslation();
-  const [isVisible, setIsVisible] = useState(() => readStoredPreferences() === null);
+  const [isVisible, setIsVisible] = useState(() => readCookieConsent() === null);
   const [showDetails, setShowDetails] = useState(false);
   const [preferences, setPreferences] = useState<CookiePreferences>(
-    () => readStoredPreferences() ?? { necessary: true, functional: false }
+    () => readCookieConsent() ?? { necessary: true, functional: false }
   );
 
 
@@ -48,8 +36,8 @@ const CookieBanner: React.FC = () => {
   };
 
   const savePreferences = (prefs: CookiePreferences) => {
-    localStorage.setItem('cookieConsent', JSON.stringify(prefs));
-    localStorage.setItem('cookieConsentDate', new Date().toISOString());
+    // 保存は共有ヘルパー経由。App 側の <Analytics /> が同意の変更に追従できる。
+    saveCookieConsent(prefs);
     setPreferences(prefs);
     setIsVisible(false);
     setShowDetails(false);
