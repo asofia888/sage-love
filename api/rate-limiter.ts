@@ -115,7 +115,7 @@ if (isRedisConfigured()) {
  * Estimate the cost of a request based on message and history length
  */
 function estimateRequestCost(messageLength: number, historyLength: number = 0): number {
-  // Cost estimation for gemini-3.7-flash (api/config.ts MODEL_NAME):
+  // Cost estimation for gemini-3.8-flash (api/config.ts MODEL_NAME):
   // Input: $1.50 per 1M tokens = $0.0015 per 1K tokens (text)
   // Output: $7.50 per 1M tokens = $0.0075 per 1K tokens
   // Average character ≈ 1.5 tokens
