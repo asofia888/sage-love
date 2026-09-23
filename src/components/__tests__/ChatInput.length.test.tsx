@@ -19,7 +19,7 @@ vi.mock('@/components/VoiceInputButton', () => ({
 }));
 
 /**
- * サーバー(api/rate-limiter.ts)は MESSAGE.MAX_LENGTH 超を 429 で弾く。
+ * サーバー(server/rate-limiter.ts)は MESSAGE.MAX_LENGTH 超を 429 で弾く。
  * 入力欄側で止めないと、長い胸の内を書き切って送信した瞬間にエラーになる。
  */
 describe('ChatInput の文字数上限', () => {

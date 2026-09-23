@@ -56,7 +56,7 @@ function setCosts(daily: number, hourly: number, monthly: number = 0) {
 }
 
 async function loadModule() {
-  return await import('@/api/rate-limiter');
+  return await import('@/server/rate-limiter');
 }
 
 describe('rate-limiter (Redis paths)', () => {

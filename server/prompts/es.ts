@@ -4,7 +4,7 @@
  * サーバー専用モジュール。クライアントバンドルには含めない。
  *
  * Why: 以前は src/lib/locales/es/translation.ts に置かれていたが、
- * i18n.ts が全 locale を静的 import するため、実際には api/system-instruction.ts
+ * i18n.ts が全 locale を静的 import するため、実際には server/system-instruction.ts
  * しか読まない7言語ぶんのプロンプト（計 約44KB / メインチャンクの13.7%）が
  * 全訪問者のブラウザに配信されていた。あわせて、ペルソナ定義が誰でも
  * 読める状態でもあった。

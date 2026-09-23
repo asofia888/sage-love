@@ -28,6 +28,7 @@
       "@/components/*": ["./src/components/*"],
       "@/hooks/*": ["./src/hooks/*"],
       "@/api/*": ["./api/*"],
+      "@/server/*": ["./server/*"],
       "@/*": ["./src/*"]
     }
   }

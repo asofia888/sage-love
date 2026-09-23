@@ -6,7 +6,7 @@
 
 ## アーキテクチャ
 
-### 1. カスタムエラークラス (`api/errors.ts`)
+### 1. カスタムエラークラス (`server/errors.ts`)
 
 型安全なエラー処理のためのカスタムエラークラス:
 
@@ -44,7 +44,7 @@ class APIError extends Error {
 - `ValidationError` - バリデーションエラー (400)
 - `CircuitBreakerError` - サーキットブレーカーエラー (503)
 
-### 2. リトライロジック (`api/retry-utils.ts`)
+### 2. リトライロジック (`server/retry-utils.ts`)
 
 Exponential Backoff + Jitterを使用した賢いリトライ:
 
@@ -76,7 +76,7 @@ const result = await retryWithBackoff(
 - 認証エラー (401, 403)
 - バリデーションエラー (400)
 
-### 3. サーキットブレーカー (`api/circuit-breaker.ts`)
+### 3. サーキットブレーカー (`server/circuit-breaker.ts`)
 
 カスケード障害を防ぐためのサーキットブレーカーパターン:
 

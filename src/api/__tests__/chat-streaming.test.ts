@@ -28,7 +28,7 @@ vi.mock('@google/generative-ai', () => ({
 }));
 
 const chatHandler = await import('../../../api/chat');
-const { geminiCircuitBreaker } = await import('../../../api/circuit-breaker');
+const { geminiCircuitBreaker } = await import('../../../server/circuit-breaker');
 
 function streamRequest(message = 'こんにちは'): Request {
   return new Request('http://localhost/api/chat', {

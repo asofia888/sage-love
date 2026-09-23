@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { CircuitBreaker, CircuitState } from '@/api/circuit-breaker';
-import { CircuitBreakerError } from '@/api/errors';
+import { CircuitBreaker, CircuitState } from '@/server/circuit-breaker';
+import { CircuitBreakerError } from '@/server/errors';
 
 /**
  * サーキットブレーカーの状態遷移テスト。

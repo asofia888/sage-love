@@ -1,7 +1,7 @@
 /**
  * 履歴メッセージの構造的最小型。フロントの ChatMessage（sender: 'ai'）と
  * APIワイヤ形式（sender: 'assistant'）の両方を受けられるよう、サーバー側
- * （api/system-instruction.ts）からも利用される。
+ * （server/system-instruction.ts）からも利用される。
  */
 export interface HistoryMessageLike {
   sender: string;

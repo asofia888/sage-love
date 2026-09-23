@@ -66,7 +66,7 @@ VITE_SENTRY_DSN=https://xxxx@xxx.ingest.sentry.io/xxxx
 VITE_APP_VERSION=1.0.0
 ```
 
-コスト上限（$5/時間・$10/日・$15緊急停止）は `api/rate-limiter.ts` にハードコードされています。変更する場合はコードを編集してください。
+コスト上限（$5/時間・$10/日・$15緊急停止）は `server/rate-limiter.ts` にハードコードされています。変更する場合はコードを編集してください。
 
 ### Development
 

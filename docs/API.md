@@ -43,7 +43,7 @@ AIチャットメッセージを送信し、応答を取得します。
 | `language` | string | No | 応答言語（`ja`/`en`/`es`/`pt`/`fr`/`hi`/`ar`、未対応値は `en` にフォールバック） |
 | `stream` | boolean | No | `true` を指定すると Server-Sent Events (SSE) でチャンク配信（詳細は [Streaming Response](#streaming-response) 参照） |
 
-> **システムプロンプトの方針**: 以前は `systemInstruction` をリクエストボディで受け取っていましたが、任意のプロンプトを指定して本エンドポイントを汎用 Gemini プロキシとして悪用できるため廃止しました。現在はサーバ側（`api/system-instruction.ts`）が `language` に応じてプロンプトを構築し、ボディ内の `systemInstruction` は無視されます。
+> **システムプロンプトの方針**: 以前は `systemInstruction` をリクエストボディで受け取っていましたが、任意のプロンプトを指定して本エンドポイントを汎用 Gemini プロキシとして悪用できるため廃止しました。現在はサーバ側（`server/system-instruction.ts`）が `language` に応じてプロンプトを構築し、ボディ内の `systemInstruction` は無視されます。
 
 > **セッション管理の方針**: 以前の `X-Session-ID` ヘッダはクライアントから自由に改変できたためレート制限を回避される恐れがありました。現在はサーバが HMAC-SHA256 で署名した `sid` Cookie を発行・検証しており、クライアントは偽造できません。署名鍵は環境変数 `SESSION_SECRET` で設定します。
 

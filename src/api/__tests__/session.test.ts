@@ -3,7 +3,7 @@ import {
   getOrCreateSession,
   attachSessionCookie,
   timingSafeEqual,
-} from '@/api/session';
+} from '@/server/session';
 
 /**
  * HMAC署名セッションCookieのユニットテスト。

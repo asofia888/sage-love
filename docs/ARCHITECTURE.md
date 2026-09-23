@@ -109,11 +109,23 @@ Sage's Love AIは、React + Vite フロントエンドと Vercel Edge Functions 
 
 ## Directory Structure
 
+> ⚠️ **`api/` には HTTP エンドポイント（`export default` の handler を持つファイル）だけを置くこと。**
+> Vercel は `api/` 配下の `.ts` を1ファイルにつき1つの Serverless Function に変換するため、
+> ヘルパーモジュールを置くと関数数を消費し、プラン上限（Hobby は12関数）を超えた時点で
+> **ビルドは成功するのにデプロイだけが Error になる**。実際に、プロンプトを `api/prompts/`
+> （8ファイル）に置いた際に 12 → 20 となってこの状態に陥った。
+> サーバー専用のライブラリは `server/` に置く。`api/` からは `../server/...` で import する。
+> 副次的な効果として、`/api/session` や `/api/config` のようなルートが外部から
+> 叩ける状態（handler が無いので 500 を返すだけだが）も解消される。
+
 ```
 sage-love/
-├── api/                          # Backend (Vercel Edge Functions)
+├── api/                          # HTTPエンドポイントのみ（後述の注意を参照）
 │   ├── chat.ts                   # Main chat endpoint
 │   ├── health.ts                 # Health check endpoint
+│   └── admin/stats.ts            # Admin statistics endpoint (ADMIN_TOKEN)
+│
+├── server/                       # サーバー専用ライブラリ（ルーティングされない）
 │   ├── session.ts                # HMAC-signed session cookie
 │   ├── errors.ts                 # Custom error classes
 │   ├── rate-limiter.ts           # Rate limiting logic
@@ -122,9 +134,8 @@ sage-love/
 │   ├── system-instruction.ts     # Server-side prompt builder
 │   ├── crisis-directives.ts      # Per-language crisis-response directives
 │   ├── safety-fallback.ts        # Fallback reply when Gemini blocks a response
-│   ├── prompts/                  # Sage persona prompts, per language (server-only)
-│   ├── config.ts                 # Model name + env validation
-│   └── admin/stats.ts            # Admin statistics endpoint (ADMIN_TOKEN)
+│   ├── prompts/                  # Sage persona prompts, per language
+│   └── config.ts                 # Model name + env validation
 │
 ├── src/                          # Frontend (React + Vite)
 │   ├── components/               # React components

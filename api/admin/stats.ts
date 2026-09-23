@@ -2,10 +2,10 @@
  * Admin endpoint for monitoring usage and costs
  */
 
-import { getUsageStats, config as rateLimitConfig } from '../rate-limiter';
-import { validateEnv } from '../config';
-import { timingSafeEqual } from '../session';
-import { geminiCircuitBreaker } from '../circuit-breaker';
+import { getUsageStats, config as rateLimitConfig } from '../../server/rate-limiter';
+import { validateEnv } from '../../server/config';
+import { timingSafeEqual } from '../../server/session';
+import { geminiCircuitBreaker } from '../../server/circuit-breaker';
 
 export const config = {
   runtime: 'edge',

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getSafetyFallbackMessage, isSafetyBlocked } from '../../../api/safety-fallback';
+import { getSafetyFallbackMessage, isSafetyBlocked } from '../../../server/safety-fallback';
 
 const SUPPORTED_LANGUAGES = ['ja', 'en', 'es', 'pt', 'fr', 'hi', 'ar'] as const;
 

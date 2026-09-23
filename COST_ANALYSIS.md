@@ -7,11 +7,11 @@
 - **Output:** $7.50 per 1M tokens ($0.0075 per 1K tokens)
 
 > 💡 **導入価格:** 2026-12-31 までは Input $0.75 / Output $3.75 per 1M（上記の半額）。
-> 2027-01-01 から上記の標準単価に戻ります。本書と `api/rate-limiter.ts` の見積りは
+> 2027-01-01 から上記の標準単価に戻ります。本書と `server/rate-limiter.ts` の見積りは
 > 安全側に倒して**標準単価**で計算しているため、2026年内の実費は試算の約半分です
 > （＝上限が早めに効く方向のズレ。収容人数は下表より多くなります）。
 >
-> モデルは `api/config.ts` の `MODEL_NAME` でバージョン固定しています。
+> モデルは `server/config.ts` の `MODEL_NAME` でバージョン固定しています。
 > エイリアス（`gemini-flash-latest`）は指す先と単価が予告なく変わるため使いません。
 > `gemini-3.8-flash` は GA 版のため、モデルIDは安定しています（`-preview` サフィックスなし）。
 > ⚠️ 3.8 Flash は「Flash-Lite」より上位ティアで、旧 3.5 Flash-Lite（$0.30/$2.50）より高単価です。
@@ -51,7 +51,7 @@ Total per request = $0.005325 (約 $0.0053)
 | 3 メッセージ/日 | お試し | 約 64 人 |
 
 > 1人1日10メッセージを毎日なら月300メッセージ = 約 $1.60（¥261）/人・月 → ¥5,000 で約 19 人。
-> ✅ **月次上限を実装済み**：`api/rate-limiter.ts` に `maxCostPerMonth: 30.0`（≈¥5,000/月）を追加し、
+> ✅ **月次上限を実装済み**：`server/rate-limiter.ts` に `maxCostPerMonth: 30.0`（≈¥5,000/月）を追加し、
 > 月次コストを `cost:monthly:YYYY-MM` で集計。使い切ると `MONTHLY_COST_LIMIT` を返し翌月まで停止します。
 > USD建てのため為替変動で¥換算は前後します（$30 ≈ ¥4,896 @¥163.19/USD）。
 > ⚠️ 日次上限は $10 のまま。ヘビーな3日で月予算を使い切り得るため、平準化したい場合は
@@ -69,7 +69,7 @@ Total per request = $0.005325 (約 $0.0053)
 
 ## 🎯 現在の予算制限との比較
 
-### 設定されている制限 (`api/rate-limiter.ts`)
+### 設定されている制限 (`server/rate-limiter.ts`)
 ```typescript
 global: {
   maxCostPerHour: 5.0,    // $5/時間

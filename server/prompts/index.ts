@@ -1,7 +1,7 @@
 /**
  * 言語別システムプロンプトの索引。サーバー専用。
  *
- * ここに並ぶ言語が api/system-instruction.ts の対応言語そのものであり、
+ * ここに並ぶ言語が server/system-instruction.ts の対応言語そのものであり、
  * resolveLanguage() のフォールバック判定もこのキー集合を使う。
  */
 import { SYSTEM_INSTRUCTION_JA } from './ja';

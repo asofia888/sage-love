@@ -84,7 +84,7 @@ Attitude de référence : {guidance}`,
 الموقف المرجعي: {guidance}`,
 };
 
-/** 対応言語外は英語にフォールバックする（api/system-instruction.ts と同じ方針） */
+/** 対応言語外は英語にフォールバックする（server/system-instruction.ts と同じ方針） */
 export const CRISIS_DIRECTIVE_FALLBACK_LANG = 'en';
 
 /**

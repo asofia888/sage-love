@@ -1,12 +1,12 @@
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold, GenerateContentResult } from '@google/generative-ai';
-import { shouldBlockRequest, recordActualCost } from './rate-limiter';
-import { parseGeminiError, buildErrorResponse, ValidationError, APIError } from './errors';
-import { retryWithBackoff, withTimeout, RetryStatsTracker } from './retry-utils';
-import { geminiCircuitBreaker } from './circuit-breaker';
-import { API_CONFIG, validateEnv, isOriginAllowed } from './config';
-import { getOrCreateSession, attachSessionCookie, SessionResult } from './session';
-import { buildSystemInstruction, resolveLanguage } from './system-instruction';
-import { getSafetyFallbackMessage, isSafetyBlocked } from './safety-fallback';
+import { shouldBlockRequest, recordActualCost } from '../server/rate-limiter';
+import { parseGeminiError, buildErrorResponse, ValidationError, APIError } from '../server/errors';
+import { retryWithBackoff, withTimeout, RetryStatsTracker } from '../server/retry-utils';
+import { geminiCircuitBreaker } from '../server/circuit-breaker';
+import { API_CONFIG, validateEnv, isOriginAllowed } from '../server/config';
+import { getOrCreateSession, attachSessionCookie, SessionResult } from '../server/session';
+import { buildSystemInstruction, resolveLanguage } from '../server/system-instruction';
+import { getSafetyFallbackMessage, isSafetyBlocked } from '../server/safety-fallback';
 
 export const config = {
   runtime: 'edge',
@@ -133,7 +133,7 @@ export default async function handler(req: Request) {
   try {
     const body = await req.json();
     // systemInstruction is intentionally NOT read from the body — the prompt
-    // is built server-side (see api/system-instruction.ts) so the endpoint
+    // is built server-side (see server/system-instruction.ts) so the endpoint
     // cannot be repurposed as a generic Gemini proxy.
     const { message, conversationHistory, language, stream: streamRequested } = body || {};
 

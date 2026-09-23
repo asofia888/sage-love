@@ -6,8 +6,8 @@ import {
   withTimeout,
   RetryStatsTracker,
   DEFAULT_RETRY_CONFIG,
-} from '@/api/retry-utils';
-import { RateLimitError, AuthenticationError } from '@/api/errors';
+} from '@/server/retry-utils';
+import { RateLimitError, AuthenticationError } from '@/server/errors';
 
 describe('retry-utils', () => {
   describe('calculateBackoffDelay', () => {

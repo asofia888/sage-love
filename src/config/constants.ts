@@ -19,10 +19,10 @@ export const API = {
 /**
  * 1通あたりの本文長の上限。
  *
- * サーバー（api/rate-limiter.ts）が超過分を 429 で弾くので、クライアント側の
+ * サーバー（server/rate-limiter.ts）が超過分を 429 で弾くので、クライアント側の
  * 入力欄も同じ値で止める必要がある。ここだけの値にすると、長い胸の内を
  * 書き切って送信した瞬間にエラー、という最悪の体験になる。
- * api/rate-limiter.ts はこの定数を import している。片方だけ変えないこと。
+ * server/rate-limiter.ts はこの定数を import している。片方だけ変えないこと。
  */
 export const MESSAGE = {
   MAX_LENGTH: 1000,

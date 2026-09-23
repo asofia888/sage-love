@@ -187,7 +187,7 @@ vi.mock('process', () => ({
 - `*.config.ts`
 - `src/test/`
 - `assets/`, `types.ts`
-- `src/lib/locales/`, `api/prompts/` — 翻訳リソースとシステムプロンプト。
+- `src/lib/locales/`, `server/prompts/` — 翻訳リソースとシステムプロンプト。
   文字列リテラルの集合でロジック（分岐・関数）を持たないため、率に混ぜると
   実態を歪める。
 

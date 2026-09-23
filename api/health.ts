@@ -2,7 +2,7 @@
  * Health check endpoint for API service
  */
 
-import { validateEnv } from './config';
+import { validateEnv } from '../server/config';
 
 export const config = {
   runtime: 'edge',

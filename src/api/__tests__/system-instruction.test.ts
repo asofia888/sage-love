@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildSystemInstruction, resolveLanguage } from '../../../api/system-instruction';
+import { buildSystemInstruction, resolveLanguage } from '../../../server/system-instruction';
 
 const SUPPORTED_LANGUAGES = ['ja', 'en', 'es', 'pt', 'fr', 'hi', 'ar'] as const;
 

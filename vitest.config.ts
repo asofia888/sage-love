@@ -13,8 +13,8 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'json-summary', 'html'],
-      // api/ はセキュリティ中核（セッション署名・レート制限・サーキットブレーカー）
-      // なのでカバレッジ計測対象に含める
+      // api/（エンドポイント）と server/（セッション署名・レート制限・
+      // サーキットブレーカー等のセキュリティ中核）はカバレッジ計測対象に含める
       exclude: [
         'node_modules/',
         'dist/',
@@ -29,12 +29,12 @@ export default defineConfig({
         // （文字列リテラルの集合）。分岐も関数もないので、カバレッジ率に
         // 混ぜると実態を歪める。
         //
-        // 以前これらが「カバー済み」に見えていたのは、api/system-instruction.ts
+        // 以前これらが「カバー済み」に見えていたのは、server/system-instruction.ts
         // が systemInstructionForSage を読むために locale を丸ごと import して
-        // いた副作用にすぎない。プロンプトを api/prompts/ へ移した時点で
+        // いた副作用にすぎない。プロンプトを server/prompts/ へ移した時点で
         // その偶然が消え、実質の変化が無いのにカバレッジが約25pt下がった。
         'src/lib/locales/',
-        'api/prompts/',
+        'server/prompts/',
       ],
       // CIで強制する下限（実測 Stmts81/Branch80/Func77/Lines81 に対し余裕を持たせた値）。
       // 下回るとtest:coverageが失敗する。カバレッジが上がったら引き上げること。
@@ -52,6 +52,7 @@ export default defineConfig({
       '@/components': path.resolve(__dirname, './src/components'),
       '@/hooks': path.resolve(__dirname, './src/hooks'),
       '@/api': path.resolve(__dirname, './api'),
+      '@/server': path.resolve(__dirname, './server'),
       '@': path.resolve(__dirname, './src'),
     }
   }

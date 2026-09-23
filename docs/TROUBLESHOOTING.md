@@ -75,7 +75,7 @@ await new Promise(resolve => setTimeout(resolve, retryAfter * 1000));
 
 3. For development, temporarily disable rate limiting:
 ```typescript
-// api/rate-limiter.ts
+// server/rate-limiter.ts
 // WARNING: Only for development!
 if (process.env.NODE_ENV === 'development') {
   return { blocked: false };
@@ -99,7 +99,7 @@ curl -H "Authorization: Bearer YOUR_ADMIN_TOKEN" \
 2. Increase limits (if needed):
 
 コスト上限（$5/時間・$10/日・$15緊急停止）は環境変数ではなく
-`api/rate-limiter.ts` の `RATE_LIMIT_CONFIG.global` にハードコードされています。
+`server/rate-limiter.ts` の `RATE_LIMIT_CONFIG.global` にハードコードされています。
 変更する場合はコードを編集して再デプロイしてください。
 
 ---
