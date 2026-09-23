@@ -54,26 +54,63 @@ function sanitizeHistory(conversationHistory: unknown): WireHistoryMessage[] {
   );
 }
 
+/**
+ * 危機の複数ターン評価で遡るユーザー発言の数。
+ * クライアント側 useCrisisDetection の checkHistoryLength と同じ値にすること。
+ * ここがズレると「モーダルは出たのにプロンプトには危機指示が付かない」
+ * （またはその逆）という食い違いが生じる。
+ */
+const CRISIS_HISTORY_LENGTH = 5;
+
+/** 危機の複数ターン評価に用いる、直近のユーザー発言（最新の1通を含む）。 */
+function recentUserMessages(history: WireHistoryMessage[], message: string): string[] {
+  const past = history.filter((m) => m.sender === 'user').map((m) => m.text);
+  return [...past, message].slice(-CRISIS_HISTORY_LENGTH);
+}
+
+/**
+ * 危機判定。クライアント（useMessageHandler）と同じ順序で評価する:
+ * まず最新メッセージ単体を見て、そこで検出されなかったときだけ直近の
+ * 複数ターンをまとめて評価する。
+ *
+ * Why: 以前はここが単発判定のみだったため、「疲れた」→「誰も分かって
+ * くれない」→「もういいや」のように流れとして現れた危機では、画面には
+ * 介入モーダルが出るのに、システムプロンプトには危機指示が付かず、
+ * 聖者は平時の断定調・共感禁止のペルソナのまま応答していた。
+ */
+function detectCrisisAcrossTurns(
+  message: string,
+  history: WireHistoryMessage[],
+  lang: string
+) {
+  const singleTurn = CrisisDetectionService.detectCrisis(message, lang);
+  if (singleTurn.isCrisis) return singleTurn;
+
+  return CrisisDetectionService.detectCrisisPattern(
+    recentUserMessages(history, message),
+    lang
+  );
+}
+
 export function buildSystemInstruction(
   language: unknown,
   message: string,
   conversationHistory: unknown
 ): string {
   const lang = resolveLanguage(language);
+  const history = sanitizeHistory(conversationHistory);
   let instruction = INSTRUCTIONS[lang];
 
   // 危機が検出された場合は、利用者の言語で危機対応指示を追記する。
   // この指示はペルソナ側の口調制約（断定調・共感の禁止）を意図的に上書きする
   // ので、必ずベースのシステムプロンプトより後ろに置くこと。
-  const crisisResult = CrisisDetectionService.detectCrisis(message, lang);
+  const crisisResult = detectCrisisAcrossTurns(message, history, lang);
   if (crisisResult.isCrisis) {
     const guidance = CrisisDetectionService.generateCrisisResponse(crisisResult, lang);
     instruction += `\n\n${buildCrisisDirective(lang, guidance)}`;
   }
 
-  instruction += DuplicateAvoidanceService.generateDuplicateAvoidancePrompt(
-    sanitizeHistory(conversationHistory)
-  );
+  instruction += DuplicateAvoidanceService.generateDuplicateAvoidancePrompt(history);
 
   return instruction;
 }

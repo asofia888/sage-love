@@ -103,6 +103,62 @@ describe('buildSystemInstruction', () => {
     expect(normal).not.toContain('HIGHEST PRIORITY');
   });
 
+  /**
+   * 危機が単発の一通ではなく流れとして現れる場合の回帰テスト。
+   * ここが単発判定だけだった頃は、画面に介入モーダルが出ているのに
+   * システムプロンプトには危機指示が付かず、聖者だけが平時のペルソナ
+   * （断定調・共感禁止）のまま応答していた。
+   */
+  describe('複数ターンにまたがる危機', () => {
+    it('最新メッセージ単体が危機でなくても、直近の履歴と併せて判定する', () => {
+      const history = [
+        { sender: 'user', text: '死にたい' },
+        { sender: 'assistant', text: 'あなたの苦しさを聞いている。' },
+      ];
+      const instruction = buildSystemInstruction('ja', 'そうかもしれない', history);
+      expect(instruction).toContain('【最優先の指示 — 危機対応】');
+    });
+
+    it('単体でも履歴でも危機でなければ危機指示を足さない', () => {
+      const history = [
+        { sender: 'user', text: '今日はいい天気だ' },
+        { sender: 'assistant', text: '良い一日である。' },
+      ];
+      const instruction = buildSystemInstruction('ja', 'そうかもしれない', history);
+      expect(instruction).not.toContain('【最優先の指示 — 危機対応】');
+    });
+
+    /**
+     * 聖者自身の発話に危機語が含まれることは普通にある
+     * （危機対応の応答そのものがそう）。それを利用者の危機として
+     * 数え始めると、一度の介入が延々と自己参照で続いてしまう。
+     */
+    it('アシスタントの発話は危機判定の対象にしない', () => {
+      const history = [
+        { sender: 'assistant', text: '死にたいと感じるほどの苦しさなのだな。' },
+      ];
+      const instruction = buildSystemInstruction('ja', 'そうかもしれない', history);
+      expect(instruction).not.toContain('【最優先の指示 — 危機対応】');
+    });
+
+    it('履歴を遡る範囲は直近のユーザー発言に限られる', () => {
+      const old = { sender: 'user', text: '死にたい' };
+      const filler = Array.from({ length: 6 }, () => ({
+        sender: 'user',
+        text: 'そうかもしれない',
+      }));
+      const instruction = buildSystemInstruction('ja', 'そうかもしれない', [old, ...filler]);
+      expect(instruction).not.toContain('【最優先の指示 — 危機対応】');
+    });
+
+    it('複数ターンで検出された場合も利用者の言語で追記される', () => {
+      const history = [{ sender: 'user', text: 'I want to die' }];
+      const instruction = buildSystemInstruction('en', 'maybe', history);
+      expect(instruction).toContain('HIGHEST PRIORITY');
+      expect(instruction).not.toContain('【最優先の指示 — 危機対応】');
+    });
+  });
+
   it('壊れた履歴を渡してもクラッシュしない', () => {
     expect(() => buildSystemInstruction('ja', 'hello', null)).not.toThrow();
     expect(() => buildSystemInstruction('ja', 'hello', 'not-an-array')).not.toThrow();
