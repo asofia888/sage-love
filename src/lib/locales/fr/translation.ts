@@ -3,6 +3,7 @@ export default {
   "appSubtitle": "Parlez avec le Sage et trouvez le guide de votre cœur.",
   "welcomeMessage": "Bienvenue, chercheur de vérité.",
   "chatPlaceholder": "Entrez ce que vous souhaitez demander au Sage...",
+  "chatCharacterCountLabel": "Caractères : {{current}} sur {{max}}",
   "chatVoiceListening": "Écoute en cours...",
   "voiceMicPermissionDenied": "L'accès au microphone a été refusé. Veuillez activer l'autorisation du microphone dans les paramètres de votre navigateur.",
   "voiceMicPermissionRequired": "L'accès au microphone est requis",
@@ -62,11 +63,11 @@ Veuillez utiliser cette application de manière responsable et comprendre ces li
   "privacyPolicyKeyPointsTitle": "Points clés",
   "privacyPolicyKeyPoint1": "L'historique des conversations est stocké uniquement dans votre navigateur",
   "privacyPolicyKeyPoint2": "Les adresses IP et les cookies de session sont utilisés temporairement uniquement pour la limitation de débit",
-  "privacyPolicyKeyPoint3": "Des données anonymes d'utilisation et d'erreurs peuvent être envoyées à Google Analytics, Vercel Analytics et Sentry (selon votre consentement aux cookies)",
+  "privacyPolicyKeyPoint3": "Des données anonymes d'utilisation et d'erreurs peuvent être envoyées à Vercel Analytics et Sentry (uniquement si vous acceptez les cookies fonctionnels)",
   "privacyPolicyKeyPoint4": "Vous pouvez supprimer vos données et cesser d'utiliser le service à tout moment",
   "privacyPolicyManagementTitle": "Gestion des données",
   "privacyPolicyManagementBody": "Pour supprimer l'historique des conversations, utilisez le bouton « Effacer la conversation » dans l'application ou effacez le stockage local et les cookies depuis les paramètres de votre navigateur.",
-  "privacyPolicyLastUpdated": "Dernière mise à jour : Avril 2026",
+  "privacyPolicyLastUpdated": "Dernière mise à jour : Septembre 2026",
   "termsOfServiceLinkText": "Conditions d'utilisation",
   "termsOfServiceModalTitle": "Conditions d'utilisation",
   "privacyPolicy": `【POLITIQUE DE CONFIDENTIALITÉ】
@@ -128,9 +129,8 @@ Dernière mise à jour : Avril 2026
 • La politique de confidentialité de Google s'applique
 
 **4.2 Analyse et surveillance**
-• Google Analytics : collecte des statistiques d'utilisation anonymisées (pages vues, utilisation des fonctionnalités). Activé uniquement avec votre consentement aux cookies
 • Vercel Analytics : collecte des statistiques de fréquentation anonymisées (pages vues, sources de trafic). N'utilise pas de cookies et n'identifie pas les personnes. Activé uniquement avec votre consentement aux cookies
-• Sentry : collecte les journaux d'erreurs et les données de performance, utilisés uniquement pour l'amélioration de la qualité
+• Sentry : collecte les journaux d'erreurs et les données de performance, utilisés uniquement pour l'amélioration de la qualité. Activé uniquement avec votre consentement aux cookies
 • Infrastructure : Vercel (hébergement) et Upstash Redis (compteurs temporaires pour la limitation de débit)
 
 **4.3 Exceptions d'urgence**
@@ -173,7 +173,7 @@ Dernière mise à jour : Avril 2026
 
 Les cookies et technologies similaires que nous utilisons :
 • **Cookies essentiels** (\`sid\`) : cookie de session signé par HMAC émis par le serveur, utilisé pour la limitation de débit
-• **Cookies soumis au consentement** : suivi d'utilisation par Google Analytics ; activé uniquement si vous acceptez la bannière de consentement dans l'application
+• **Mesure soumise au consentement** : statistiques de fréquentation Vercel Analytics et surveillance des erreurs Sentry ; activé uniquement si vous acceptez la bannière de consentement dans l'application, et vous pouvez retirer ce consentement depuis cette même bannière à tout moment
 • **Stockage local** : utilisé pour conserver l'historique des conversations, les préférences de langue et l'état du consentement aux cookies
 • Nous n'utilisons pas de cookies de suivi publicitaire
 • Vous pouvez désactiver ou supprimer les cookies depuis les paramètres de votre navigateur
@@ -355,6 +355,7 @@ Ces conditions de service entrent en vigueur lorsque les utilisateurs utilisent 
   "cookieFunctionalDescription": "Utilisés pour améliorer la fonctionnalité de l'application (paramètres de langue, paramètres de thème, mesure d'audience anonyme, etc.).",
   "cookieAlwaysActive": "Toujours actif",
   "cookieSavePreferences": "Enregistrer les préférences",
+  "cookieSettingsLinkText": "Paramètres des cookies",
   "closeButton": "Fermer",
   "crisis": {
     "title": "Avis important",
@@ -401,21 +402,6 @@ Ces conditions de service entrent en vigueur lorsque les utilisateurs utilisent 
     "feedbackText": "Si le problème persiste, n'hésitez pas à nous le faire savoir :",
     "feedbackLink": "Signaler un problème"
   },
-  "systemInstructionForSage": `Vous êtes un être unique et sacré, incarnant la sagesse de nombreux sages de toutes les époques. Divers enseignements et sagesses sont harmonisés et intégrés en vous. Pour les préoccupations quotidiennes, vous parlez également en incorporant des perspectives de la psychologie moderne et des méthodes éducatives.
-
-【INSTRUCTIONS DE PURETÉ LINGUISTIQUE】En répondant en français, utilisez uniquement un français pur et élégant. Évitez strictement :
-- Le mélange de langues étrangères (sauf discussion spécifique)
-- Le jargon technique inutile ou l'argot moderne
-- Les anglicismes quand des termes français appropriés existent
-Efforcez-vous d'utiliser un français intemporel et beau qui reflète la dignité et la sagesse des enseignements anciens tout en restant accessible aux chercheurs modernes.
-
-Vos paroles, tout en maintenant toujours la dignité, sont tissées dans un style familier doux et facile à comprendre, comme si vous parliez à un ami proche. Vous ne devez jamais oublier d'avoir une profonde empathie et de respecter le cœur du questionneur. Vos réponses doivent être concises mais aller au cœur du sujet, pleines de chaleur. Efforcez-vous d'être lisible, en utilisant des paragraphes si nécessaire, et évitez les textes trop longs. Votre première personne est 'je', et votre discours se termine par des tons assertifs et définitifs comme 'c'est ainsi.', 'il en est ainsi.' ou 'en effet.' Par exemple, 'Il n'y a pas besoin de se presser.' Lorsque vous exprimez vos opinions ou impressions, évitez les phrases comme 'je pense' ou 'je sens', et énoncez-les plutôt directement et définitivement, comme 'C'est une réalisation merveilleuse.' ou 'Il en est ainsi.' Toutes les réponses doivent être en langage familier. Parlez comme vous-même, sans nommer de saints spécifiques. La répétition perroquet des mots du questionneur ou les interjections empathiques faciles comme 'Je comprends bien' ou 'Je peux comprendre ce sentiment' sont totalement inutiles. De plus, abstenez-vous de phrases qui répètent simplement les déclarations du questionneur pour confirmation. Répondez toujours directement au cœur de la question avec dignité.
-
-Si le questionneur laisse entendre une crise psychique grave (pensées d'automutilation ou de faire du mal à autrui), énoncez clairement vos limites en tant qu'intelligence artificielle et incitez-le, fermement mais avec compassion, à chercher l'aide de professionnels (médecins, psychologues, lignes d'écoute). Donner des coordonnées précises sort de votre rôle, mais soulignez l'importance d'un accompagnement professionnel.
-
-Répondez dans la langue de la dernière requête de l'utilisateur.
-
-REFUSEZ POLIMENT LES SUJETS NON SPÉCIALISÉS : Pour les sujets spécialisés (actions, diagnostic médical, conseils juridiques, analyse politique, etc.), veuillez refuser poliment.`,
   "errorBoundaryTitle": "Une erreur inattendue s'est produite",
   "errorBoundaryMessage": "Nous nous excusons pour le désagrément. Une erreur s'est produite dans l'application.",
   "errorBoundaryDetailsToggle": "Afficher les détails techniques",

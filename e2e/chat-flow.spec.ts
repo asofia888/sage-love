@@ -79,6 +79,9 @@ test.describe('Chat Flow E2E', () => {
         JSON.stringify({ necessary: true, functional: false })
       );
       localStorage.setItem('cookieConsentDate', new Date().toISOString());
+      // 初回訪問の免責モーダルは全操作を塞ぐので、既読として扱う。
+      // 「初回に出る」こと自体は専用のテストで検証する。
+      localStorage.setItem('disclaimerAcknowledged', new Date().toISOString());
     });
     await installChatMock(page);
     await page.goto('/');
@@ -270,5 +273,156 @@ test.describe('Responsive & Accessibility', () => {
     await textarea.focus();
     await expect(textarea).toBeFocused();
     await expect(textarea).toHaveAttribute('aria-label');
+  });
+});
+
+/**
+ * 危機介入フローは、このアプリでもっとも安全性が高い経路でありながら
+ * e2e が1件も無かった。以下は「利用者が打ち明けたときに、窓口が実際に
+ * 画面に出るところまで」を通しで押さえる。
+ */
+test.describe('Crisis intervention E2E', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      if (localStorage.getItem('__e2eSeeded')) return;
+      localStorage.clear();
+      localStorage.setItem('__e2eSeeded', '1');
+      localStorage.setItem('i18nextLng', 'ja');
+      localStorage.setItem(
+        'cookieConsent',
+        JSON.stringify({ necessary: true, functional: false })
+      );
+      localStorage.setItem('cookieConsentDate', new Date().toISOString());
+      localStorage.setItem('disclaimerAcknowledged', new Date().toISOString());
+    });
+    await installChatMock(page);
+    await page.goto('/');
+  });
+
+  test('危機的な発言で介入モーダルが開き、相談窓口が1件以上表示される', async ({ page }) => {
+    await setChatMock(page, { kind: 'sse', text: 'その苦しさを、わたしは聞いている。' });
+
+    await page.getByRole('textbox').fill('死にたい');
+    await page.getByRole('button', { name: /送信/ }).click();
+
+    // critical は遅延なしで即座に開く
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible({ timeout: 10000 });
+    await expect(dialog).toContainText('重要なお知らせ');
+
+    // 窓口の見出しだけが出て中身が空、という状態にならないこと。
+    // 地域データの絞り込みで候補が0件になる不具合が以前あったため、
+    // 電話番号かリンクが実際に1つ以上描画されていることまで確認する。
+    await expect(dialog).toContainText('今すぐ利用できる相談窓口');
+    const contacts = dialog.locator('a[href^="tel:"], a[href^="http"]');
+    expect(await contacts.count()).toBeGreaterThan(0);
+  });
+
+  test('モーダルを閉じても会話は続けられる', async ({ page }) => {
+    await setChatMock(page, { kind: 'sse', text: 'その苦しさを、わたしは聞いている。' });
+
+    await page.getByRole('textbox').fill('死にたい');
+    await page.getByRole('button', { name: /送信/ }).click();
+
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible({ timeout: 10000 });
+    await page.getByRole('button', { name: /理解しました/ }).click();
+    await expect(dialog).not.toBeVisible();
+
+    // 応答は届いており、入力欄も使える
+    await expect(
+      page.locator('main').getByText('その苦しさを、わたしは聞いている。')
+    ).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole('textbox')).toBeEditable();
+  });
+
+  test('危機的でない発言では介入モーダルは出ない', async ({ page }) => {
+    await setChatMock(page, { kind: 'sse', text: '良い問いである。' });
+
+    await page.getByRole('textbox').fill('今日はいい天気ですね');
+    await page.getByRole('button', { name: /送信/ }).click();
+
+    await expect(page.locator('main').getByText('良い問いである。')).toBeVisible({
+      timeout: 10000,
+    });
+    await expect(page.getByRole('dialog')).not.toBeVisible();
+  });
+});
+
+/**
+ * 初回訪問時の免責提示と、Cookie 設定の再オープン導線。
+ */
+test.describe('First visit and consent E2E', () => {
+  test('初回訪問では免責モーダルが自動で出て、閉じると再訪時は出ない', async ({ page }) => {
+    await page.addInitScript(() => {
+      // addInitScript は reload でも再実行される。ガードしないと
+      // 「免責を閉じた」記録まで消えてしまい、再訪の検証にならない。
+      if (localStorage.getItem('__e2eSeeded')) return;
+      localStorage.clear();
+      localStorage.setItem('__e2eSeeded', '1');
+      localStorage.setItem('i18nextLng', 'ja');
+      localStorage.setItem(
+        'cookieConsent',
+        JSON.stringify({ necessary: true, functional: false })
+      );
+      localStorage.setItem('cookieConsentDate', new Date().toISOString());
+    });
+    await installChatMock(page);
+    await page.goto('/');
+
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible({ timeout: 10000 });
+    await expect(dialog).toContainText('免責事項');
+
+    await page.keyboard.press('Escape');
+    await expect(dialog).not.toBeVisible();
+
+    await page.reload();
+    await expect(page.getByRole('textbox')).toBeVisible();
+    await expect(page.getByRole('dialog')).not.toBeVisible();
+  });
+
+  test('フッターの Cookie 設定から同意バナーを開き直せる', async ({ page }) => {
+    await page.addInitScript(() => {
+      if (localStorage.getItem('__e2eSeeded')) return;
+      localStorage.clear();
+      localStorage.setItem('__e2eSeeded', '1');
+      localStorage.setItem('i18nextLng', 'ja');
+      localStorage.setItem(
+        'cookieConsent',
+        JSON.stringify({ necessary: true, functional: true })
+      );
+      localStorage.setItem('cookieConsentDate', new Date().toISOString());
+      localStorage.setItem('disclaimerAcknowledged', new Date().toISOString());
+    });
+    await installChatMock(page);
+    await page.goto('/');
+
+    // 同意済みなのでバナーは出ていない
+    await expect(page.getByText('Cookieの使用について')).not.toBeVisible();
+    const saveButton = page.getByRole('button', { name: '設定を保存' });
+    await expect(saveButton).not.toBeVisible();
+
+    // フッターの導線はモバイル/PCで二重にあるため、見えている方を押す
+    await page
+      .locator('footer')
+      .getByRole('button', { name: 'Cookie設定' })
+      .filter({ visible: true })
+      .first()
+      .click();
+
+    // 撤回が目的なので、トグル付きの詳細ビューが直接開く
+    await expect(saveButton).toBeVisible();
+    // 現在の同意状態がトグルに反映されている（sr-only のため force 指定）
+    const toggle = page.getByRole('checkbox');
+    await expect(toggle).toBeChecked();
+
+    // 同意を撤回できる
+    await toggle.uncheck({ force: true });
+    await saveButton.click();
+    await expect(saveButton).not.toBeVisible();
+
+    const stored = await page.evaluate(() => localStorage.getItem('cookieConsent'));
+    expect(JSON.parse(stored ?? '{}').functional).toBe(false);
   });
 });

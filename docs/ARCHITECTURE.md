@@ -122,6 +122,7 @@ sage-love/
 │   ├── system-instruction.ts     # Server-side prompt builder
 │   ├── crisis-directives.ts      # Per-language crisis-response directives
 │   ├── safety-fallback.ts        # Fallback reply when Gemini blocks a response
+│   ├── prompts/                  # Sage persona prompts, per language (server-only)
 │   ├── config.ts                 # Model name + env validation
 │   └── admin/stats.ts            # Admin statistics endpoint (ADMIN_TOKEN)
 │

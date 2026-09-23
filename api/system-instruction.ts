@@ -9,26 +9,10 @@
  * server already receives, so the client no longer sends any prompt text
  * besides the user's own message.
  */
-import ja from '../src/lib/locales/ja/translation';
-import en from '../src/lib/locales/en/translation';
-import es from '../src/lib/locales/es/translation';
-import pt from '../src/lib/locales/pt/translation';
-import fr from '../src/lib/locales/fr/translation';
-import hi from '../src/lib/locales/hi/translation';
-import ar from '../src/lib/locales/ar/translation';
 import { CrisisDetectionService } from '../src/services/crisisDetectionService';
 import { DuplicateAvoidanceService } from '../src/services/duplicateAvoidanceService';
 import { buildCrisisDirective } from './crisis-directives';
-
-const INSTRUCTIONS: Record<string, string> = {
-  ja: ja.systemInstructionForSage,
-  en: en.systemInstructionForSage,
-  es: es.systemInstructionForSage,
-  pt: pt.systemInstructionForSage,
-  fr: fr.systemInstructionForSage,
-  hi: hi.systemInstructionForSage,
-  ar: ar.systemInstructionForSage,
-};
+import { SYSTEM_INSTRUCTIONS as INSTRUCTIONS } from './prompts';
 
 // Matches the client's i18next fallbackLng (src/lib/i18n.ts).
 const FALLBACK_LANG = 'en';

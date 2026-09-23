@@ -24,7 +24,17 @@ export default defineConfig({
         'src/test/',
         'assets/',
         'i18n/',
-        'types.ts'
+        'types.ts',
+        // 翻訳リソースとシステムプロンプトはロジックを持たない純粋なデータ
+        // （文字列リテラルの集合）。分岐も関数もないので、カバレッジ率に
+        // 混ぜると実態を歪める。
+        //
+        // 以前これらが「カバー済み」に見えていたのは、api/system-instruction.ts
+        // が systemInstructionForSage を読むために locale を丸ごと import して
+        // いた副作用にすぎない。プロンプトを api/prompts/ へ移した時点で
+        // その偶然が消え、実質の変化が無いのにカバレッジが約25pt下がった。
+        'src/lib/locales/',
+        'api/prompts/',
       ],
       // CIで強制する下限（実測 Stmts81/Branch80/Func77/Lines81 に対し余裕を持たせた値）。
       // 下回るとtest:coverageが失敗する。カバレッジが上がったら引き上げること。
