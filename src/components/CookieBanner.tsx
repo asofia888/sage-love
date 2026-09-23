@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   readCookieConsent,
   saveCookieConsent,
+  onCookieConsentReopen,
   type CookiePreferences,
 } from '../hooks/useCookieConsent';
 
@@ -13,6 +14,33 @@ const CookieBanner: React.FC = () => {
   const [preferences, setPreferences] = useState<CookiePreferences>(
     () => readCookieConsent() ?? { necessary: true, functional: false }
   );
+
+  // 同意済みの利用者が設定を見直しに来た状態かどうか。
+  // 初回提示（まだ選んでいない）と違い、何も変えずに閉じられる必要がある。
+  const [isReviewing, setIsReviewing] = useState(false);
+
+  // フッターの「Cookie設定」から開き直せるようにする。撤回が目的なので、
+  // 簡易バナーではなく詳細（トグル付き）を直接開く。
+  useEffect(
+    () =>
+      onCookieConsentReopen(() => {
+        setPreferences(readCookieConsent() ?? { necessary: true, functional: false });
+        setIsReviewing(true);
+        setShowDetails(true);
+        setIsVisible(true);
+      }),
+    []
+  );
+
+  // 詳細ビューの × の挙動。見直しで開いた場合はバナーごと閉じ、
+  // 初回提示の場合は従来どおり簡易バナーへ戻る（選択は避けられない）。
+  const handleDismissDetails = () => {
+    if (isReviewing) {
+      setIsVisible(false);
+      setIsReviewing(false);
+    }
+    setShowDetails(false);
+  };
 
 
   const handleAcceptAll = () => {
@@ -41,6 +69,7 @@ const CookieBanner: React.FC = () => {
     setPreferences(prefs);
     setIsVisible(false);
     setShowDetails(false);
+    setIsReviewing(false);
   };
 
   const handlePreferenceChange = (type: keyof CookiePreferences, value: boolean) => {
@@ -93,7 +122,7 @@ const CookieBanner: React.FC = () => {
                 {t('cookiePreferencesTitle')}
               </h3>
               <button
-                onClick={() => setShowDetails(false)}
+                onClick={handleDismissDetails}
                 className="text-gray-400 hover:text-gray-600"
                 aria-label={t('closeButton')}
               >

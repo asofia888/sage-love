@@ -265,7 +265,8 @@ export function setupGlobalErrorHandlers(): void {
     );
   });
 
-  const sentryStatus = isSentryEnabled() ? 'enabled' : 'disabled (no DSN)';
+  // 無効の理由は DSN 未設定とは限らない（Cookie 同意が無い場合も無効になる）
+  const sentryStatus = isSentryEnabled() ? 'enabled' : 'disabled (no DSN or no consent)';
   console.log(`✅ Global error handlers initialized (Sentry: ${sentryStatus})`);
 }
 

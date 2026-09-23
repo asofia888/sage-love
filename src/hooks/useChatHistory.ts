@@ -3,7 +3,6 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { ChatMessage } from '../types';
 import { STORAGE } from '../config/constants';
 import { storage } from '../lib/storage';
-import { analytics } from '../lib/analytics';
 
 // メッセージ数制限チェックとトリム（フックに依存しない純粋なロジック）
 function trimMessagesIfNeeded(messageList: ChatMessage[]): ChatMessage[] {
@@ -15,14 +14,6 @@ function trimMessagesIfNeeded(messageList: ChatMessage[]): ChatMessage[] {
 
     // 最新のメッセージを保持（ユーザーメッセージとアシスタントメッセージのペアを維持）
     const trimmed = messageList.slice(-STORAGE.TRIM_TO_MESSAGES);
-
-    // Analytics tracking for performance monitoring
-    analytics.trackEvent('chat_history_trimmed', {
-        event_category: 'performance',
-        original_count: messageList.length,
-        trimmed_count: trimmed.length,
-        memory_usage: new Blob([JSON.stringify(messageList)]).size
-    });
 
     return trimmed;
 }
@@ -74,9 +65,6 @@ function loadInitialMessages(): ChatMessage[] {
     } catch (e) {
         console.error("Failed to load history:", e);
         storage.remove(STORAGE.CHAT_HISTORY_KEY);
-
-        // Analytics tracking for errors
-        analytics.trackError(e instanceof Error ? e : 'Unknown error', 'chat_history_load');
         return [];
     }
 }
@@ -124,13 +112,6 @@ export function useChatHistory(_isI18nInitialized: boolean): [
                     const trimmedString = serializeHistory(furtherTrimmed);
                     storage.setRaw(STORAGE.CHAT_HISTORY_KEY, trimmedString);
                     lastSavedRef.current = trimmedString;
-
-                    // Analytics tracking
-                    analytics.trackEvent('storage_limit_exceeded', {
-                        event_category: 'performance',
-                        data_size: dataSize,
-                        limit: STORAGE.SIZE_LIMIT
-                    });
                 } else {
                     storage.setRaw(STORAGE.CHAT_HISTORY_KEY, dataString);
                     lastSavedRef.current = dataString;
@@ -147,23 +128,13 @@ export function useChatHistory(_isI18nInitialized: boolean): [
 
         } catch (e) {
             console.error("Failed to save history:", e);
-
-            // Analytics tracking for save errors
-            analytics.trackError(e instanceof Error ? e : 'Unknown error', 'chat_history_save');
         }
     }, [messages]);
 
     const clearChat = useCallback(() => {
-        const previousCount = messages.length;
         setMessages([]);
         storage.remove(STORAGE.CHAT_HISTORY_KEY);
-
-        // Analytics tracking
-        analytics.trackEvent('chat_cleared', {
-            event_category: 'user_interaction',
-            previous_message_count: previousCount
-        });
-    }, [messages.length]);
+    }, []);
 
     return [messages, optimizedSetMessages, clearChat];
 }

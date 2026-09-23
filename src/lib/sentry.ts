@@ -10,16 +10,30 @@ const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN;
 const ENVIRONMENT = import.meta.env.MODE || 'development';
 const RELEASE = import.meta.env.VITE_APP_VERSION || '1.0.0';
 
-// Check if Sentry is configured
+/**
+ * 実際に初期化が済んでいるか。Sentry は functional Cookie への同意が
+ * あるときだけ初期化されるので、DSN と環境だけでは判断できない。
+ */
+let initialized = false;
+
+// Check if Sentry is configured AND actually running (consent granted)
 export const isSentryEnabled = (): boolean => {
-  return !!SENTRY_DSN && ENVIRONMENT === 'production';
+  return !!SENTRY_DSN && ENVIRONMENT === 'production' && initialized;
 };
 
 /**
- * Initialize Sentry
- * Call this in main.tsx before rendering the app
+ * Initialize Sentry.
+ *
+ * 呼び出しは src/index.tsx の同意ゲート経由のみ。同意前に初期化すると、
+ * エラーログだけでなくセッションリプレイ（replaysOnErrorSampleRate）まで
+ * 同意なしに走ってしまい、プライバシーポリシーの「Cookie同意に基づく」
+ * という記載とも食い違う。
+ *
+ * 二重初期化は無視する（同意の付け外しで複数回呼ばれうるため）。
  */
 export function initSentry(): void {
+  if (initialized) return;
+
   if (!SENTRY_DSN) {
     console.log('📊 Sentry: DSN not configured, skipping initialization');
     return;
@@ -105,9 +119,30 @@ export function initSentry(): void {
       ],
     });
 
+    initialized = true;
     console.log('✅ Sentry initialized successfully');
   } catch (error) {
     console.error('❌ Failed to initialize Sentry:', error);
+  }
+}
+
+/**
+ * 同意が撤回されたときに送信を止める。
+ *
+ * 既に初期化済みのクライアントを閉じることで、以降のイベント送信と
+ * セッションリプレイの記録を停止する。再度同意された場合は initSentry()
+ * が新しいクライアントを作り直す。
+ */
+export function shutdownSentry(): void {
+  if (!initialized) return;
+
+  initialized = false;
+  try {
+    // close() は保留中のイベントを流し切ってからクライアントを無効化する
+    void Sentry.close(0);
+    console.log('📊 Sentry: shut down after consent withdrawal');
+  } catch (error) {
+    console.error('❌ Failed to shut down Sentry:', error);
   }
 }
 
