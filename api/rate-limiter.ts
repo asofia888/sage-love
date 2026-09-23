@@ -1,5 +1,6 @@
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
+import { MESSAGE } from '../src/config/constants';
 
 // Rate limit configuration
 const RATE_LIMIT_CONFIG = {
@@ -33,7 +34,9 @@ const RATE_LIMIT_CONFIG = {
 
   // Content-based limits
   content: {
-    maxMessageLength: 1000,    // Max 1000 characters
+    // クライアントの入力欄と同じ値を使う（src/config/constants.ts）。
+    // ズレると、入力欄では書けるのに送信すると 429 になる。
+    maxMessageLength: MESSAGE.MAX_LENGTH,
     maxHistoryMessages: 10,    // Limit conversation history (matches api/chat.ts slice(-10))
     // 履歴1件あたりの本文長上限。正規のAI応答(最大4096トークン)より十分大きく、
     // 巨大な履歴本文を送り込むコスト膨張攻撃だけを弾く

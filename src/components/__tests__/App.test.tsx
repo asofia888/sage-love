@@ -138,6 +138,52 @@ describe('App Integration Tests', () => {
     });
   });
 
+  /**
+   * 人生相談と危機検出を伴うアプリでありながら、免責はフッターのリンクから
+   * しか読めず、AIであること・専門家の代わりではないことがどこにも前置き
+   * されていなかった。初回に一度だけ提示する。
+   */
+  describe('初回訪問時の免責提示', () => {
+    it('初回訪問では免責モーダルが自動で開く', () => {
+      render(<App />);
+
+      expect(screen.getByTestId('disclaimer-modal')).toBeInTheDocument();
+    });
+
+    it('一度閉じると再訪時には開かない', async () => {
+      const user = userEvent.setup();
+      const { unmount } = render(<App />);
+
+      await user.click(screen.getByTestId('disclaimer-modal'));
+      expect(screen.queryByTestId('disclaimer-modal')).not.toBeInTheDocument();
+
+      unmount();
+      render(<App />);
+      expect(screen.queryByTestId('disclaimer-modal')).not.toBeInTheDocument();
+    });
+
+    it('既読の記録があれば最初から開かない', () => {
+      localStorage.setItem('disclaimerAcknowledged', new Date().toISOString());
+
+      render(<App />);
+      expect(screen.queryByTestId('disclaimer-modal')).not.toBeInTheDocument();
+    });
+
+    /** ストレージが使えなくてもモーダルは閉じられる必要がある */
+    it('既読の記録に失敗してもモーダルは閉じられる', async () => {
+      const user = userEvent.setup();
+      vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+        throw new Error('storage blocked');
+      });
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      render(<App />);
+      await user.click(screen.getByTestId('disclaimer-modal'));
+
+      expect(screen.queryByTestId('disclaimer-modal')).not.toBeInTheDocument();
+    });
+  });
+
   describe('メッセージ送信機能', () => {
     it('ユーザーがメッセージを送信できる', async () => {
       const user = userEvent.setup();

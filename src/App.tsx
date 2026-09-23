@@ -29,9 +29,11 @@ const PrivacyPolicyModal = React.lazy(() => import('./components/PrivacyPolicyMo
 const TermsOfServiceModal = React.lazy(() => import('./components/TermsOfServiceModal'));
 import { useChatHistory } from './hooks/useChatHistory';
 import { useTextSize } from './hooks/useTextSize';
-import { useCookieConsent } from './hooks/useCookieConsent';
+import { useCookieConsent, reopenCookieConsent } from './hooks/useCookieConsent';
 import { useMessageHandler } from './hooks/useMessageHandler';
 import { MessageSender } from './types';
+import { STORAGE } from './config/constants';
+import { storage } from './lib/storage';
 
 
 // --- Main App Component ---
@@ -41,8 +43,28 @@ const App: React.FC = () => {
 
   // Unified modal state: only one modal open at a time (except crisis modal)
   type ModalType = null | 'disclaimer' | 'clearConfirm' | 'help' | 'privacyPolicy' | 'termsOfService';
-  const [activeModal, setActiveModal] = useState<ModalType>(null);
-  const closeModal = () => setActiveModal(null);
+
+  // 初回訪問時は免責事項を一度だけ自動で提示する。
+  // Why: 人生相談・危機検出を伴うアプリでありながら、免責はフッターの
+  // リンクからしか読めず、ウェルカムメッセージにも「AIであり専門家の
+  // 代わりではない」旨がどこにも出ていなかった。
+  const [activeModal, setActiveModal] = useState<ModalType>(
+    () => (storage.getRaw(STORAGE.DISCLAIMER_SEEN_KEY) ? null : 'disclaimer')
+  );
+
+  const closeModal = () => {
+    // 免責を閉じた時点で「読んだ」と記録する。閉じ方（ボタン/Esc/背景）に
+    // よらず記録したいので、個別のハンドラではなくここで行う。
+    if (activeModal === 'disclaimer') {
+      try {
+        storage.setRaw(STORAGE.DISCLAIMER_SEEN_KEY, new Date().toISOString());
+      } catch {
+        // ストレージが使えない環境（プライベートウィンドウ等）でも
+        // モーダルは閉じられる必要がある。記録できないので次回また出る。
+      }
+    }
+    setActiveModal(null);
+  };
 
   const [textSize, setTextSize] = useTextSize();
   const cookieConsent = useCookieConsent();
@@ -193,6 +215,13 @@ const App: React.FC = () => {
                   >
                     {t('termsOfServiceLinkText')}
                   </button>
+                  {/* 同意は与えるのと同じ手軽さで撤回できる必要がある（GDPR 7条3項） */}
+                  <button
+                    onClick={reopenCookieConsent}
+                    className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1 text-xs"
+                  >
+                    {t('cookieSettingsLinkText')}
+                  </button>
                 </div>
               </div>
               {/* PC: Horizontal layout */}
@@ -214,6 +243,13 @@ const App: React.FC = () => {
                   className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1"
                 >
                   {t('termsOfServiceLinkText')}
+                </button>
+                {/* 同意は与えるのと同じ手軽さで撤回できる必要がある（GDPR 7条3項） */}
+                <button
+                  onClick={reopenCookieConsent}
+                  className="underline hover:text-sky-400 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-400 rounded px-1"
+                >
+                  {t('cookieSettingsLinkText')}
                 </button>
               </div>
             </div>

@@ -3,6 +3,7 @@
 import React, { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import VoiceInputButton from './VoiceInputButton';
+import { MESSAGE } from '../config/constants';
 
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
@@ -62,10 +63,11 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading, onStopS
     setVoiceError(null);
     
     if (isFinal) {
-      // 最終的な認識結果
+      // 最終的な認識結果。maxLength は DOM 側の入力にしか効かないので、
+      // プログラムから差し込む音声認識結果はここで切り詰める。
       setInputValue(prev => {
         const newValue = prev.trim() ? `${prev} ${transcript}` : transcript;
-        return newValue;
+        return newValue.slice(0, MESSAGE.MAX_LENGTH);
       });
       setIsVoiceInput(false);
       
@@ -108,6 +110,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading, onStopS
             onKeyDown={handleKeyDown}
             placeholder={isVoiceInput ? t('chatVoiceListening') : t('chatPlaceholder')}
             aria-label={t('chatPlaceholder')}
+            maxLength={MESSAGE.MAX_LENGTH}
             className={`w-full p-3 pr-20 border border-slate-600/70 rounded-lg bg-slate-800/60 text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none placeholder-slate-300 shadow-sm transition-colors duration-200 backdrop-blur-sm ${isVoiceInput ? 'bg-indigo-900/30 border-indigo-500/50' : ''}`}
             rows={2}
             disabled={isLoading}
@@ -151,6 +154,24 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading, onStopS
             )}
           </div>
         </div>
+
+        {/* 文字数カウンタ。上限に近づいてから出す（常時出すと急かす印象になる）。
+            サーバーは 1000 文字超を 429 で弾くので、入力欄側で止めないと
+            長文を書き切った瞬間にエラーになる。 */}
+        {inputValue.length >= MESSAGE.COUNTER_THRESHOLD && (
+          <p
+            className={`mt-1 text-right text-xs tabular-nums ${
+              inputValue.length >= MESSAGE.MAX_LENGTH ? 'text-amber-300' : 'text-slate-300'
+            }`}
+            aria-live="polite"
+            aria-label={t('chatCharacterCountLabel', {
+              current: inputValue.length,
+              max: MESSAGE.MAX_LENGTH,
+            })}
+          >
+            {inputValue.length} / {MESSAGE.MAX_LENGTH}
+          </p>
+        )}
       </form>
     </div>
   );
