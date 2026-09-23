@@ -23,6 +23,7 @@ vi.mock('@google/generative-ai', () => ({
   HarmBlockThreshold: {
     BLOCK_MEDIUM_AND_ABOVE: 'BLOCK_MEDIUM_AND_ABOVE',
     BLOCK_ONLY_HIGH: 'BLOCK_ONLY_HIGH',
+    BLOCK_NONE: 'BLOCK_NONE',
   }
 }));
 
@@ -70,6 +71,38 @@ describe('Chat API Handler', () => {
       expect(data.timestamp).toBeDefined();
       // New sessions should issue a signed cookie.
       expect(response.headers.get('Set-Cookie') || '').toContain('sid=');
+    });
+
+    /**
+     * 安全設定は2度変更している（MEDIUM → ONLY_HIGH → NONE）。
+     * 自傷・希死念慮の相談は DANGEROUS_CONTENT に正面から当たるため、
+     * ここが締まると聖者が応答できなくなる（このアプリの目的そのものを潰す）。
+     * 意図しない巻き戻しを検出できるよう、渡している値を固定する。
+     */
+    it('安全設定は DANGEROUS_CONTENT のみ緩め、他3カテゴリは据え置く', async () => {
+      mockGenerateContent.mockResolvedValue({ response: { text: () => 'こんにちは。' } });
+
+      await chatHandler.default(
+        new Request('http://localhost/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: 'こんにちは', language: 'ja', conversationHistory: [] }),
+        })
+      );
+
+      const config = mockGetGenerativeModel.mock.calls[0][0] as unknown as {
+        safetySettings: Array<{ category: string; threshold: string }>;
+      };
+      const thresholds = Object.fromEntries(
+        config.safetySettings.map((s) => [s.category, s.threshold])
+      );
+
+      expect(thresholds).toEqual({
+        HARM_CATEGORY_DANGEROUS_CONTENT: 'BLOCK_NONE',
+        HARM_CATEGORY_HARASSMENT: 'BLOCK_MEDIUM_AND_ABOVE',
+        HARM_CATEGORY_HATE_SPEECH: 'BLOCK_MEDIUM_AND_ABOVE',
+        HARM_CATEGORY_SEXUALLY_EXPLICIT: 'BLOCK_MEDIUM_AND_ABOVE',
+      });
     });
 
     /** 非ストリーミング経路でも安全ブロックを汎用エラーに潰さない。 */

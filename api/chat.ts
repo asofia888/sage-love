@@ -6,7 +6,7 @@ import { geminiCircuitBreaker } from '../server/circuit-breaker';
 import { API_CONFIG, validateEnv, isOriginAllowed } from '../server/config';
 import { getOrCreateSession, attachSessionCookie, SessionResult } from '../server/session';
 import { buildSystemInstruction, resolveLanguage } from '../server/system-instruction';
-import { getSafetyFallbackMessage, isSafetyBlocked } from '../server/safety-fallback';
+import { getSafetyFallbackMessage, isSafetyBlocked, describeSafetyBlock } from '../server/safety-fallback';
 
 export const config = {
   runtime: 'edge',
@@ -207,12 +207,19 @@ export default async function handler(req: Request) {
       { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
       { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
       { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-      // 自傷・希死念慮の相談はこのカテゴリに触れやすい。MEDIUM で止めると、
-      // 悩みを打ち明けた瞬間に応答がブロックされ、利用者には汎用エラーしか
-      // 残らない（このアプリの目的そのものを潰す）。安全側の制御は
-      // システムプロンプトと危機ディレクティブ、および画面の危機介入モーダルで
-      // 行っているので、ここは HIGH のみに緩める。
-      { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+      // 自傷・希死念慮の相談はこのカテゴリに正面から当たる。当初 MEDIUM から
+      // BLOCK_ONLY_HIGH に緩めたが、本番で「死にたい」を送ったところ依然として
+      // ブロックされ、聖者本人は応答できずフォールバック文言だけが返った
+      // （2026-09-23 実機確認）。このアプリの目的そのものを潰すため BLOCK_NONE とする。
+      //
+      // 安全側の歯止めはモデル任せにせず、以下の3層で担保する:
+      //   1. システムプロンプト + 危機ディレクティブ（受診勧奨・決めつけない・
+      //      助言を急がず まず聴く）
+      //   2. 画面の危機介入モーダル（相談窓口を必ず1件以上表示する不変条件つき）
+      //   3. 空応答時のフォールバック（万一止められても沈黙しない）
+      //
+      // 他の3カテゴリは BLOCK_MEDIUM_AND_ABOVE のまま。緩めるのはここだけ。
+      { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
     ];
 
     const systemInstruction = buildSystemInstruction(language, message, conversationHistory);
@@ -303,7 +310,10 @@ async function handleJsonResponse(ctx: ResponseContext): Promise<Response> {
 
   if (!text || text.trim().length === 0) {
     if (isSafetyBlocked(response)) {
-      console.warn('Response blocked by safety filter; returning fallback message.');
+      console.warn(
+        'Response blocked by safety filter; returning fallback message.',
+        JSON.stringify(describeSafetyBlock(response))
+      );
       text = getSafetyFallbackMessage(lang);
     } else {
       throw new ValidationError('AI service returned empty response');
@@ -363,8 +373,13 @@ function handleStreamingResponse(ctx: ResponseContext): Response {
 
         let fullText = '';
         let safetyBlocked = false;
+        // ブロック時の診断ログに使う（チャンク側/集約側のどちらでも拾えるように）
+        let blockSource: unknown = null;
         for await (const chunk of streamResult.stream) {
-          if (isSafetyBlocked(chunk)) safetyBlocked = true;
+          if (isSafetyBlocked(chunk)) {
+            safetyBlocked = true;
+            blockSource ??= chunk;
+          }
 
           let chunkText = '';
           try {
@@ -384,7 +399,11 @@ function handleStreamingResponse(ctx: ResponseContext): Response {
         // ブロック理由がチャンク側に現れず、集約レスポンスにだけ載ることがある
         if (!safetyBlocked) {
           try {
-            safetyBlocked = isSafetyBlocked(await streamResult.response);
+            const aggregated = await streamResult.response;
+            if (isSafetyBlocked(aggregated)) {
+              safetyBlocked = true;
+              blockSource = aggregated;
+            }
           } catch (err) {
             console.warn('Aggregated stream response unavailable:', err);
           }
@@ -394,7 +413,10 @@ function handleStreamingResponse(ctx: ResponseContext): Response {
         // 文言を通常のチャンクとして流す。途中で切られた場合も continuation
         // として末尾に足し、半端な文のまま終わらせない。
         if (safetyBlocked) {
-          console.warn('Stream blocked by safety filter; emitting fallback message.');
+          console.warn(
+            'Stream blocked by safety filter; emitting fallback message.',
+            JSON.stringify(describeSafetyBlock(blockSource))
+          );
           const fallback = getSafetyFallbackMessage(lang);
           enqueue({ type: 'chunk', text: fullText.trim() ? `\n\n${fallback}` : fallback });
           fullText += fallback;

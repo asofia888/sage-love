@@ -24,6 +24,7 @@ vi.mock('@google/generative-ai', () => ({
   HarmBlockThreshold: {
     BLOCK_MEDIUM_AND_ABOVE: 'BLOCK_MEDIUM_AND_ABOVE',
     BLOCK_ONLY_HIGH: 'BLOCK_ONLY_HIGH',
+    BLOCK_NONE: 'BLOCK_NONE',
   },
 }));
 

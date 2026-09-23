@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { getSafetyFallbackMessage, isSafetyBlocked } from '../../../server/safety-fallback';
+import {
+  getSafetyFallbackMessage,
+  isSafetyBlocked,
+  describeSafetyBlock,
+} from '../../../server/safety-fallback';
 
 const SUPPORTED_LANGUAGES = ['ja', 'en', 'es', 'pt', 'fr', 'hi', 'ar'] as const;
 
@@ -58,5 +62,70 @@ describe('getSafetyFallbackMessage', () => {
   it('窓口につなぐ案内を含む', () => {
     expect(getSafetyFallbackMessage('ja')).toContain('相談窓口');
     expect(getSafetyFallbackMessage('en')).toMatch(/helpline/i);
+  });
+});
+
+/**
+ * 「ブロックされた」ことだけ分かっても閾値の調整ができない。
+ * 止まったのがプロンプト側か応答側か、どのカテゴリが効いたのかをログに残す。
+ */
+describe('describeSafetyBlock', () => {
+  it('プロンプト側のブロック理由と評価を抜き出す', () => {
+    const d = describeSafetyBlock({
+      promptFeedback: {
+        blockReason: 'SAFETY',
+        safetyRatings: [
+          { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', probability: 'HIGH', blocked: true },
+        ],
+      },
+    });
+
+    expect(d.promptBlockReason).toBe('SAFETY');
+    expect(d.promptSafetyRatings).toEqual([
+      { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', probability: 'HIGH', blocked: true },
+    ]);
+  });
+
+  it('応答側の finishReason と評価を抜き出す', () => {
+    const d = describeSafetyBlock({
+      candidates: [
+        {
+          finishReason: 'SAFETY',
+          safetyRatings: [
+            { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', probability: 'MEDIUM' },
+          ],
+        },
+      ],
+    });
+
+    expect(d.finishReasons).toEqual(['SAFETY']);
+    expect(d.candidateSafetyRatings).toEqual([
+      [{ category: 'HARM_CATEGORY_DANGEROUS_CONTENT', probability: 'MEDIUM' }],
+    ]);
+  });
+
+  /** 相談内容がログに流れると、それ自体が事故になる */
+  it('利用者の本文は一切含めない', () => {
+    const secret = '死にたいと毎晩思っている';
+    const d = describeSafetyBlock({
+      text: secret,
+      candidates: [{ finishReason: 'SAFETY', content: { parts: [{ text: secret }] } }],
+    });
+
+    expect(JSON.stringify(d)).not.toContain(secret);
+  });
+
+  it('形の違う値を渡してもクラッシュしない', () => {
+    expect(() => describeSafetyBlock(undefined)).not.toThrow();
+    expect(describeSafetyBlock(undefined)).toEqual({ detail: 'unavailable' });
+    expect(describeSafetyBlock(null)).toEqual({ detail: 'unavailable' });
+    expect(describeSafetyBlock('blocked')).toEqual({ detail: 'unavailable' });
+    expect(() => describeSafetyBlock({ candidates: [null] })).not.toThrow();
+    expect(() => describeSafetyBlock({ promptFeedback: {} })).not.toThrow();
+  });
+
+  it('JSON.stringify できる（そのままログに出せる）', () => {
+    const d = describeSafetyBlock({ candidates: [{ finishReason: 'SAFETY' }] });
+    expect(() => JSON.stringify(d)).not.toThrow();
   });
 });

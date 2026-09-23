@@ -80,6 +80,50 @@ export function getSafetyFallbackMessage(language: string): string {
   return SAFETY_FALLBACK_MESSAGES[language] ?? SAFETY_FALLBACK_MESSAGES[FALLBACK_LANG];
 }
 
+interface RawSafetyRating {
+  category?: string;
+  probability?: string;
+  blocked?: boolean;
+}
+
+interface RawSafetyResponse {
+  promptFeedback?: { blockReason?: string; safetyRatings?: RawSafetyRating[] };
+  candidates?: Array<{ finishReason?: string; safetyRatings?: RawSafetyRating[] }>;
+}
+
+/**
+ * ブロックの判定メタデータだけを取り出す（ログ用）。
+ *
+ * Why: 「ブロックされた」ことだけ分かっても、止まったのがプロンプト側か
+ * 応答側か、どのカテゴリが効いたのかが判らないと閾値の調整ができない。
+ * 緩めているのは DANGEROUS_CONTENT だけで、他の3カテゴリは
+ * BLOCK_MEDIUM_AND_ABOVE のままなので、その切り分けにも要る。
+ *
+ * 利用者の本文は一切含めない。カテゴリ名・確率・ブロック理由のみ。
+ */
+export function describeSafetyBlock(response: unknown): Record<string, unknown> {
+  if (!response || typeof response !== 'object') return { detail: 'unavailable' };
+  const r = response as RawSafetyResponse;
+
+  const ratings = (list?: RawSafetyRating[]) =>
+    (list ?? [])
+      .filter((x) => !!x?.category)
+      .map((x) => ({
+        category: x.category,
+        probability: x.probability,
+        ...(x.blocked === undefined ? {} : { blocked: x.blocked }),
+      }));
+
+  return {
+    // プロンプト側で止められた場合はここに理由が入る
+    promptBlockReason: r.promptFeedback?.blockReason ?? null,
+    promptSafetyRatings: ratings(r.promptFeedback?.safetyRatings),
+    // 生成の途中で止められた場合は候補側に出る
+    finishReasons: (r.candidates ?? []).map((c) => c?.finishReason ?? null),
+    candidateSafetyRatings: (r.candidates ?? []).map((c) => ratings(c?.safetyRatings)),
+  };
+}
+
 /**
  * Gemini のレスポンスが安全フィルタで止められたかを判定する。
  *
