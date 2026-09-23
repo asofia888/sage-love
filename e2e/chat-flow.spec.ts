@@ -413,12 +413,17 @@ test.describe('First visit and consent E2E', () => {
 
     // 撤回が目的なので、トグル付きの詳細ビューが直接開く
     await expect(saveButton).toBeVisible();
-    // 現在の同意状態がトグルに反映されている（sr-only のため force 指定）
-    const toggle = page.getByRole('checkbox');
+
+    // 現在の同意状態がトグルに反映されている
+    const toggle = page.getByRole('checkbox', { name: '機能Cookie' });
     await expect(toggle).toBeChecked();
 
-    // 同意を撤回できる
-    await toggle.uncheck({ force: true });
+    // input 自体は sr-only（1x1 に clip され、見た目の div に覆われている）ため
+    // 直接クリックしても状態が変わらない（firefox/webkit で実際に落ちた）。
+    // 利用者と同じく、input を包むラベルを押す。
+    await page.locator('label:has(input[type="checkbox"])').click();
+    await expect(toggle).not.toBeChecked();
+
     await saveButton.click();
     await expect(saveButton).not.toBeVisible();
 
