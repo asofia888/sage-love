@@ -120,6 +120,9 @@ sage-love/
 │   ├── circuit-breaker.ts        # Circuit breaker pattern
 │   ├── retry-utils.ts            # Retry utilities
 │   ├── system-instruction.ts     # Server-side prompt builder
+│   ├── crisis-directives.ts      # Per-language crisis-response directives
+│   ├── safety-fallback.ts        # Fallback reply when Gemini blocks a response
+│   ├── config.ts                 # Model name + env validation
 │   └── admin/stats.ts            # Admin statistics endpoint (ADMIN_TOKEN)
 │
 ├── src/                          # Frontend (React + Vite)

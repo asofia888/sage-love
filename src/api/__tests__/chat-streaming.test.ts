@@ -23,6 +23,7 @@ vi.mock('@google/generative-ai', () => ({
   },
   HarmBlockThreshold: {
     BLOCK_MEDIUM_AND_ABOVE: 'BLOCK_MEDIUM_AND_ABOVE',
+    BLOCK_ONLY_HIGH: 'BLOCK_ONLY_HIGH',
   },
 }));
 
@@ -129,6 +130,102 @@ describe('Chat API streaming (SSE)', () => {
     expect(events[0].code).toBeDefined();
     expect(events[0].details).toBeDefined();
     errorSpy.mockRestore();
+  });
+
+  /**
+   * 自傷・希死念慮の相談は Gemini の安全フィルタに触れやすい。
+   * ここを汎用エラーに潰すと、最も助けが要る瞬間に聖者が沈黙する。
+   */
+  describe('安全フィルタでブロックされた場合', () => {
+    it('本文が空でも汎用エラーではなくフォールバック文言を流す', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      mockGenerateContentStream.mockResolvedValue({
+        stream: (async function* () {
+          yield { text: () => '', candidates: [{ finishReason: 'SAFETY' }] };
+        })(),
+      });
+
+      const response = await chatHandler.default(streamRequest('死にたい'));
+      const events = await readSseEvents(response);
+
+      expect(events.map(e => e.type)).toEqual(['chunk', 'done']);
+      expect(String(events[0].text)).toContain('相談窓口');
+      expect(events.some(e => e.type === 'error')).toBe(false);
+      warnSpy.mockRestore();
+    });
+
+    it('プロンプト側でブロックされた場合も集約レスポンスから拾う', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      mockGenerateContentStream.mockResolvedValue({
+        stream: chunksOf(),
+        response: Promise.resolve({ promptFeedback: { blockReason: 'SAFETY' } }),
+      });
+
+      const response = await chatHandler.default(streamRequest('死にたい'));
+      const events = await readSseEvents(response);
+
+      expect(events.map(e => e.type)).toEqual(['chunk', 'done']);
+      expect(String(events[0].text)).toContain('相談窓口');
+      warnSpy.mockRestore();
+    });
+
+    it('途中で切られた場合は生成済みの本文を残したまま末尾に足す', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      mockGenerateContentStream.mockResolvedValue({
+        stream: (async function* () {
+          yield { text: () => 'その痛みは' };
+          yield { text: () => '', candidates: [{ finishReason: 'SAFETY' }] };
+        })(),
+      });
+
+      const response = await chatHandler.default(streamRequest('死にたい'));
+      const events = await readSseEvents(response);
+
+      expect(events.map(e => e.type)).toEqual(['chunk', 'chunk', 'done']);
+      expect(events[0].text).toBe('その痛みは');
+      expect(String(events[1].text)).toContain('相談窓口');
+      warnSpy.mockRestore();
+    });
+
+    it('利用者の言語でフォールバックを返す', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      mockGenerateContentStream.mockResolvedValue({
+        stream: (async function* () {
+          yield { text: () => '', candidates: [{ finishReason: 'SAFETY' }] };
+        })(),
+      });
+
+      const request = new Request('http://localhost/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: 'I want to die',
+          language: 'en',
+          conversationHistory: [],
+          stream: true,
+        }),
+      });
+
+      const events = await readSseEvents(await chatHandler.default(request));
+      expect(String(events[0].text)).toMatch(/helpline/i);
+      warnSpy.mockRestore();
+    });
+
+    /**
+     * ブロックでない本当の空応答まで握り潰すと、上流の不調に気づけなくなる。
+     */
+    it('ブロック以外の空応答は従来どおりエラーにする', async () => {
+      mockGenerateContentStream.mockResolvedValue({
+        stream: (async function* () {
+          yield { text: () => '', candidates: [{ finishReason: 'STOP' }] };
+        })(),
+      });
+
+      const events = await readSseEvents(await chatHandler.default(streamRequest()));
+      expect(events).toHaveLength(1);
+      expect(events[0].type).toBe('error');
+      expect(events[0].code).toBe('errorGeneric');
+    });
   });
 
   it('rejects oversized history entries before opening a stream', async () => {

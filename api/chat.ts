@@ -5,7 +5,8 @@ import { retryWithBackoff, withTimeout, RetryStatsTracker } from './retry-utils'
 import { geminiCircuitBreaker } from './circuit-breaker';
 import { API_CONFIG, validateEnv, isOriginAllowed } from './config';
 import { getOrCreateSession, attachSessionCookie, SessionResult } from './session';
-import { buildSystemInstruction } from './system-instruction';
+import { buildSystemInstruction, resolveLanguage } from './system-instruction';
+import { getSafetyFallbackMessage, isSafetyBlocked } from './safety-fallback';
 
 export const config = {
   runtime: 'edge',
@@ -206,10 +207,17 @@ export default async function handler(req: Request) {
       { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
       { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
       { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-      { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+      // 自傷・希死念慮の相談はこのカテゴリに触れやすい。MEDIUM で止めると、
+      // 悩みを打ち明けた瞬間に応答がブロックされ、利用者には汎用エラーしか
+      // 残らない（このアプリの目的そのものを潰す）。安全側の制御は
+      // システムプロンプトと危機ディレクティブ、および画面の危機介入モーダルで
+      // 行っているので、ここは HIGH のみに緩める。
+      { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
     ];
 
     const systemInstruction = buildSystemInstruction(language, message, conversationHistory);
+    // 安全フィルタで止められたときのフォールバック文言を利用者の言語で返すため
+    const lang = resolveLanguage(language);
 
     const model = genAI.getGenerativeModel({
       model: API_CONFIG.MODEL_NAME,
@@ -224,6 +232,7 @@ export default async function handler(req: Request) {
       return handleStreamingResponse({
         model,
         prompt,
+        lang,
         session,
         sessionId,
         rateLimitResult,
@@ -233,6 +242,7 @@ export default async function handler(req: Request) {
     return await handleJsonResponse({
       model,
       prompt,
+      lang,
       session,
       sessionId,
       rateLimitResult,
@@ -247,6 +257,8 @@ export default async function handler(req: Request) {
 interface ResponseContext {
   model: ReturnType<GoogleGenerativeAI['getGenerativeModel']>;
   prompt: string;
+  /** 正規化済みの利用者言語。安全フィルタのフォールバック文言に使う。 */
+  lang: string;
   session: SessionResult;
   sessionId: string;
   rateLimitResult: RateLimitResult;
@@ -257,7 +269,7 @@ interface ResponseContext {
  * a single response, matching the pre-streaming contract.
  */
 async function handleJsonResponse(ctx: ResponseContext): Promise<Response> {
-  const { model, prompt, session, sessionId, rateLimitResult } = ctx;
+  const { model, prompt, lang, session, sessionId, rateLimitResult } = ctx;
 
   let retryAttempts = 0;
   const result = await geminiCircuitBreaker.execute<GenerateContentResult>(async () => {
@@ -279,9 +291,23 @@ async function handleJsonResponse(ctx: ResponseContext): Promise<Response> {
   });
 
   const response = await result.response;
-  const text = response.text();
+
+  // 安全フィルタで止められると text() が空になるか例外を投げる。
+  // その場合は汎用エラーではなく、受け止めを伝える文言を通常の応答として返す。
+  let text = '';
+  try {
+    text = response.text();
+  } catch (err) {
+    console.warn('response.text() failed (likely safety-blocked):', err);
+  }
+
   if (!text || text.trim().length === 0) {
-    throw new ValidationError('AI service returned empty response');
+    if (isSafetyBlocked(response)) {
+      console.warn('Response blocked by safety filter; returning fallback message.');
+      text = getSafetyFallbackMessage(lang);
+    } else {
+      throw new ValidationError('AI service returned empty response');
+    }
   }
 
   retryStats.recordAttempt(retryAttempts, true);
@@ -317,7 +343,7 @@ async function handleJsonResponse(ctx: ResponseContext): Promise<Response> {
  * so upstream outages trip the breaker just like the JSON path.
  */
 function handleStreamingResponse(ctx: ResponseContext): Response {
-  const { model, prompt, session, sessionId, rateLimitResult } = ctx;
+  const { model, prompt, lang, session, sessionId, rateLimitResult } = ctx;
   const encoder = new TextEncoder();
 
   const body = new ReadableStream<Uint8Array>({
@@ -336,7 +362,10 @@ function handleStreamingResponse(ctx: ResponseContext): Response {
         );
 
         let fullText = '';
+        let safetyBlocked = false;
         for await (const chunk of streamResult.stream) {
+          if (isSafetyBlocked(chunk)) safetyBlocked = true;
+
           let chunkText = '';
           try {
             chunkText = chunk.text();
@@ -350,6 +379,25 @@ function handleStreamingResponse(ctx: ResponseContext): Response {
             fullText += chunkText;
             enqueue({ type: 'chunk', text: chunkText });
           }
+        }
+
+        // ブロック理由がチャンク側に現れず、集約レスポンスにだけ載ることがある
+        if (!safetyBlocked) {
+          try {
+            safetyBlocked = isSafetyBlocked(await streamResult.response);
+          } catch (err) {
+            console.warn('Aggregated stream response unavailable:', err);
+          }
+        }
+
+        // 安全フィルタで止められた場合は汎用エラーに潰さず、受け止めを伝える
+        // 文言を通常のチャンクとして流す。途中で切られた場合も continuation
+        // として末尾に足し、半端な文のまま終わらせない。
+        if (safetyBlocked) {
+          console.warn('Stream blocked by safety filter; emitting fallback message.');
+          const fallback = getSafetyFallbackMessage(lang);
+          enqueue({ type: 'chunk', text: fullText.trim() ? `\n\n${fallback}` : fallback });
+          fullText += fallback;
         }
 
         if (!fullText.trim()) {

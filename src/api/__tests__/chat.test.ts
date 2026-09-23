@@ -22,6 +22,7 @@ vi.mock('@google/generative-ai', () => ({
   },
   HarmBlockThreshold: {
     BLOCK_MEDIUM_AND_ABOVE: 'BLOCK_MEDIUM_AND_ABOVE',
+    BLOCK_ONLY_HIGH: 'BLOCK_ONLY_HIGH',
   }
 }));
 
@@ -69,6 +70,54 @@ describe('Chat API Handler', () => {
       expect(data.timestamp).toBeDefined();
       // New sessions should issue a signed cookie.
       expect(response.headers.get('Set-Cookie') || '').toContain('sid=');
+    });
+
+    /** 非ストリーミング経路でも安全ブロックを汎用エラーに潰さない。 */
+    describe('安全フィルタでブロックされた場合', () => {
+      function crisisRequest(language = 'ja', message = '死にたい') {
+        return new Request('http://localhost/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message, language, conversationHistory: [] }),
+        });
+      }
+
+      it('text() が空でもフォールバック文言を 200 で返す', async () => {
+        vi.spyOn(console, 'warn').mockImplementation(() => {});
+        mockGenerateContent.mockResolvedValue({
+          response: { text: () => '', candidates: [{ finishReason: 'SAFETY' }] },
+        });
+
+        const response = await chatHandler.default(crisisRequest());
+        expect(response.status).toBe(200);
+        const data = await response.json();
+        expect(data.message).toContain('相談窓口');
+      });
+
+      it('text() が例外を投げてもフォールバック文言を返す', async () => {
+        vi.spyOn(console, 'warn').mockImplementation(() => {});
+        mockGenerateContent.mockResolvedValue({
+          response: {
+            text: () => { throw new Error('blocked'); },
+            promptFeedback: { blockReason: 'SAFETY' },
+          },
+        });
+
+        const response = await chatHandler.default(crisisRequest());
+        expect(response.status).toBe(200);
+        const data = await response.json();
+        expect(data.message).toContain('相談窓口');
+      });
+
+      it('ブロック以外の空応答は従来どおりエラーにする', async () => {
+        vi.spyOn(console, 'error').mockImplementation(() => {});
+        mockGenerateContent.mockResolvedValue({
+          response: { text: () => '', candidates: [{ finishReason: 'STOP' }] },
+        });
+
+        const response = await chatHandler.default(crisisRequest());
+        expect(response.status).toBeGreaterThanOrEqual(400);
+      });
     });
 
     it('should reject non-POST requests', async () => {
