@@ -12,6 +12,7 @@
 import { CrisisDetectionService } from '../src/services/crisisDetectionService';
 import { DuplicateAvoidanceService } from '../src/services/duplicateAvoidanceService';
 import { buildCrisisDirective } from './crisis-directives';
+import { buildSafetyGuardrails } from './safety-guardrails';
 import { SYSTEM_INSTRUCTIONS as INSTRUCTIONS } from './prompts';
 
 // Matches the client's i18next fallbackLng (src/lib/i18n.ts).
@@ -84,6 +85,12 @@ export function buildSystemInstruction(
   const lang = resolveLanguage(language);
   const history = sanitizeHistory(conversationHistory);
   let instruction = INSTRUCTIONS[lang];
+
+  // 安全のための指針は平時から常に添える。幻聴に近い体験、離人感、服薬、
+  // 取り返しのつかない決断、暴力の被害といった場面は危機検出（キーワード）では
+  // 拾えないので、モデル自身に持たせる（server/safety-guardrails.ts）。
+  // ペルソナの口調指示を上書きするため、ベースより後ろに置く。
+  instruction += `\n\n${buildSafetyGuardrails(lang)}`;
 
   // 危機が検出された場合は、利用者の言語で危機対応指示を追記する。
   // この指示はペルソナ側の口調制約（断定調・共感の禁止）を意図的に上書きする
