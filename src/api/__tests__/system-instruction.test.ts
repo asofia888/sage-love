@@ -167,3 +167,31 @@ describe('buildSystemInstruction', () => {
     ).not.toThrow();
   });
 });
+
+/**
+ * サーバー側の危機判定も、画面の言語ではなく入力そのものを見る。
+ * ここが画面の言語に縛られていると、英語表示で「死にたい」と打った人には
+ * 危機対応指示が付かず、聖者は平時の断定調のまま応じてしまう。
+ */
+describe('画面の言語と入力の言語が食い違う場合', () => {
+  it('英語表示で日本語の危機発言を受けても危機対応指示が付く', () => {
+    const instruction = buildSystemInstruction('en', '死にたい', []);
+    expect(instruction).toContain('HIGHEST PRIORITY');
+  });
+
+  it('日本語表示で英語の危機発言を受けても危機対応指示が付く', () => {
+    const instruction = buildSystemInstruction('ja', 'I want to kill myself', []);
+    expect(instruction).toContain('【最優先の指示 — 危機対応】');
+  });
+
+  it('未対応言語のブラウザ（英語にフォールバック）でも危機対応指示が付く', () => {
+    const instruction = buildSystemInstruction('de-DE', 'I want to kill myself', []);
+    expect(instruction).toContain('HIGHEST PRIORITY');
+  });
+
+  it('口語の危機発言（辞書の見出し語と表記が違う）でも付く', () => {
+    expect(buildSystemInstruction('ja', 'もうしにたい', [])).toContain(
+      '【最優先の指示 — 危機対応】'
+    );
+  });
+});

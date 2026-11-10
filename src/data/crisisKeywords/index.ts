@@ -75,4 +75,7 @@ export function getCrisisData(lang: string): CrisisLanguageData | undefined {
   return DATA[lang];
 }
 
+/** 辞書を持っている全言語。検出は画面の言語によらずこの全てを走査する。 */
+export const CRISIS_LANGUAGES: readonly string[] = Object.keys(DATA);
+
 export const DEFAULT_LANG = 'ja';
