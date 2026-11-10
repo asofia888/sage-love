@@ -278,11 +278,9 @@ const App: React.FC = () => {
             isOpen={isCrisisModalOpen}
             onClose={closeCrisisModal}
             crisisResult={lastCrisisResult}
+            // 利用者の国はモーダル側が端末のタイムゾーン等から推定する
+            // （src/lib/userCountry.ts）。表示言語の地域サブタグは居場所ではないので使わない。
             userLanguage={i18n.language}
-            // 地域サブタグが無いロケール（"ar" 等）で 'JP' を既定にすると、
-            // 日本にいない利用者を日本在住として扱い国内専用番号で絞り込んでしまう。
-            // 判らないときは undefined を渡し、言語一致だけで窓口を選ばせる。
-            userCountry={navigator.language.split('-')[1]?.toUpperCase()}
           />
         )}
       </React.Suspense>

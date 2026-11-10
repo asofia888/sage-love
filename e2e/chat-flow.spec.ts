@@ -431,3 +431,46 @@ test.describe('First visit and consent E2E', () => {
     expect(JSON.parse(stored ?? '{}').functional).toBe(false);
   });
 });
+
+/**
+ * 表示言語と入力の言語、表示言語と居場所は、どちらも一致しないことがある。
+ * ここでは「英語表示・英語ロケールのまま日本に居て、日本語で打つ人」を再現する。
+ *
+ * 以前はこの人に対して、(1) 英語の辞書しか見ないのでモーダルが出ず、
+ * (2) 出たとしてもロケールの地域（US）から米国専用の 988 を案内していた。
+ */
+test.describe('Crisis intervention E2E: 表示言語と居場所が食い違う利用者', () => {
+  test.use({ locale: 'en-US', timezoneId: 'Asia/Tokyo' });
+
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      if (localStorage.getItem('__e2eSeeded')) return;
+      localStorage.clear();
+      localStorage.setItem('__e2eSeeded', '1');
+      localStorage.setItem('i18nextLng', 'en');
+      localStorage.setItem(
+        'cookieConsent',
+        JSON.stringify({ necessary: true, functional: false })
+      );
+      localStorage.setItem('cookieConsentDate', new Date().toISOString());
+      localStorage.setItem('disclaimerAcknowledged', new Date().toISOString());
+    });
+    await installChatMock(page);
+    await page.goto('/');
+  });
+
+  test('英語表示で日本語の危機発言を送ると、日本から掛かる窓口が出る', async ({ page }) => {
+    await setChatMock(page, { kind: 'sse', text: 'I hear how much pain you are carrying.' });
+
+    const textarea = page.getByRole('textbox');
+    await textarea.fill('死にたい');
+    await textarea.press('Enter');
+
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible({ timeout: 10000 });
+
+    // 日本から掛かるフリーダイヤルが出て、米国専用の 988 は出ない
+    await expect(dialog.locator('a[href="tel:0120279338"]')).toBeVisible();
+    await expect(dialog.locator('a[href="tel:988"]')).toHaveCount(0);
+  });
+});

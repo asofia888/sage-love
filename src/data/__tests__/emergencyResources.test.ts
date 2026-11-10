@@ -164,10 +164,95 @@ describe('EmergencyResourceService', () => {
       }
     });
 
+    /**
+     * 電話窓口の phone はそのまま tel: リンクになる。「番号A または 番号B」のように
+     * 複数の番号や語を混ぜると、連結された掛からない番号に発信してしまう
+     * （ドイツの窓口が実際にそうなっていた）。
+     */
+    it('電話窓口の phone は1つの番号だけを持つ', () => {
+      for (const resource of allResources.filter(r => r.phone && r.type === 'hotline')) {
+        expect(resource.phone, `${resource.id} の phone に番号以外が混ざっている`).toMatch(
+          /^\+?\d[\d\s()-]*$/
+        );
+      }
+    });
+
+    /** SMS 専用の短縮番号に tel: で音声発信させない */
+    it('テキスト相談の窓口は sms の宛先と本文を宣言している', () => {
+      const textLines = allResources.filter(r => r.type === 'text' && r.phone);
+      expect(textLines.length).toBeGreaterThan(0);
+      for (const resource of textLines) {
+        expect(resource.sms, `${resource.id} に sms が無い`).toBeDefined();
+        expect(resource.sms!.number).toMatch(/^\d+$/);
+        expect(resource.phone).toContain(resource.sms!.number);
+        expect(resource.phone).toContain(resource.sms!.body);
+      }
+    });
+
     it('対応7言語すべてに、その言語で読める窓口が1件以上存在する', () => {
       for (const lang of SUPPORTED_LANGUAGES) {
         const matching = allResources.filter(r => r.language.includes(lang));
         expect(matching.length, `${lang} 向けの窓口が1件も無い`).toBeGreaterThan(0);
+      }
+    });
+  });
+
+  describe('連絡先リンク', () => {
+    const byId = (id: string) =>
+      EMERGENCY_RESOURCES.flatMap(region => region.resources).find(r => r.id === id)!;
+
+    it('電話窓口は tel: で、区切り文字を除いた番号になる', () => {
+      expect(EmergencyResourceService.getContactHref(byId('jp-yorisoi-hotline'))).toBe('tel:0120279338');
+      expect(EmergencyResourceService.getContactHref(byId('in-aasra'))).toBe('tel:+919820466726');
+      expect(EmergencyResourceService.getContactHref(byId('de-telefonseelsorge'))).toBe('tel:08001110111');
+    });
+
+    it('テキスト窓口は sms: で、本文があらかじめ入る', () => {
+      expect(EmergencyResourceService.getContactHref(byId('us-crisis-text-line'))).toBe(
+        'sms:741741?&body=HOME'
+      );
+      expect(EmergencyResourceService.getContactHref(byId('uk-shout'))).toBe('sms:85258?&body=SHOUT');
+    });
+
+    it('連絡先が Web だけの窓口はリンクを作らない', () => {
+      expect(EmergencyResourceService.getContactHref(byId('intl-findahelpline'))).toBeUndefined();
+    });
+  });
+
+  describe('国の表示と、国が判らない場合の案内', () => {
+    const byId = (id: string) =>
+      EMERGENCY_RESOURCES.flatMap(region => region.resources).find(r => r.id === id)!;
+
+    it('国別の窓口には国名が付き、国際ディレクトリには付かない', () => {
+      expect(EmergencyResourceService.getCountryLabel(byId('jp-yorisoi-hotline'))).toBe('日本');
+      expect(EmergencyResourceService.getCountryLabel(byId('us-988-lifeline'))).toBe('United States');
+      expect(EmergencyResourceService.getCountryLabel(byId('intl-findahelpline'))).toBeUndefined();
+    });
+
+    /**
+     * 国が判らないと、日本の 0120 と米国の 988 が同じ一覧に並びうる。
+     * どれも掛からない国の人のために、自分の国の窓口を探せる入口を必ず添える。
+     */
+    it.each(SUPPORTED_LANGUAGES)(
+      '%s: 国が判らないときは深刻度によらず国際ディレクトリを添える',
+      (lang) => {
+        for (const severity of SEVERITIES) {
+          const ids = EmergencyResourceService.getRecommendedResources(severity, lang, undefined).map(
+            r => r.id
+          );
+          expect(ids, `${lang}/${severity}`).toContain('intl-findahelpline');
+          expect(new Set(ids).size).toBe(ids.length);
+        }
+      }
+    );
+
+    /** 英語設定のまま日本に居る人: 米国の 988 ではなく、日本から掛かる窓口を出す */
+    it('日本に居る英語話者に、日本から掛からない番号を出さない', () => {
+      const resources = EmergencyResourceService.getRecommendedResources('critical', 'en-US', 'JP');
+      expect(resources.map(r => r.id)).toContain('jp-yorisoi-hotline');
+      expect(resources.map(r => r.id)).not.toContain('us-988-lifeline');
+      for (const resource of resources) {
+        if (resource.dialableFrom) expect(resource.dialableFrom).toContain('JP');
       }
     });
   });

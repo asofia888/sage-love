@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CrisisDetectionResult } from '../services/crisisDetectionService';
 import { EmergencyResource, EmergencyResourceService } from '../data/emergencyResources';
+import { detectUserCountry } from '../lib/userCountry';
 import Modal from './Modal';
 
 interface CrisisInterventionModalProps {
@@ -9,6 +10,10 @@ interface CrisisInterventionModalProps {
   onClose: () => void;
   crisisResult: CrisisDetectionResult;
   userLanguage: string;
+  /**
+   * 利用者の居る国（ISO 3166-1 alpha-2）。省略時は端末のタイムゾーン等から推定する。
+   * テストや将来の「国を選び直す」操作のために外から渡せるようにしてある。
+   */
   userCountry?: string;
 }
 
@@ -22,6 +27,10 @@ const CrisisInterventionModal: React.FC<CrisisInterventionModalProps> = ({
   const { t } = useTranslation();
   const [showAllResources, setShowAllResources] = useState(false);
 
+  // 国の推定はこのモーダルの中で行う。タイムゾーンの対応表はここでしか使わないので、
+  // 遅延読み込みされるこのチャンクに閉じ込めて初期バンドルを太らせない。
+  const country = useMemo(() => userCountry ?? detectUserCountry(), [userCountry]);
+
   // 入力（深刻度・言語・国）から導出できる値なので state ではなく useMemo で持つ。
   // getRecommendedResources は常に1件以上返す契約だが、万一空で返ってきても
   // 「窓口の見出しだけあって中身が無いモーダル」を出さないようここでも受け止める。
@@ -30,12 +39,12 @@ const CrisisInterventionModal: React.FC<CrisisInterventionModalProps> = ({
     const recommended = EmergencyResourceService.getRecommendedResources(
       crisisResult.severity,
       userLanguage,
-      userCountry
+      country
     );
     return recommended.length > 0
       ? recommended
       : EmergencyResourceService.getGlobalFallbackResources();
-  }, [isOpen, crisisResult, userLanguage, userCountry]);
+  }, [isOpen, crisisResult, userLanguage, country]);
 
   if (!isOpen) return null;
 
@@ -162,23 +171,34 @@ const CrisisInterventionModal: React.FC<CrisisInterventionModalProps> = ({
             </h3>
 
             <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2">
-              {resources.slice(0, showAllResources ? resources.length : 4).map((resource) => (
+              {resources.slice(0, showAllResources ? resources.length : 4).map((resource) => {
+                const countryLabel = EmergencyResourceService.getCountryLabel(resource);
+                const contactHref = EmergencyResourceService.getContactHref(resource);
+                return (
                 <div key={resource.id} className="bg-slate-700 rounded-lg p-4 border border-slate-600 hover:border-blue-500 transition-colors">
                   <div className="flex items-start space-x-3">
                     <div className="flex-shrink-0 p-2 bg-blue-600 rounded-lg">
                       {getResourceTypeIcon(resource.type)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-slate-200 mb-1">{resource.name}</h4>
+                      <h4 className="font-medium text-slate-200 mb-1">
+                        {resource.name}
+                        {/* どの国の窓口かを必ず示す。国内専用番号は他国から掛からない。 */}
+                        {countryLabel && (
+                          <span className="ms-2 align-middle px-2 py-0.5 bg-slate-600 text-slate-200 text-xs font-normal rounded-full">
+                            {countryLabel}
+                          </span>
+                        )}
+                      </h4>
                       <p className="text-sm text-slate-400 mb-2">{resource.description}</p>
                       
                       {/* 連絡先情報 */}
                       <div className="space-y-1">
-                        {resource.phone && (
+                        {resource.phone && contactHref && (
                           <div className="flex items-center text-sm">
-                            <span className="text-slate-400 w-12">{t('phone', '電話')}:</span>
+                            <span className="text-slate-400 w-12">{resource.sms ? 'SMS' : t('phone', '電話')}:</span>
                             <a 
-                              href={`tel:${resource.phone.replace(/[^\d+]/g, '')}`}
+                              href={contactHref}
                               className="text-blue-400 hover:text-blue-300 font-mono"
                             >
                               {resource.phone}
@@ -219,7 +239,8 @@ const CrisisInterventionModal: React.FC<CrisisInterventionModalProps> = ({
                     </div>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
 
             {resources.length > 4 && (

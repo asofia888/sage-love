@@ -10,7 +10,16 @@ export interface EmergencyResource {
   id: string;
   name: string;
   type: 'hotline' | 'chat' | 'text' | 'website' | 'app';
+  /**
+   * 表示する連絡先。電話窓口は「1つの番号だけ」を書くこと（tel: リンクになる）。
+   * 複数の番号や説明文を混ぜると、連結された掛からない番号に発信してしまう。
+   */
   phone?: string;
+  /**
+   * SMS で相談する窓口の宛先と本文。指定があるとリンクは tel: ではなく sms: になる。
+   * 「Text HOME to 741741」を tel: にすると、SMS 専用の短縮番号へ音声発信してしまう。
+   */
+  sms?: { number: string; body: string };
   website?: string;
   hours: string;
   language: string[];
@@ -118,6 +127,7 @@ export const EMERGENCY_RESOURCES: RegionalResources[] = [
         name: 'Crisis Text Line',
         type: 'text',
         phone: 'Text HOME to 741741',
+        sms: { number: '741741', body: 'HOME' },
         website: 'https://www.crisistextline.org/',
         hours: '24/7',
         language: ['en', 'es'],
@@ -165,6 +175,7 @@ export const EMERGENCY_RESOURCES: RegionalResources[] = [
         name: 'Shout',
         type: 'text',
         phone: 'Text SHOUT to 85258',
+        sms: { number: '85258', body: 'SHOUT' },
         website: 'https://giveusashout.org/',
         hours: '24/7',
         language: ['en'],
@@ -253,12 +264,12 @@ export const EMERGENCY_RESOURCES: RegionalResources[] = [
         id: 'de-telefonseelsorge',
         name: 'Telefonseelsorge',
         type: 'hotline',
-        phone: '0800 111 0 111 または 0800 111 0 222',
+        phone: '0800 111 0 111',
         website: 'https://www.telefonseelsorge.de/',
         hours: '24/7',
         language: ['de'],
         dialableFrom: ['DE'],
-        description: 'Kostenlose telefonische Beratung in Krisen.',
+        description: 'Kostenlose telefonische Beratung in Krisen. Auch unter 0800 111 0 222 erreichbar.',
         isAvailable24h: true,
         isFree: true
       }
@@ -528,10 +539,46 @@ function isReachableFrom(resource: EmergencyResource, countryCode?: string): boo
   return resource.dialableFrom.includes(countryCode.toUpperCase());
 }
 
+/** 窓口ID → その窓口が属する地域。カードに「どの国の窓口か」を出すために引く。 */
+const REGION_BY_RESOURCE_ID = new Map<string, RegionalResources>(
+  EMERGENCY_RESOURCES.flatMap((region) =>
+    region.resources.map((resource): [string, RegionalResources] => [resource.id, region])
+  )
+);
+
+const INTERNATIONAL_CODE = 'INTL';
+const INTERNATIONAL_DIRECTORY_ID = 'intl-findahelpline';
+
 /**
  * 緊急時リソース検索サービス
  */
 export class EmergencyResourceService {
+  /**
+   * その窓口がどの国のものか。国際ディレクトリ（国を問わない）は undefined。
+   *
+   * Why: 発信元の国が判らないと、日本の 0120 と米国の 988 が同じ一覧に並ぶ。
+   * 国名が書かれていなければ、利用者は自分に掛けられる番号を選べない。
+   */
+  static getCountryLabel(resource: EmergencyResource): string | undefined {
+    const region = REGION_BY_RESOURCE_ID.get(resource.id);
+    if (!region || region.countryCode === INTERNATIONAL_CODE) return undefined;
+    return region.country;
+  }
+
+  /**
+   * 連絡先をタップしたときのリンク。SMS 窓口は sms:、それ以外は tel:。
+   * 連絡先（phone）を持たない窓口は undefined。
+   */
+  static getContactHref(resource: EmergencyResource): string | undefined {
+    if (resource.sms) {
+      // `?&body=` は iOS と Android の双方で本文が入る書き方
+      // （`?body=` は iOS で、`&body=` は Android で本文が落ちる）。
+      return `sms:${resource.sms.number}?&body=${encodeURIComponent(resource.sms.body)}`;
+    }
+    if (!resource.phone) return undefined;
+    return `tel:${resource.phone.replace(/[^\d+]/g, '')}`;
+  }
+
   /**
    * どの言語・どの国から呼ばれても必ず案内できる国際リソース。
    * 「窓口が1件も出ない」状態を作らないための最後の砦である。
@@ -629,6 +676,15 @@ export class EmergencyResourceService {
     // 2段目: それでも空なら国際ディレクトリを出す（ここは必ず非空）
     if (picked.length === 0) {
       picked = this.getGlobalFallbackResources();
+    }
+
+    // 発信元の国が判らないときは、国別の番号が利用者の国から掛かる保証が無い。
+    // 自分の国の窓口を探せる国際ディレクトリを必ず添える。
+    if (!countryCode && !picked.some(r => r.id === INTERNATIONAL_DIRECTORY_ID)) {
+      const directory = this.getGlobalFallbackResources().find(
+        r => r.id === INTERNATIONAL_DIRECTORY_ID
+      );
+      if (directory) picked = [...picked, directory];
     }
     return picked;
   }
