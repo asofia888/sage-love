@@ -300,10 +300,13 @@ detection: {
 
 **Solutions:**
 
-1. Verify keywords for the language:
+1. Verify the phrase is in a dictionary. Dictionaries live in
+   `src/data/crisisKeywords/<lang>.json`. Detection scans every dictionary
+   regardless of the UI language, so check the dictionary of the language the
+   message was written in:
 ```typescript
-// src/services/crisisDetectionService.ts
-console.log(CRISIS_KEYWORDS[currentLanguage]);
+import { getCrisisData } from '../data/crisisKeywords';
+console.log(getCrisisData('ja')?.suicide.keywords);
 ```
 
 2. Check detection is enabled:

@@ -133,6 +133,7 @@ sage-love/
 │   ├── retry-utils.ts            # Retry utilities
 │   ├── system-instruction.ts     # Server-side prompt builder
 │   ├── crisis-directives.ts      # Per-language crisis-response directives
+│   ├── safety-guardrails.ts      # Always-on safety guidelines, per language
 │   ├── safety-fallback.ts        # Fallback reply when Gemini blocks a response
 │   ├── prompts/                  # Sage persona prompts, per language
 │   └── config.ts                 # Model name + env validation
@@ -441,6 +442,17 @@ const HelpModal = React.lazy(() => import('./HelpModal'));
 
 ### Crisis Detection
 
-- Multi-language keyword detection
+- Multi-language keyword detection. Every registered dictionary is scanned
+  regardless of the UI language, so a message typed in Japanese under an
+  English UI (or under an unsupported browser language) is still detected.
+  The UI language only breaks ties between dictionaries.
 - 4 severity levels
-- Automatic resource referral
+- Automatic resource referral. The user's country is inferred on-device from
+  the time zone (`src/lib/userCountry.ts`), falling back to the locale's
+  region; numbers that cannot be dialled from that country are filtered out.
+  When the country is unknown, an international directory is always added.
+- Always-on safety guidelines (`server/safety-guardrails.ts`) are appended to
+  every system prompt, covering situations keyword detection cannot catch:
+  voice-hearing and delusion-like experiences, depersonalisation, medication,
+  irreversible life decisions, dependency, and violence. The crisis directive
+  is layered after them when a crisis is detected.
